@@ -20,10 +20,24 @@ type Bot struct {
 	l *zap.Logger
 }
 
-func New(token string) (*Bot, error) {
+func New(token string, opts ...Option) (*Bot, error) {
 	b := &Bot{}
 
+	for _, o := range opts {
+		o(b)
+	}
+
+	if b.l == nil {
+		l, err := zap.NewProduction()
+		if err != nil {
+			return nil, fmt.Errorf("bot: creating logger: %w", err)
+		}
+
+		b.l = l
+	}
+
 	b.s = state.New("Bot " + token)
+	b.s.AddHandler(b.onReady)
 
 	b.r = cmdroute.NewRouter()
 	b.r.AddFunc("ping", b.cmdPing)

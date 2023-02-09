@@ -35,7 +35,7 @@ func main() {
 		logger.Fatal("$BOT2_TOKEN is blank")
 	}
 
-	b, err := bot.New(token)
+	b, err := bot.New(token, bot.WithLogger(logger))
 	if err != nil {
 		logger.Fatal("error creating bot", zap.Error(err))
 	}
