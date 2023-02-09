@@ -4,7 +4,9 @@ import (
 	"context"
 	"log"
 	"os"
+	"strings"
 
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/holedaemon/bot2/internal/bot"
 	"go.uber.org/zap"
 )
@@ -30,12 +32,26 @@ func main() {
 		}
 	}
 
+	rawAdmins := os.Getenv("BOT2_ADMINS")
+	admins := make(map[discord.UserID]struct{})
+	if rawAdmins != "" {
+		adminsSplit := strings.Split(rawAdmins, ",")
+		for _, a := range adminsSplit {
+			sf, err := discord.ParseSnowflake(a)
+			if err != nil {
+				logger.Fatal("error parsing admin ID into snowflake", zap.Error(err), zap.String("id", a))
+			}
+
+			admins[discord.UserID(sf)] = struct{}{}
+		}
+	}
+
 	token := os.Getenv("BOT2_TOKEN")
 	if token == "" {
 		logger.Fatal("$BOT2_TOKEN is blank")
 	}
 
-	b, err := bot.New(token, bot.WithLogger(logger))
+	b, err := bot.New(token, bot.WithLogger(logger), bot.WithAdminMap(admins))
 	if err != nil {
 		logger.Fatal("error creating bot", zap.Error(err))
 	}

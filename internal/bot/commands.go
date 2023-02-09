@@ -18,4 +18,11 @@ var commands = []Command{
 			Description: "The bot may have a little ping (as a treat)",
 		},
 	},
+	{
+		Scoped: testGuildID,
+		Data: api.CreateCommandData{
+			Name:        "is-admin",
+			Description: "Debugging command to see if one is an admin",
+		},
+	},
 }

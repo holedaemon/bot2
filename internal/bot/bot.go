@@ -14,12 +14,16 @@ import (
 
 const testGuildID = discord.GuildID(779875531712757800)
 
+// Bot is a Discord bot account.
 type Bot struct {
 	s *state.State
 	r *cmdroute.Router
 	l *zap.Logger
+
+	admins map[discord.UserID]struct{}
 }
 
+// New creates a new Bot.
 func New(token string, opts ...Option) (*Bot, error) {
 	b := &Bot{}
 
@@ -36,11 +40,16 @@ func New(token string, opts ...Option) (*Bot, error) {
 		b.l = l
 	}
 
+	if b.admins == nil {
+		b.admins = make(map[discord.UserID]struct{})
+	}
+
 	b.s = state.New("Bot " + token)
 	b.s.AddHandler(b.onReady)
 
 	b.r = cmdroute.NewRouter()
 	b.r.AddFunc("ping", b.cmdPing)
+	b.r.AddFunc("is-admin", b.cmdIsAdmin)
 
 	b.s.AddInteractionHandler(b.r)
 	b.s.AddIntents(gateway.IntentGuilds)
@@ -82,6 +91,16 @@ func New(token string, opts ...Option) (*Bot, error) {
 	return b, nil
 }
 
+// IsAdmin checks if the given UserID is a bot admin.
+func (b *Bot) IsAdmin(sf discord.UserID) bool {
+	if _, ok := b.admins[sf]; ok {
+		return true
+	}
+
+	return false
+}
+
+// Start opens a connection to Discord.
 func (b *Bot) Start(ctx context.Context) error {
 	return b.s.Connect(ctx)
 }
