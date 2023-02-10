@@ -35,4 +35,22 @@ var commands = []Command{
 			},
 		},
 	},
+	{
+		Scoped: testGuildID,
+		Data: api.CreateCommandData{
+			Name:        "jerkcity",
+			Description: "Various commands relating to Jerkcity",
+			Options: discord.CommandOptions{
+				discord.NewSubcommandOption(
+					"episode",
+					"Fetch an episode by its number.",
+					discord.NewIntegerOption("number", "Number of the episode", true),
+				),
+				discord.NewSubcommandOption(
+					"quote",
+					"Get a random episode with a cute little quote :)",
+				),
+			},
+		},
+	},
 }

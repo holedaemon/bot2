@@ -10,6 +10,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
+	"github.com/holedaemon/bot2/internal/api/jerkcity"
 	"go.uber.org/zap"
 )
 
@@ -20,6 +21,8 @@ type Bot struct {
 	s *state.State
 	r *cmdroute.Router
 	l *zap.Logger
+
+	jc *jerkcity.Client
 
 	admins map[discord.UserID]struct{}
 
@@ -47,6 +50,8 @@ func New(token string, opts ...Option) (*Bot, error) {
 		b.admins = make(map[discord.UserID]struct{})
 	}
 
+	b.jc = jerkcity.New()
+
 	b.s = state.New("Bot " + token)
 	b.s.AddHandler(b.onReady)
 
@@ -54,6 +59,11 @@ func New(token string, opts ...Option) (*Bot, error) {
 	b.r.AddFunc("ping", b.cmdPing)
 	b.r.AddFunc("is-admin", b.cmdIsAdmin)
 	b.r.AddFunc("game", b.cmdGame)
+
+	b.r.Sub("jerkcity", func(r *cmdroute.Router) {
+		r.AddFunc("episode", b.cmdJerkcityEpisode)
+		r.AddFunc("quote", b.cmdJerkcityRandom)
+	})
 
 	b.s.AddInteractionHandler(b.r)
 	b.s.AddIntents(gateway.IntentGuilds)
