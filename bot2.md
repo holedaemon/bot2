@@ -3,7 +3,7 @@
 * Existing
 *   * General
 *   *   - [ ] Jerkcity
-*   *   - [ ] Game
+*   *   - [x] Game
 *   *   - [ ] Pronouns
 *   * Hole
 *   *   - [ ] Fortnite summon
