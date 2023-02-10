@@ -2,10 +2,14 @@ package bot
 
 import (
 	"context"
+	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
+	"github.com/diamondburned/arikawa/v3/discord"
+	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"go.uber.org/zap"
 )
 
 func (b *Bot) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
@@ -23,5 +27,39 @@ func (b *Bot) cmdIsAdmin(ctx context.Context, data cmdroute.CommandData) *api.In
 
 	return &api.InteractionResponseData{
 		Content: option.NewNullableString("HA! BIIIIIIIIIIIIIIIIIIIIIIIIIITCH"),
+	}
+}
+
+func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	if b.lastGameChange.Add(time.Hour).After(time.Now()) && !b.IsAdmin(data.Event.SenderID()) {
+		return &api.InteractionResponseData{
+			Content: option.NewNullableString("The game can only be changed once an hour"),
+		}
+	}
+
+	newGame := data.Options.Find("new-game").String()
+	if newGame == "" {
+		return &api.InteractionResponseData{
+			Content: option.NewNullableString("Gimme something to work with here!!!"),
+		}
+	}
+
+	if err := b.s.Gateway().Send(ctx, &gateway.UpdatePresenceCommand{
+		Activities: []discord.Activity{{
+			Name: newGame,
+			Type: discord.GameActivity,
+		}},
+	}); err != nil {
+		b.l.Error("error changing presence", zap.Error(err))
+
+		return &api.InteractionResponseData{
+			Content: option.NewNullableString("That shit broked"),
+		}
+	}
+
+	b.lastGameChange = time.Now()
+
+	return &api.InteractionResponseData{
+		Content: option.NewNullableString("The game has been changed. 👉👌"),
 	}
 }

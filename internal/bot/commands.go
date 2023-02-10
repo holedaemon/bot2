@@ -25,4 +25,14 @@ var commands = []Command{
 			Description: "Debugging command to see if one is an admin",
 		},
 	},
+	{
+		Scoped: testGuildID,
+		Data: api.CreateCommandData{
+			Name:        "game",
+			Description: "Change the bot's game presence",
+			Options: discord.CommandOptions{
+				discord.NewStringOption("new-game", "The new game to change to", true),
+			},
+		},
+	},
 }

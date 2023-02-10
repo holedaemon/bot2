@@ -3,6 +3,7 @@ package bot
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
@@ -21,6 +22,8 @@ type Bot struct {
 	l *zap.Logger
 
 	admins map[discord.UserID]struct{}
+
+	lastGameChange time.Time
 }
 
 // New creates a new Bot.
@@ -50,6 +53,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 	b.r = cmdroute.NewRouter()
 	b.r.AddFunc("ping", b.cmdPing)
 	b.r.AddFunc("is-admin", b.cmdIsAdmin)
+	b.r.AddFunc("game", b.cmdGame)
 
 	b.s.AddInteractionHandler(b.r)
 	b.s.AddIntents(gateway.IntentGuilds)
