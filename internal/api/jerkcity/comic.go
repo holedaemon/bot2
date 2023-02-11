@@ -3,14 +3,21 @@ package jerkcity
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/holedaemon/bot2/internal/pkg/httpx"
 )
 
-var loc *time.Location
+var (
+	// ErrEmptyQuery is returned when a search query is empty.
+	ErrEmptyQuery = errors.New("jerkcity: empty search query")
+
+	loc *time.Location
+)
 
 func init() {
 	var err error
@@ -18,6 +25,27 @@ func init() {
 	if err != nil {
 		panic("jerkcity: error loading location " + err.Error())
 	}
+}
+
+// Search represents a request to the /search endpoint.
+type Search struct {
+	Episodes []*Episode     `json:"episodes"`
+	Search   *EpisodeSearch `json:"search"`
+}
+
+type EpisodeSearchSums struct {
+	Dates    int `json:"dates"`
+	Episodes int `json:"episodes"`
+	Tags     int `json:"tags"`
+	Titles   int `json:"titles"`
+	Words    int `json:"words"`
+}
+
+type EpisodeSearch struct {
+	Query   string             `json:"query"`
+	Runtime float64            `json:"runtime"`
+	Sums    *EpisodeSearchSums `json:"sums"`
+	Version int                `json:"version"`
 }
 
 // Episode is an episode of Jerkcity.
@@ -32,6 +60,9 @@ type Episode struct {
 
 	// Only present when calling /quote/random
 	Quote string `json:"quote,omitempty"`
+
+	// Only present when calling /search
+	Search *EpisodeSearch `json:"search"`
 }
 
 // Time returns an Episode's release, localized in Pacific Time.
@@ -124,4 +155,43 @@ func (c *Client) FetchQuote(ctx context.Context) (*Episode, error) {
 	}
 
 	return eb.Episodes[0], nil
+}
+
+func (c *Client) FetchSearch(ctx context.Context, query string) (*Search, error) {
+	if query == "" {
+		return nil, ErrEmptyQuery
+	}
+
+	u := url.Values{}
+	u.Add("q", query)
+
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodGet,
+		root+"/search",
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	req.URL.RawQuery = u.Encode()
+
+	res, err := c.cli.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+
+	if !httpx.IsOK(res.StatusCode) {
+		return nil, fmt.Errorf("%w: %d", httpx.ErrStatus, res.StatusCode)
+	}
+
+	var s *Search
+	if err := json.NewDecoder(res.Body).Decode(&s); err != nil {
+		return nil, err
+	}
+
+	return s, nil
 }

@@ -3,6 +3,9 @@ package bot
 import (
 	"context"
 	"fmt"
+	"net/url"
+	"strings"
+	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
@@ -72,4 +75,63 @@ func (b *Bot) cmdJerkcityRandom(ctx context.Context, data cmdroute.CommandData) 
 			embed,
 		},
 	}
+}
+
+func (b *Bot) cmdJerkcitySearch(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	so := data.Options.Find("query")
+	search := so.String()
+
+	results, err := b.jc.FetchSearch(ctx, search)
+	if err != nil {
+		b.l.Error("error searching jerkcity API", zap.Error(err))
+		return respondError("Something happened and I wasn't able to perform the search")
+	}
+
+	embed := discord.Embed{
+		Title: "Search Results",
+		Color: embedColor,
+		Footer: &discord.EmbedFooter{
+			Text: fmt.Sprintf("Took %s", time.Second*time.Duration(results.Search.Runtime)),
+		},
+	}
+
+	if len(results.Episodes) == 0 {
+		embed.Description = "No results..."
+	} else {
+		var sb strings.Builder
+
+		for i := 0; i < 10; i++ {
+			e := results.Episodes[i]
+			sb.WriteString(
+				fmt.Sprintf("[%d - %s](https://bonequest.com/%d)\n", e.Episode, e.Title, e.Episode),
+			)
+		}
+
+		more := len(results.Episodes[9:])
+		sb.WriteString(
+			fmt.Sprintf(
+				"[and %d more](https://bonequest.com/search/?q=%s)",
+				more,
+				url.QueryEscape(search),
+			),
+		)
+
+		embed.Description = sb.String()
+	}
+
+	if results.Search.Sums != nil {
+		embed.Fields = append(embed.Fields, discord.EmbedField{
+			Name: "Sums",
+			Value: fmt.Sprintf(
+				"Dates: %d\nEpisodes: %d\nTags: %d\nTitles: %d\nWords: %d",
+				results.Search.Sums.Dates,
+				results.Search.Sums.Episodes,
+				results.Search.Sums.Tags,
+				results.Search.Sums.Titles,
+				results.Search.Sums.Words,
+			),
+		})
+	}
+
+	return respondEmbeds(embed)
 }

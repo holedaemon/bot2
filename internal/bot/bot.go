@@ -63,6 +63,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 	b.r.Sub("jerkcity", func(r *cmdroute.Router) {
 		r.AddFunc("episode", b.cmdJerkcityEpisode)
 		r.AddFunc("quote", b.cmdJerkcityRandom)
+		r.AddFunc("search", b.cmdJerkcitySearch)
 	})
 
 	b.s.AddInteractionHandler(b.r)

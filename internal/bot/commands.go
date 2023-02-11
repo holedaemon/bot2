@@ -43,12 +43,17 @@ var commands = []Command{
 			Options: discord.CommandOptions{
 				discord.NewSubcommandOption(
 					"episode",
-					"Fetch an episode by its number.",
+					"Fetch an episode by its number",
 					discord.NewIntegerOption("number", "Number of the episode", true),
 				),
 				discord.NewSubcommandOption(
 					"quote",
 					"Get a random episode with a cute little quote :)",
+				),
+				discord.NewSubcommandOption(
+					"search",
+					"Search the Jerkcity API for a specific query",
+					discord.NewStringOption("query", "Your query", true),
 				),
 			},
 		},
