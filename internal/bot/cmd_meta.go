@@ -20,28 +20,20 @@ func (b *Bot) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.Inter
 
 func (b *Bot) cmdIsAdmin(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	if b.IsAdmin(data.Event.SenderID()) {
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("You are an admin"),
-		}
+		return respond("You are an admin")
 	}
 
-	return &api.InteractionResponseData{
-		Content: option.NewNullableString("HA! BIIIIIIIIIIIIIIIIIIIIIIIIIITCH"),
-	}
+	return respond("HA! BIIIIIIIIIIIIIIIIIIIIIIIIIITCH")
 }
 
 func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	if b.lastGameChange.Add(time.Hour).After(time.Now()) && !b.IsAdmin(data.Event.SenderID()) {
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("The game can only be changed once an hour"),
-		}
+		return respond("The game can only be changed once an hour")
 	}
 
 	newGame := data.Options.Find("new-game").String()
 	if newGame == "" {
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("Gimme something to work with here!!!"),
-		}
+		return respondError("You gotta gimme something to work with here!!!")
 	}
 
 	if err := b.s.Gateway().Send(ctx, &gateway.UpdatePresenceCommand{
@@ -52,14 +44,10 @@ func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.Inter
 	}); err != nil {
 		b.l.Error("error changing presence", zap.Error(err))
 
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("That shit broked"),
-		}
+		return respondError("That shit broked")
 	}
 
 	b.lastGameChange = time.Now()
 
-	return &api.InteractionResponseData{
-		Content: option.NewNullableString("The game has been changed. 👉👌"),
-	}
+	return respond("The game has been changed. 👉👌")
 }

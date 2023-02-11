@@ -43,25 +43,17 @@ func (b *Bot) cmdJerkcityEpisode(ctx context.Context, data cmdroute.CommandData)
 	episode, err := b.jc.FetchEpisode(ctx, int(number))
 	if err != nil {
 		b.l.Error("error fetching episode", zap.Error(err), zap.Int64("number", number))
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("Sorry, something went wrong and I couldn't get that episode."),
-		}
+		return respondError("Sorry, something went wrong and I couldn't get that episode")
 	}
 
-	return &api.InteractionResponseData{
-		Embeds: &[]discord.Embed{
-			makeEpisodeEmbed(episode),
-		},
-	}
+	return respondEmbeds(makeEpisodeEmbed(episode))
 }
 
 func (b *Bot) cmdJerkcityRandom(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	episode, err := b.jc.FetchQuote(ctx)
 	if err != nil {
 		b.l.Error("error fetching episode", zap.Error(err))
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("Sorry, something went wrong and I wasn't able to get an episode."),
-		}
+		return respondError("Sorry, something went wrong and I wasn't able to get an episode")
 	}
 
 	embed := makeEpisodeEmbed(episode)
@@ -70,11 +62,7 @@ func (b *Bot) cmdJerkcityRandom(ctx context.Context, data cmdroute.CommandData) 
 		Value: episode.Quote,
 	})
 
-	return &api.InteractionResponseData{
-		Embeds: &[]discord.Embed{
-			embed,
-		},
-	}
+	return respondEmbeds(embed)
 }
 
 func (b *Bot) cmdJerkcitySearch(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
