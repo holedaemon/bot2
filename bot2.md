@@ -2,7 +2,7 @@
 
 * Existing
 *   * General
-*   *   - [ ] Jerkcity
+*   *   - [x] Jerkcity
 *   *   - [x] Game
 *   *   - [ ] Pronouns
 *   * Hole
@@ -17,6 +17,7 @@
 *   *   - [ ] Weather
 *   *   - [ ] A better list than this one
 *   *   - [ ] Tags (decently)
+*   *   - [ ] Blackout Poetry (Jif)
 
 ### egoraptor
 ```json
@@ -25,3 +26,4 @@
     "count": 999,
     "lastUser": "snowflake"
 }
+```
