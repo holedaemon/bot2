@@ -76,6 +76,46 @@ func (e *Episode) Time() time.Time {
 	)
 }
 
+type metaResponse struct {
+	Meta *Meta `json:"meta"`
+}
+
+type Meta struct {
+	High int `json:"high"`
+}
+
+func (c *Client) FetchMeta(ctx context.Context) (int, error) {
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodGet,
+		root,
+		nil,
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	req.Header.Set("User-Agent", httpx.UserAgent)
+
+	res, err := c.cli.Do(req)
+	if err != nil {
+		return 0, err
+	}
+
+	defer res.Body.Close()
+
+	if !httpx.IsOK(res.StatusCode) {
+		return 0, fmt.Errorf("%w: %d", httpx.ErrStatus, res.StatusCode)
+	}
+
+	var m *metaResponse
+	if err := json.NewDecoder(res.Body).Decode(&m); err != nil {
+		return 0, err
+	}
+
+	return m.Meta.High, nil
+}
+
 type episodeResponse struct {
 	Episodes []*Episode `json:"episodes"`
 }

@@ -49,6 +49,22 @@ func (b *Bot) cmdJerkcityEpisode(ctx context.Context, data cmdroute.CommandData)
 	return respondEmbeds(makeEpisodeEmbed(episode))
 }
 
+func (b *Bot) cmdJerkcityLatest(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	high, err := b.jc.FetchMeta(ctx)
+	if err != nil {
+		b.l.Error("error fetching meta payload", zap.Error(err))
+		return respondError("Couldn't get the latest episode number. Sorry?")
+	}
+
+	episode, err := b.jc.FetchEpisode(ctx, high)
+	if err != nil {
+		b.l.Error("error fetching latest episode", zap.Error(err))
+		return respondError("Couldn't get the latest episode. Sorry I guess")
+	}
+
+	return respondEmbeds(makeEpisodeEmbed(episode))
+}
+
 func (b *Bot) cmdJerkcityRandom(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	episode, err := b.jc.FetchQuote(ctx)
 	if err != nil {

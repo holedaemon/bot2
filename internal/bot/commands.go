@@ -42,6 +42,10 @@ var commands = []Command{
 			Description: "Various commands relating to Jerkcity",
 			Options: discord.CommandOptions{
 				discord.NewSubcommandOption(
+					"latest",
+					"Fetch the latest episode",
+				),
+				discord.NewSubcommandOption(
 					"episode",
 					"Fetch an episode by its number",
 					discord.NewIntegerOption("number", "Number of the episode", true),
