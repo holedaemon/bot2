@@ -10,7 +10,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
 	"github.com/diamondburned/arikawa/v3/discord"
-	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
 	"go.uber.org/zap"
 )
@@ -35,9 +34,7 @@ func (b *Bot) cmdJerkcityEpisode(ctx context.Context, data cmdroute.CommandData)
 	number, err := opt.IntValue()
 	if err != nil {
 		b.l.Error("error reading value as int", zap.Error(err))
-		return &api.InteractionResponseData{
-			Content: option.NewNullableString("Something about the episode number you gave is wrong. Fix it."),
-		}
+		return respondError("Something about the episode number you gave is wrong. Fix it.")
 	}
 
 	episode, err := b.jc.FetchEpisode(ctx, int(number))
