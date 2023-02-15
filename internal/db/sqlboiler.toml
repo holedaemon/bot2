@@ -1,0 +1,15 @@
+add-global-variants = false
+add-panic-variants = false
+no-context = false
+no-hooks = true
+no-tests = true
+no-rows-affected = true
+wipe = true
+
+[psql]
+dbname = "b"
+host = "172.17.0.2"
+user = "b"
+pass = "b"
+sslmode = "disable"
+blacklist = ["schema_migrations"]
