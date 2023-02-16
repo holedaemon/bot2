@@ -54,6 +54,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 
 	b.s = state.New("Bot " + token)
 	b.s.AddHandler(b.onReady)
+	b.s.AddHandler(b.onGuildRoleUpdate)
 
 	r := b.router()
 	b.s.AddInteractionHandler(r)

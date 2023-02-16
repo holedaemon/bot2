@@ -37,6 +37,7 @@ func (b *Bot) router() *cmdroute.Router {
 
 	r.Sub("role", func(r *cmdroute.Router) {
 		r.AddFunc("create", b.cmdRoleCreate)
+		r.AddFunc("add", b.cmdRoleAdd)
 	})
 
 	return r

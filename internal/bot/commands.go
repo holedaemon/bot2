@@ -66,12 +66,17 @@ var commands = []Command{
 		Scoped: testGuildID,
 		Data: api.CreateCommandData{
 			Name:        "role",
-			Description: "Interface for self-assignable vanity roles (pronouns, etc)",
+			Description: "Interface for vanity roles (pronouns, etc)",
 			Options: discord.CommandOptions{
 				discord.NewSubcommandOption(
 					"create",
-					"Create a new self-assignable role",
+					"Create a new vanity role",
 					discord.NewStringOption("name", "Name of new role", true),
+				),
+				discord.NewSubcommandOption(
+					"add",
+					"Add a vanity role to yourself",
+					discord.NewStringOption("name", "Name of role", true),
 				),
 			},
 			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageRoles),
