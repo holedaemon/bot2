@@ -2,11 +2,11 @@ package bot
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
-	"github.com/diamondburned/arikawa/v3/api/cmdroute"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
@@ -19,10 +19,10 @@ const testGuildID = discord.GuildID(779875531712757800)
 // Bot is a Discord bot account.
 type Bot struct {
 	s *state.State
-	r *cmdroute.Router
 	l *zap.Logger
 
 	jc *jerkcity.Client
+	db *sql.DB
 
 	admins map[discord.UserID]struct{}
 
@@ -55,19 +55,8 @@ func New(token string, opts ...Option) (*Bot, error) {
 	b.s = state.New("Bot " + token)
 	b.s.AddHandler(b.onReady)
 
-	b.r = cmdroute.NewRouter()
-	b.r.AddFunc("ping", b.cmdPing)
-	b.r.AddFunc("is-admin", b.cmdIsAdmin)
-	b.r.AddFunc("game", b.cmdGame)
-
-	b.r.Sub("jerkcity", func(r *cmdroute.Router) {
-		r.AddFunc("latest", b.cmdJerkcityLatest)
-		r.AddFunc("episode", b.cmdJerkcityEpisode)
-		r.AddFunc("quote", b.cmdJerkcityRandom)
-		r.AddFunc("search", b.cmdJerkcitySearch)
-	})
-
-	b.s.AddInteractionHandler(b.r)
+	r := b.router()
+	b.s.AddInteractionHandler(r)
 	b.s.AddIntents(gateway.IntentGuilds)
 
 	cmds := make(map[discord.GuildID][]api.CreateCommandData)

@@ -4,7 +4,7 @@
 package models
 
 var TableNames = struct {
-	Pronouns string
+	Roles string
 }{
-	Pronouns: "pronouns",
+	Roles: "roles",
 }

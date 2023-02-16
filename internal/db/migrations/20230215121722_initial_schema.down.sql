@@ -1,5 +1,5 @@
 BEGIN;
 
-DROP TABLE pronouns;
+DROP TABLE roles;
 
 COMMIT;

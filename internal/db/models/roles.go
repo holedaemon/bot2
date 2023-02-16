@@ -21,49 +21,49 @@ import (
 	"github.com/volatiletech/strmangle"
 )
 
-// Pronoun is an object representing the database table.
-type Pronoun struct {
+// Role is an object representing the database table.
+type Role struct {
 	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Pronoun   string    `boil:"pronoun" json:"pronoun" toml:"pronoun" yaml:"pronoun"`
+	RoleName  string    `boil:"role_name" json:"role_name" toml:"role_name" yaml:"role_name"`
 	RoleID    string    `boil:"role_id" json:"role_id" toml:"role_id" yaml:"role_id"`
 	GuildID   string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
 	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
-	R *pronounR `boil:"-" json:"-" toml:"-" yaml:"-"`
-	L pronounL  `boil:"-" json:"-" toml:"-" yaml:"-"`
+	R *roleR `boil:"-" json:"-" toml:"-" yaml:"-"`
+	L roleL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
-var PronounColumns = struct {
+var RoleColumns = struct {
 	ID        string
-	Pronoun   string
+	RoleName  string
 	RoleID    string
 	GuildID   string
 	CreatedAt string
 	UpdatedAt string
 }{
 	ID:        "id",
-	Pronoun:   "pronoun",
+	RoleName:  "role_name",
 	RoleID:    "role_id",
 	GuildID:   "guild_id",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
 }
 
-var PronounTableColumns = struct {
+var RoleTableColumns = struct {
 	ID        string
-	Pronoun   string
+	RoleName  string
 	RoleID    string
 	GuildID   string
 	CreatedAt string
 	UpdatedAt string
 }{
-	ID:        "pronouns.id",
-	Pronoun:   "pronouns.pronoun",
-	RoleID:    "pronouns.role_id",
-	GuildID:   "pronouns.guild_id",
-	CreatedAt: "pronouns.created_at",
-	UpdatedAt: "pronouns.updated_at",
+	ID:        "roles.id",
+	RoleName:  "roles.role_name",
+	RoleID:    "roles.role_id",
+	GuildID:   "roles.guild_id",
+	CreatedAt: "roles.created_at",
+	UpdatedAt: "roles.updated_at",
 }
 
 // Generated where
@@ -135,67 +135,67 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
-var PronounWhere = struct {
+var RoleWhere = struct {
 	ID        whereHelperint64
-	Pronoun   whereHelperstring
+	RoleName  whereHelperstring
 	RoleID    whereHelperstring
 	GuildID   whereHelperstring
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
 }{
-	ID:        whereHelperint64{field: "\"pronouns\".\"id\""},
-	Pronoun:   whereHelperstring{field: "\"pronouns\".\"pronoun\""},
-	RoleID:    whereHelperstring{field: "\"pronouns\".\"role_id\""},
-	GuildID:   whereHelperstring{field: "\"pronouns\".\"guild_id\""},
-	CreatedAt: whereHelpertime_Time{field: "\"pronouns\".\"created_at\""},
-	UpdatedAt: whereHelpertime_Time{field: "\"pronouns\".\"updated_at\""},
+	ID:        whereHelperint64{field: "\"roles\".\"id\""},
+	RoleName:  whereHelperstring{field: "\"roles\".\"role_name\""},
+	RoleID:    whereHelperstring{field: "\"roles\".\"role_id\""},
+	GuildID:   whereHelperstring{field: "\"roles\".\"guild_id\""},
+	CreatedAt: whereHelpertime_Time{field: "\"roles\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"roles\".\"updated_at\""},
 }
 
-// PronounRels is where relationship names are stored.
-var PronounRels = struct {
+// RoleRels is where relationship names are stored.
+var RoleRels = struct {
 }{}
 
-// pronounR is where relationships are stored.
-type pronounR struct {
+// roleR is where relationships are stored.
+type roleR struct {
 }
 
 // NewStruct creates a new relationship struct
-func (*pronounR) NewStruct() *pronounR {
-	return &pronounR{}
+func (*roleR) NewStruct() *roleR {
+	return &roleR{}
 }
 
-// pronounL is where Load methods for each relationship are stored.
-type pronounL struct{}
+// roleL is where Load methods for each relationship are stored.
+type roleL struct{}
 
 var (
-	pronounAllColumns            = []string{"id", "pronoun", "role_id", "guild_id", "created_at", "updated_at"}
-	pronounColumnsWithoutDefault = []string{"pronoun", "role_id", "guild_id"}
-	pronounColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
-	pronounPrimaryKeyColumns     = []string{"id"}
-	pronounGeneratedColumns      = []string{}
+	roleAllColumns            = []string{"id", "role_name", "role_id", "guild_id", "created_at", "updated_at"}
+	roleColumnsWithoutDefault = []string{"role_name", "role_id", "guild_id"}
+	roleColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
+	rolePrimaryKeyColumns     = []string{"id"}
+	roleGeneratedColumns      = []string{}
 )
 
 type (
-	// PronounSlice is an alias for a slice of pointers to Pronoun.
-	// This should almost always be used instead of []Pronoun.
-	PronounSlice []*Pronoun
+	// RoleSlice is an alias for a slice of pointers to Role.
+	// This should almost always be used instead of []Role.
+	RoleSlice []*Role
 
-	pronounQuery struct {
+	roleQuery struct {
 		*queries.Query
 	}
 )
 
 // Cache for insert, update and upsert
 var (
-	pronounType                 = reflect.TypeOf(&Pronoun{})
-	pronounMapping              = queries.MakeStructMapping(pronounType)
-	pronounPrimaryKeyMapping, _ = queries.BindMapping(pronounType, pronounMapping, pronounPrimaryKeyColumns)
-	pronounInsertCacheMut       sync.RWMutex
-	pronounInsertCache          = make(map[string]insertCache)
-	pronounUpdateCacheMut       sync.RWMutex
-	pronounUpdateCache          = make(map[string]updateCache)
-	pronounUpsertCacheMut       sync.RWMutex
-	pronounUpsertCache          = make(map[string]insertCache)
+	roleType                 = reflect.TypeOf(&Role{})
+	roleMapping              = queries.MakeStructMapping(roleType)
+	rolePrimaryKeyMapping, _ = queries.BindMapping(roleType, roleMapping, rolePrimaryKeyColumns)
+	roleInsertCacheMut       sync.RWMutex
+	roleInsertCache          = make(map[string]insertCache)
+	roleUpdateCacheMut       sync.RWMutex
+	roleUpdateCache          = make(map[string]updateCache)
+	roleUpsertCacheMut       sync.RWMutex
+	roleUpsertCache          = make(map[string]insertCache)
 )
 
 var (
@@ -206,9 +206,9 @@ var (
 	_ = qmhelper.Where
 )
 
-// One returns a single pronoun record from the query.
-func (q pronounQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Pronoun, error) {
-	o := &Pronoun{}
+// One returns a single role record from the query.
+func (q roleQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Role, error) {
+	o := &Role{}
 
 	queries.SetLimit(q.Query, 1)
 
@@ -217,26 +217,26 @@ func (q pronounQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Pron
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: failed to execute a one query for pronouns")
+		return nil, errors.Wrap(err, "models: failed to execute a one query for roles")
 	}
 
 	return o, nil
 }
 
-// All returns all Pronoun records from the query.
-func (q pronounQuery) All(ctx context.Context, exec boil.ContextExecutor) (PronounSlice, error) {
-	var o []*Pronoun
+// All returns all Role records from the query.
+func (q roleQuery) All(ctx context.Context, exec boil.ContextExecutor) (RoleSlice, error) {
+	var o []*Role
 
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
-		return nil, errors.Wrap(err, "models: failed to assign all query results to Pronoun slice")
+		return nil, errors.Wrap(err, "models: failed to assign all query results to Role slice")
 	}
 
 	return o, nil
 }
 
-// Count returns the count of all Pronoun records in the query.
-func (q pronounQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+// Count returns the count of all Role records in the query.
+func (q roleQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -244,14 +244,14 @@ func (q pronounQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to count pronouns rows")
+		return 0, errors.Wrap(err, "models: failed to count roles rows")
 	}
 
 	return count, nil
 }
 
 // Exists checks if the row exists in the table.
-func (q pronounQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+func (q roleQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -260,54 +260,54 @@ func (q pronounQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bo
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return false, errors.Wrap(err, "models: failed to check if pronouns exists")
+		return false, errors.Wrap(err, "models: failed to check if roles exists")
 	}
 
 	return count > 0, nil
 }
 
-// Pronouns retrieves all the records using an executor.
-func Pronouns(mods ...qm.QueryMod) pronounQuery {
-	mods = append(mods, qm.From("\"pronouns\""))
+// Roles retrieves all the records using an executor.
+func Roles(mods ...qm.QueryMod) roleQuery {
+	mods = append(mods, qm.From("\"roles\""))
 	q := NewQuery(mods...)
 	if len(queries.GetSelect(q)) == 0 {
-		queries.SetSelect(q, []string{"\"pronouns\".*"})
+		queries.SetSelect(q, []string{"\"roles\".*"})
 	}
 
-	return pronounQuery{q}
+	return roleQuery{q}
 }
 
-// FindPronoun retrieves a single record by ID with an executor.
+// FindRole retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindPronoun(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*Pronoun, error) {
-	pronounObj := &Pronoun{}
+func FindRole(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*Role, error) {
+	roleObj := &Role{}
 
 	sel := "*"
 	if len(selectCols) > 0 {
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"pronouns\" where \"id\"=$1", sel,
+		"select %s from \"roles\" where \"id\"=$1", sel,
 	)
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(ctx, exec, pronounObj)
+	err := q.Bind(ctx, exec, roleObj)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: unable to select from pronouns")
+		return nil, errors.Wrap(err, "models: unable to select from roles")
 	}
 
-	return pronounObj, nil
+	return roleObj, nil
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *Pronoun) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
+func (o *Role) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no pronouns provided for insertion")
+		return errors.New("models: no roles provided for insertion")
 	}
 
 	var err error
@@ -322,33 +322,33 @@ func (o *Pronoun) Insert(ctx context.Context, exec boil.ContextExecutor, columns
 		}
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(pronounColumnsWithDefault, o)
+	nzDefaults := queries.NonZeroDefaultSet(roleColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
-	pronounInsertCacheMut.RLock()
-	cache, cached := pronounInsertCache[key]
-	pronounInsertCacheMut.RUnlock()
+	roleInsertCacheMut.RLock()
+	cache, cached := roleInsertCache[key]
+	roleInsertCacheMut.RUnlock()
 
 	if !cached {
 		wl, returnColumns := columns.InsertColumnSet(
-			pronounAllColumns,
-			pronounColumnsWithDefault,
-			pronounColumnsWithoutDefault,
+			roleAllColumns,
+			roleColumnsWithDefault,
+			roleColumnsWithoutDefault,
 			nzDefaults,
 		)
 
-		cache.valueMapping, err = queries.BindMapping(pronounType, pronounMapping, wl)
+		cache.valueMapping, err = queries.BindMapping(roleType, roleMapping, wl)
 		if err != nil {
 			return err
 		}
-		cache.retMapping, err = queries.BindMapping(pronounType, pronounMapping, returnColumns)
+		cache.retMapping, err = queries.BindMapping(roleType, roleMapping, returnColumns)
 		if err != nil {
 			return err
 		}
 		if len(wl) != 0 {
-			cache.query = fmt.Sprintf("INSERT INTO \"pronouns\" (\"%s\") %%sVALUES (%s)%%s", strings.Join(wl, "\",\""), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
+			cache.query = fmt.Sprintf("INSERT INTO \"roles\" (\"%s\") %%sVALUES (%s)%%s", strings.Join(wl, "\",\""), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
 		} else {
-			cache.query = "INSERT INTO \"pronouns\" %sDEFAULT VALUES%s"
+			cache.query = "INSERT INTO \"roles\" %sDEFAULT VALUES%s"
 		}
 
 		var queryOutput, queryReturning string
@@ -376,22 +376,22 @@ func (o *Pronoun) Insert(ctx context.Context, exec boil.ContextExecutor, columns
 	}
 
 	if err != nil {
-		return errors.Wrap(err, "models: unable to insert into pronouns")
+		return errors.Wrap(err, "models: unable to insert into roles")
 	}
 
 	if !cached {
-		pronounInsertCacheMut.Lock()
-		pronounInsertCache[key] = cache
-		pronounInsertCacheMut.Unlock()
+		roleInsertCacheMut.Lock()
+		roleInsertCache[key] = cache
+		roleInsertCacheMut.Unlock()
 	}
 
 	return nil
 }
 
-// Update uses an executor to update the Pronoun.
+// Update uses an executor to update the Role.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *Pronoun) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
+func (o *Role) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
@@ -400,28 +400,28 @@ func (o *Pronoun) Update(ctx context.Context, exec boil.ContextExecutor, columns
 
 	var err error
 	key := makeCacheKey(columns, nil)
-	pronounUpdateCacheMut.RLock()
-	cache, cached := pronounUpdateCache[key]
-	pronounUpdateCacheMut.RUnlock()
+	roleUpdateCacheMut.RLock()
+	cache, cached := roleUpdateCache[key]
+	roleUpdateCacheMut.RUnlock()
 
 	if !cached {
 		wl := columns.UpdateColumnSet(
-			pronounAllColumns,
-			pronounPrimaryKeyColumns,
+			roleAllColumns,
+			rolePrimaryKeyColumns,
 		)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
 		}
 		if len(wl) == 0 {
-			return errors.New("models: unable to update pronouns, could not build whitelist")
+			return errors.New("models: unable to update roles, could not build whitelist")
 		}
 
-		cache.query = fmt.Sprintf("UPDATE \"pronouns\" SET %s WHERE %s",
+		cache.query = fmt.Sprintf("UPDATE \"roles\" SET %s WHERE %s",
 			strmangle.SetParamNames("\"", "\"", 1, wl),
-			strmangle.WhereClause("\"", "\"", len(wl)+1, pronounPrimaryKeyColumns),
+			strmangle.WhereClause("\"", "\"", len(wl)+1, rolePrimaryKeyColumns),
 		)
-		cache.valueMapping, err = queries.BindMapping(pronounType, pronounMapping, append(wl, pronounPrimaryKeyColumns...))
+		cache.valueMapping, err = queries.BindMapping(roleType, roleMapping, append(wl, rolePrimaryKeyColumns...))
 		if err != nil {
 			return err
 		}
@@ -436,32 +436,32 @@ func (o *Pronoun) Update(ctx context.Context, exec boil.ContextExecutor, columns
 	}
 	_, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to update pronouns row")
+		return errors.Wrap(err, "models: unable to update roles row")
 	}
 
 	if !cached {
-		pronounUpdateCacheMut.Lock()
-		pronounUpdateCache[key] = cache
-		pronounUpdateCacheMut.Unlock()
+		roleUpdateCacheMut.Lock()
+		roleUpdateCache[key] = cache
+		roleUpdateCacheMut.Unlock()
 	}
 
 	return nil
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q pronounQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) error {
+func (q roleQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) error {
 	queries.SetUpdate(q.Query, cols)
 
 	_, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to update all for pronouns")
+		return errors.Wrap(err, "models: unable to update all for roles")
 	}
 
 	return nil
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o PronounSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) error {
+func (o RoleSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) error {
 	ln := int64(len(o))
 	if ln == 0 {
 		return nil
@@ -483,13 +483,13 @@ func (o PronounSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, 
 
 	// Append all of the primary key values for each column
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), pronounPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), rolePrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := fmt.Sprintf("UPDATE \"pronouns\" SET %s WHERE %s",
+	sql := fmt.Sprintf("UPDATE \"roles\" SET %s WHERE %s",
 		strmangle.SetParamNames("\"", "\"", 1, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, pronounPrimaryKeyColumns, len(o)))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, rolePrimaryKeyColumns, len(o)))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -498,7 +498,7 @@ func (o PronounSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, 
 	}
 	_, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to update all in pronoun slice")
+		return errors.Wrap(err, "models: unable to update all in role slice")
 	}
 
 	return nil
@@ -506,9 +506,9 @@ func (o PronounSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, 
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *Pronoun) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *Role) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no pronouns provided for upsert")
+		return errors.New("models: no roles provided for upsert")
 	}
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
@@ -519,7 +519,7 @@ func (o *Pronoun) Upsert(ctx context.Context, exec boil.ContextExecutor, updateO
 		o.UpdatedAt = currTime
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(pronounColumnsWithDefault, o)
+	nzDefaults := queries.NonZeroDefaultSet(roleColumnsWithDefault, o)
 
 	// Build cache key in-line uglily - mysql vs psql problems
 	buf := strmangle.GetBuffer()
@@ -549,42 +549,42 @@ func (o *Pronoun) Upsert(ctx context.Context, exec boil.ContextExecutor, updateO
 	key := buf.String()
 	strmangle.PutBuffer(buf)
 
-	pronounUpsertCacheMut.RLock()
-	cache, cached := pronounUpsertCache[key]
-	pronounUpsertCacheMut.RUnlock()
+	roleUpsertCacheMut.RLock()
+	cache, cached := roleUpsertCache[key]
+	roleUpsertCacheMut.RUnlock()
 
 	var err error
 
 	if !cached {
 		insert, ret := insertColumns.InsertColumnSet(
-			pronounAllColumns,
-			pronounColumnsWithDefault,
-			pronounColumnsWithoutDefault,
+			roleAllColumns,
+			roleColumnsWithDefault,
+			roleColumnsWithoutDefault,
 			nzDefaults,
 		)
 
 		update := updateColumns.UpdateColumnSet(
-			pronounAllColumns,
-			pronounPrimaryKeyColumns,
+			roleAllColumns,
+			rolePrimaryKeyColumns,
 		)
 
 		if updateOnConflict && len(update) == 0 {
-			return errors.New("models: unable to upsert pronouns, could not build update column list")
+			return errors.New("models: unable to upsert roles, could not build update column list")
 		}
 
 		conflict := conflictColumns
 		if len(conflict) == 0 {
-			conflict = make([]string, len(pronounPrimaryKeyColumns))
-			copy(conflict, pronounPrimaryKeyColumns)
+			conflict = make([]string, len(rolePrimaryKeyColumns))
+			copy(conflict, rolePrimaryKeyColumns)
 		}
-		cache.query = buildUpsertQueryPostgres(dialect, "\"pronouns\"", updateOnConflict, ret, update, conflict, insert)
+		cache.query = buildUpsertQueryPostgres(dialect, "\"roles\"", updateOnConflict, ret, update, conflict, insert)
 
-		cache.valueMapping, err = queries.BindMapping(pronounType, pronounMapping, insert)
+		cache.valueMapping, err = queries.BindMapping(roleType, roleMapping, insert)
 		if err != nil {
 			return err
 		}
 		if len(ret) != 0 {
-			cache.retMapping, err = queries.BindMapping(pronounType, pronounMapping, ret)
+			cache.retMapping, err = queries.BindMapping(roleType, roleMapping, ret)
 			if err != nil {
 				return err
 			}
@@ -612,27 +612,27 @@ func (o *Pronoun) Upsert(ctx context.Context, exec boil.ContextExecutor, updateO
 		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 	if err != nil {
-		return errors.Wrap(err, "models: unable to upsert pronouns")
+		return errors.Wrap(err, "models: unable to upsert roles")
 	}
 
 	if !cached {
-		pronounUpsertCacheMut.Lock()
-		pronounUpsertCache[key] = cache
-		pronounUpsertCacheMut.Unlock()
+		roleUpsertCacheMut.Lock()
+		roleUpsertCache[key] = cache
+		roleUpsertCacheMut.Unlock()
 	}
 
 	return nil
 }
 
-// Delete deletes a single Pronoun record with an executor.
+// Delete deletes a single Role record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *Pronoun) Delete(ctx context.Context, exec boil.ContextExecutor) error {
+func (o *Role) Delete(ctx context.Context, exec boil.ContextExecutor) error {
 	if o == nil {
-		return errors.New("models: no Pronoun provided for delete")
+		return errors.New("models: no Role provided for delete")
 	}
 
-	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), pronounPrimaryKeyMapping)
-	sql := "DELETE FROM \"pronouns\" WHERE \"id\"=$1"
+	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), rolePrimaryKeyMapping)
+	sql := "DELETE FROM \"roles\" WHERE \"id\"=$1"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -641,42 +641,42 @@ func (o *Pronoun) Delete(ctx context.Context, exec boil.ContextExecutor) error {
 	}
 	_, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to delete from pronouns")
+		return errors.Wrap(err, "models: unable to delete from roles")
 	}
 
 	return nil
 }
 
 // DeleteAll deletes all matching rows.
-func (q pronounQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) error {
+func (q roleQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if q.Query == nil {
-		return errors.New("models: no pronounQuery provided for delete all")
+		return errors.New("models: no roleQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
 	_, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to delete all from pronouns")
+		return errors.Wrap(err, "models: unable to delete all from roles")
 	}
 
 	return nil
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o PronounSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) error {
+func (o RoleSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if len(o) == 0 {
 		return nil
 	}
 
 	var args []interface{}
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), pronounPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), rolePrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "DELETE FROM \"pronouns\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, pronounPrimaryKeyColumns, len(o))
+	sql := "DELETE FROM \"roles\" WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, rolePrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -685,7 +685,7 @@ func (o PronounSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) 
 	}
 	_, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to delete all from pronoun slice")
+		return errors.Wrap(err, "models: unable to delete all from role slice")
 	}
 
 	return nil
@@ -693,8 +693,8 @@ func (o PronounSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) 
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *Pronoun) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindPronoun(ctx, exec, o.ID)
+func (o *Role) Reload(ctx context.Context, exec boil.ContextExecutor) error {
+	ret, err := FindRole(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -705,26 +705,26 @@ func (o *Pronoun) Reload(ctx context.Context, exec boil.ContextExecutor) error {
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *PronounSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
+func (o *RoleSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
 
-	slice := PronounSlice{}
+	slice := RoleSlice{}
 	var args []interface{}
 	for _, obj := range *o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), pronounPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), rolePrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "SELECT \"pronouns\".* FROM \"pronouns\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, pronounPrimaryKeyColumns, len(*o))
+	sql := "SELECT \"roles\".* FROM \"roles\" WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, rolePrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
 	err := q.Bind(ctx, exec, &slice)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to reload all in PronounSlice")
+		return errors.Wrap(err, "models: unable to reload all in RoleSlice")
 	}
 
 	*o = slice
@@ -732,10 +732,10 @@ func (o *PronounSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor)
 	return nil
 }
 
-// PronounExists checks if the Pronoun row exists.
-func PronounExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
+// RoleExists checks if the Role row exists.
+func RoleExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"pronouns\" where \"id\"=$1 limit 1)"
+	sql := "select exists(select 1 from \"roles\" where \"id\"=$1 limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -746,13 +746,13 @@ func PronounExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bo
 
 	err := row.Scan(&exists)
 	if err != nil {
-		return false, errors.Wrap(err, "models: unable to check if pronouns exists")
+		return false, errors.Wrap(err, "models: unable to check if roles exists")
 	}
 
 	return exists, nil
 }
 
-// Exists checks if the Pronoun row exists.
-func (o *Pronoun) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
-	return PronounExists(ctx, exec, o.ID)
+// Exists checks if the Role row exists.
+func (o *Role) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+	return RoleExists(ctx, exec, o.ID)
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
+	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
 
@@ -33,13 +34,13 @@ func (b *Bot) cmdJerkcityEpisode(ctx context.Context, data cmdroute.CommandData)
 
 	number, err := opt.IntValue()
 	if err != nil {
-		b.l.Error("error reading value as int", zap.Error(err))
+		ctxlog.Error(ctx, "error reading value as int", zap.Error(err))
 		return respondError("Something about the episode number you gave is wrong. Fix it.")
 	}
 
 	episode, err := b.jc.FetchEpisode(ctx, int(number))
 	if err != nil {
-		b.l.Error("error fetching episode", zap.Error(err), zap.Int64("number", number))
+		ctxlog.Error(ctx, "error fetching episode", zap.Error(err), zap.Int64("number", number))
 		return respondError("Sorry, something went wrong and I couldn't get that episode")
 	}
 
@@ -49,13 +50,13 @@ func (b *Bot) cmdJerkcityEpisode(ctx context.Context, data cmdroute.CommandData)
 func (b *Bot) cmdJerkcityLatest(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	high, err := b.jc.FetchMeta(ctx)
 	if err != nil {
-		b.l.Error("error fetching meta payload", zap.Error(err))
+		ctxlog.Error(ctx, "error fetching meta payload", zap.Error(err))
 		return respondError("Couldn't get the latest episode number. Sorry?")
 	}
 
 	episode, err := b.jc.FetchEpisode(ctx, high)
 	if err != nil {
-		b.l.Error("error fetching latest episode", zap.Error(err))
+		ctxlog.Error(ctx, "error fetching latest episode", zap.Error(err))
 		return respondError("Couldn't get the latest episode. Sorry I guess")
 	}
 
@@ -65,7 +66,7 @@ func (b *Bot) cmdJerkcityLatest(ctx context.Context, data cmdroute.CommandData) 
 func (b *Bot) cmdJerkcityRandom(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	episode, err := b.jc.FetchQuote(ctx)
 	if err != nil {
-		b.l.Error("error fetching episode", zap.Error(err))
+		ctxlog.Error(ctx, "error fetching episode", zap.Error(err))
 		return respondError("Sorry, something went wrong and I wasn't able to get an episode")
 	}
 
@@ -84,7 +85,7 @@ func (b *Bot) cmdJerkcitySearch(ctx context.Context, data cmdroute.CommandData) 
 
 	results, err := b.jc.FetchSearch(ctx, search)
 	if err != nil {
-		b.l.Error("error searching jerkcity API", zap.Error(err))
+		ctxlog.Error(ctx, "error searching jerkcity API", zap.Error(err))
 		return respondError("Something happened and I wasn't able to perform the search")
 	}
 

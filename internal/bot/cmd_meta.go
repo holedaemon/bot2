@@ -9,6 +9,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
 
@@ -42,7 +43,7 @@ func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.Inter
 			Type: discord.GameActivity,
 		}},
 	}); err != nil {
-		b.l.Error("error changing presence", zap.Error(err))
+		ctxlog.Error(ctx, "error changing presence", zap.Error(err))
 
 		return respondError("That shit broked")
 	}

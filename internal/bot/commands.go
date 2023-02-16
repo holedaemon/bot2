@@ -62,4 +62,19 @@ var commands = []Command{
 			},
 		},
 	},
+	{
+		Scoped: testGuildID,
+		Data: api.CreateCommandData{
+			Name:        "role",
+			Description: "Interface for self-assignable vanity roles (pronouns, etc)",
+			Options: discord.CommandOptions{
+				discord.NewSubcommandOption(
+					"create",
+					"Create a new self-assignable role",
+					discord.NewStringOption("name", "Name of new role", true),
+				),
+			},
+			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageRoles),
+		},
+	},
 }

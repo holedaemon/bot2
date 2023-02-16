@@ -1,6 +1,8 @@
 package bot
 
 import (
+	"database/sql"
+
 	"github.com/diamondburned/arikawa/v3/discord"
 	"go.uber.org/zap"
 )
@@ -19,5 +21,12 @@ func WithLogger(l *zap.Logger) Option {
 func WithAdminMap(m map[discord.UserID]struct{}) Option {
 	return func(b *Bot) {
 		b.admins = m
+	}
+}
+
+// WithDB sets a Bot's DB.
+func WithDB(db *sql.DB) Option {
+	return func(b *Bot) {
+		b.db = db
 	}
 }
