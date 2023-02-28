@@ -287,8 +287,6 @@ func (b *Bot) cmdRoleSetColor(ctx context.Context, data cmdroute.CommandData) *a
 	return respond("Role color has been updated")
 }
 
-var optionNames = []string{"first", "second", "third", "fourth", "fifth"}
-
 func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	var sb strings.Builder
 	sb.WriteString("Roles ")
