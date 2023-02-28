@@ -169,6 +169,53 @@ func (b *Bot) cmdRoleDelete(ctx context.Context, data cmdroute.CommandData) *api
 	return respond("Role has been deleted, woop woop")
 }
 
+func (b *Bot) cmdRoleRelinquish(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	var sb strings.Builder
+	sb.WriteString("Relinquished ")
+
+	tx, err := b.db.BeginTx(ctx, nil)
+	if err != nil {
+		ctxlog.Error(ctx, "error beginning transaction", zap.Error(err))
+		return dbError
+	}
+
+	for i, opt := range data.Options {
+		sf, err := opt.SnowflakeValue()
+		if err != nil {
+			ctxlog.Error(ctx, "error converting to snowflake", zap.Error(err))
+			return respondError("Unable to convert role to Snowflake")
+		}
+
+		if !sf.IsValid() {
+			continue
+		}
+
+		role, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).One(ctx, tx)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				continue
+			}
+
+			ctxlog.Error(ctx, "error querying for role", zap.Error(err))
+			return dbError
+		}
+
+		if err := role.Delete(ctx, tx); err != nil {
+			ctxlog.Error(ctx, "error deleting role", zap.Error(err))
+			return respondErrorf("There was an issue deleting <@&%s> from the database", sf.String())
+		}
+
+		if i == len(data.Options)-1 {
+			sb.WriteString("<@&" + sf.String() + ">")
+			break
+		}
+
+		sb.WriteString("<@&" + sf.String() + ">, ")
+	}
+
+	return respond(sb.String())
+}
+
 func (b *Bot) cmdRoleAdd(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	sf, err := data.Options.Find("role").SnowflakeValue()
 	if err != nil {

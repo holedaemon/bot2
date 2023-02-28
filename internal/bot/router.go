@@ -47,6 +47,7 @@ func (b *Bot) router() *cmdroute.Router {
 		r.AddFunc("rename", b.cmdRoleRename)
 		r.AddFunc("setcolor", b.cmdRoleSetColor)
 		r.AddFunc("import", b.cmdRoleImport)
+		r.AddFunc("relinquish", b.cmdRoleRelinquish)
 	})
 
 	return r
