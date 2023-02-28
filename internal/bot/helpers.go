@@ -8,10 +8,30 @@ import (
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
 )
 
+var (
+	dbError = &api.InteractionResponseData{
+		Content: option.NewNullableString("A database error has occurred xD"),
+		Flags:   discord.EphemeralMessage,
+	}
+)
+
 func respondError(msg string) *api.InteractionResponseData {
 	if msg == "" {
 		panic("bot: blank string given to respondError")
 	}
+
+	return &api.InteractionResponseData{
+		Content: option.NewNullableString(msg),
+		Flags:   discord.EphemeralMessage,
+	}
+}
+
+func respondErrorf(msg string, args ...interface{}) *api.InteractionResponseData {
+	if msg == "" {
+		panic("bot: blank string given to respondErrorf")
+	}
+
+	msg = fmt.Sprintf(msg, args...)
 
 	return &api.InteractionResponseData{
 		Content: option.NewNullableString(msg),

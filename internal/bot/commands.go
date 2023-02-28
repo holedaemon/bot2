@@ -65,21 +65,67 @@ var commands = []Command{
 	{
 		Scoped: testGuildID,
 		Data: api.CreateCommandData{
-			Name:        "role",
-			Description: "Interface for vanity roles (pronouns, etc)",
+			Name:        "roles",
+			Description: "Moderator interface for vanity roles",
 			Options: discord.CommandOptions{
 				discord.NewSubcommandOption(
 					"create",
 					"Create a new vanity role",
 					discord.NewStringOption("name", "Name of new role", true),
+					discord.NewStringOption("color", "Color of the new role", false),
+					discord.NewBooleanOption("hoisted", "Whether the role is hoisted or not", false),
 				),
 				discord.NewSubcommandOption(
-					"add",
-					"Add a vanity role to yourself",
-					discord.NewStringOption("name", "Name of role", true),
+					"delete",
+					"Delete a vanity role",
+					discord.NewRoleOption("role", "The role to delete", true),
+				),
+				discord.NewSubcommandOption(
+					"rename",
+					"Rename a vanity role",
+					discord.NewRoleOption("role", "The role to rename", true),
+					discord.NewStringOption("new-name", "The new name", true),
+				),
+				discord.NewSubcommandOption(
+					"setcolor",
+					"Change a role's color",
+					discord.NewRoleOption("role", "The role to alter", true),
+					discord.NewStringOption("color", "The new color", true),
+				),
+				discord.NewSubcommandOption(
+					"import",
+					"Import existing roles",
+					discord.NewRoleOption("first", "First role to import", true),
+					discord.NewRoleOption("second", "Second role to import", false),
+					discord.NewRoleOption("third", "Third role to import", false),
+					discord.NewRoleOption("fourth", "Fourth role to import", false),
+					discord.NewRoleOption("fifth", "Fifth role to import", false),
 				),
 			},
 			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageRoles),
+		},
+	},
+	{
+		Scoped: testGuildID,
+		Data: api.CreateCommandData{
+			Name:        "role",
+			Description: "Interface for vanity roles",
+			Options: discord.CommandOptions{
+				discord.NewSubcommandOption(
+					"add",
+					"Add a vanity role to yourself",
+					discord.NewRoleOption("role", "The role to add", true),
+				),
+				discord.NewSubcommandOption(
+					"remove",
+					"Remove a vanity role from yourself",
+					discord.NewStringOption("role", "The role to remove", true),
+				),
+				discord.NewSubcommandOption(
+					"list",
+					"List all the vanity roles available",
+				),
+			},
 		},
 	},
 }
