@@ -213,6 +213,13 @@ func (b *Bot) cmdRoleRelinquish(ctx context.Context, data cmdroute.CommandData) 
 		sb.WriteString("<@&" + sf.String() + ">, ")
 	}
 
+	if err := tx.Commit(); err != nil {
+		if !errors.Is(err, sql.ErrTxDone) {
+			ctxlog.Error(ctx, "error committing transaction", zap.Error(err))
+			return dbError
+		}
+	}
+
 	return respond(sb.String())
 }
 
