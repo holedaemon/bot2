@@ -16,13 +16,13 @@ import (
 
 // Bot is a Discord bot account.
 type Bot struct {
-	s *state.State
-	l *zap.Logger
+	State  *state.State
+	Logger *zap.Logger
 
-	jc *jerkcity.Client
-	db *sql.DB
+	Jerkcity *jerkcity.Client
+	DB       *sql.DB
 
-	admins map[discord.UserID]struct{}
+	Admins map[discord.UserID]struct{}
 
 	lastGameChange time.Time
 }
@@ -35,29 +35,29 @@ func New(token string, opts ...Option) (*Bot, error) {
 		o(b)
 	}
 
-	if b.l == nil {
+	if b.Logger == nil {
 		l, err := zap.NewProduction()
 		if err != nil {
 			return nil, fmt.Errorf("bot: creating logger: %w", err)
 		}
 
-		b.l = l
+		b.Logger = l
 	}
 
-	if b.admins == nil {
-		b.admins = make(map[discord.UserID]struct{})
+	if b.Admins == nil {
+		b.Admins = make(map[discord.UserID]struct{})
 	}
 
-	b.jc = jerkcity.New()
+	b.Jerkcity = jerkcity.New()
 
-	b.s = state.New("Bot " + token)
-	b.s.AddHandler(b.onReady)
-	b.s.AddHandler(b.onGuildRoleDelete)
-	b.s.AddHandler(b.onMessage)
+	b.State = state.New("Bot " + token)
+	b.State.AddHandler(b.onReady)
+	b.State.AddHandler(b.onGuildRoleDelete)
+	b.State.AddHandler(b.onMessage)
 
 	r := b.router()
-	b.s.AddInteractionHandler(r)
-	b.s.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages)
+	b.State.AddInteractionHandler(r)
+	b.State.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages)
 
 	cmds := make(map[discord.GuildID][]api.CreateCommandData)
 	for _, c := range commands {
@@ -76,18 +76,18 @@ func New(token string, opts ...Option) (*Bot, error) {
 		}
 	}
 
-	app, err := b.s.CurrentApplication()
+	app, err := b.State.CurrentApplication()
 	if err != nil {
 		return nil, fmt.Errorf("bot: getting current application: %w", err)
 	}
 
 	for scope, cmd := range cmds {
 		if scope == 0 {
-			if _, err := b.s.BulkOverwriteCommands(app.ID, cmd); err != nil {
+			if _, err := b.State.BulkOverwriteCommands(app.ID, cmd); err != nil {
 				return nil, fmt.Errorf("bot: overwriting global commands: %w", err)
 			}
 		} else {
-			if _, err := b.s.BulkOverwriteGuildCommands(app.ID, scope, cmd); err != nil {
+			if _, err := b.State.BulkOverwriteGuildCommands(app.ID, scope, cmd); err != nil {
 				return nil, fmt.Errorf("bot: overwriting guild commands (%d): %w", scope, err)
 			}
 		}
@@ -98,7 +98,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 
 // IsAdmin checks if the given UserID is a bot admin.
 func (b *Bot) IsAdmin(sf discord.UserID) bool {
-	if _, ok := b.admins[sf]; ok {
+	if _, ok := b.Admins[sf]; ok {
 		return true
 	}
 
@@ -107,5 +107,5 @@ func (b *Bot) IsAdmin(sf discord.UserID) bool {
 
 // Start opens a connection to Discord.
 func (b *Bot) Start(ctx context.Context) error {
-	return b.s.Connect(ctx)
+	return b.State.Connect(ctx)
 }

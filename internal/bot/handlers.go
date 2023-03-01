@@ -9,7 +9,7 @@ import (
 )
 
 func (b *Bot) onReady(r *gateway.ReadyEvent) {
-	b.l.Info("connected to Discord gateway", zap.Any("user_id", r.User.ID))
+	b.Logger.Info("connected to Discord gateway", zap.Any("user_id", r.User.ID))
 }
 
 func (b *Bot) onMessage(m *gateway.MessageCreateEvent) {
@@ -18,7 +18,7 @@ func (b *Bot) onMessage(m *gateway.MessageCreateEvent) {
 	}
 
 	ctx := context.Background()
-	ctx = ctxlog.WithLogger(ctx, b.l)
+	ctx = ctxlog.WithLogger(ctx, b.Logger)
 	ctx = ctxlog.With(ctx, zap.String("guild_id", m.GuildID.String()))
 
 	if m.GuildID == holeGuildID {

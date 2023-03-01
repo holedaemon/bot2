@@ -13,20 +13,20 @@ type Option func(*Bot)
 // WithLogger sets a Bot's logger.
 func WithLogger(l *zap.Logger) Option {
 	return func(b *Bot) {
-		b.l = l
+		b.Logger = l
 	}
 }
 
 // WithAdminMap sets a Bot's admin map.
 func WithAdminMap(m map[discord.UserID]struct{}) Option {
 	return func(b *Bot) {
-		b.admins = m
+		b.Admins = m
 	}
 }
 
 // WithDB sets a Bot's DB.
 func WithDB(db *sql.DB) Option {
 	return func(b *Bot) {
-		b.db = db
+		b.DB = db
 	}
 }

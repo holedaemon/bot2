@@ -37,7 +37,7 @@ func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.Inter
 		return respondError("You gotta gimme something to work with here!!!")
 	}
 
-	if err := b.s.Gateway().Send(ctx, &gateway.UpdatePresenceCommand{
+	if err := b.State.Gateway().Send(ctx, &gateway.UpdatePresenceCommand{
 		Activities: []discord.Activity{{
 			Name: newGame,
 			Type: discord.GameActivity,
