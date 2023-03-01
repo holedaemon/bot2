@@ -15,12 +15,12 @@ import (
 	"go.uber.org/zap"
 )
 
-var embedColor = discord.Color(2123412)
+var jerkcityEmbedColor = discord.Color(2123412)
 
 func makeEpisodeEmbed(e *jerkcity.Episode) discord.Embed {
 	return discord.Embed{
 		Title:     e.Title,
-		Color:     embedColor,
+		Color:     jerkcityEmbedColor,
 		Timestamp: discord.NewTimestamp(e.Time()),
 		Image: &discord.EmbedImage{
 			URL: "https://bonequest.com/" + e.Image,
@@ -91,7 +91,7 @@ func (b *Bot) cmdJerkcitySearch(ctx context.Context, data cmdroute.CommandData) 
 
 	embed := discord.Embed{
 		Title: "Search Results",
-		Color: embedColor,
+		Color: jerkcityEmbedColor,
 		Footer: &discord.EmbedFooter{
 			Text: fmt.Sprintf("Took %s", time.Second*time.Duration(results.Search.Runtime)),
 		},

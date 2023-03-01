@@ -14,8 +14,6 @@ import (
 	"go.uber.org/zap"
 )
 
-const testGuildID = discord.GuildID(779875531712757800)
-
 // Bot is a Discord bot account.
 type Bot struct {
 	s *state.State
@@ -55,10 +53,11 @@ func New(token string, opts ...Option) (*Bot, error) {
 	b.s = state.New("Bot " + token)
 	b.s.AddHandler(b.onReady)
 	b.s.AddHandler(b.onGuildRoleDelete)
+	b.s.AddHandler(b.onMessage)
 
 	r := b.router()
 	b.s.AddInteractionHandler(r)
-	b.s.AddIntents(gateway.IntentGuilds)
+	b.s.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages)
 
 	cmds := make(map[discord.GuildID][]api.CreateCommandData)
 	for _, c := range commands {

@@ -70,3 +70,13 @@ func respondEmbeds(embeds ...discord.Embed) *api.InteractionResponseData {
 		Embeds: &embeds,
 	}
 }
+
+func roleInSlice(id discord.RoleID, list []discord.RoleID) bool {
+	for _, r := range list {
+		if r == id {
+			return true
+		}
+	}
+
+	return false
+}
