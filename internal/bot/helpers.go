@@ -80,3 +80,11 @@ func roleInSlice(id discord.RoleID, list []discord.RoleID) bool {
 
 	return false
 }
+
+func fakeGif(path string) string {
+	return fakeCDN + "/" + path + ".gif"
+}
+
+func fakeJpg(path string) string {
+	return fakeCDN + "/" + path + ".jpg"
+}

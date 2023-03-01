@@ -109,3 +109,17 @@ func (b *Bot) IsAdmin(sf discord.UserID) bool {
 func (b *Bot) Start(ctx context.Context) error {
 	return b.State.Connect(ctx)
 }
+
+func (b *Bot) Reply(m discord.Message, content string) error {
+	if content == "" {
+		panic("bot: blank content given to Reply")
+	}
+
+	_, err := b.State.SendMessageReply(m.ChannelID, content, m.ID)
+	return err
+}
+
+func (b *Bot) Replyf(m discord.Message, content string, args ...interface{}) error {
+	msg := fmt.Sprintf(content, args...)
+	return b.Reply(m, msg)
+}
