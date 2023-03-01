@@ -4,9 +4,9 @@
 *   * General
 *   *   - [x] Jerkcity
 *   *   - [x] Game
-*   *   - [ ] Pronouns
+*   *   - [x] Pronouns
 *   * Hole
-*   *   - [ ] Fortnite summon
+*   *   - [x] Fortnite summon
 *   *   - [ ] Mafia boss
 *   * Scrote
 *   *   - [ ] Egoraptor
