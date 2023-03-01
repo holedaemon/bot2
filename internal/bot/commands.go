@@ -103,7 +103,7 @@ var commands = []Command{
 				),
 				discord.NewSubcommandOption(
 					"relinquish",
-					"Relinquish roles from database",
+					"Relinquish roles from the database",
 					discord.NewRoleOption("first", "First role to import", true),
 					discord.NewRoleOption("second", "Second role to import", false),
 					discord.NewRoleOption("third", "Third role to import", false),
