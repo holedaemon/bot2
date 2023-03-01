@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"database/sql"
-	"log"
 	"os"
 	"strings"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/holedaemon/bot2/internal/bot"
+	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 
 	// DB driver
@@ -18,23 +18,7 @@ import (
 func main() {
 	rd := os.Getenv("BOT2_DEBUG")
 	debug := rd != ""
-
-	var (
-		logger *zap.Logger
-		err    error
-	)
-
-	if debug {
-		logger, err = zap.NewDevelopment()
-		if err != nil {
-			log.Fatalf("error creating new development logger: %s\n", err.Error())
-		}
-	} else {
-		logger, err = zap.NewProduction()
-		if err != nil {
-			log.Fatalf("error creating new production logger: %s\n", err.Error())
-		}
-	}
+	logger := ctxlog.New(debug)
 
 	rawAdmins := os.Getenv("BOT2_ADMINS")
 	admins := make(map[discord.UserID]struct{})
