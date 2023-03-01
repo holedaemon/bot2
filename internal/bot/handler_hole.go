@@ -21,7 +21,7 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 	if roleInSlice(holeFortniteRoleID, m.MentionRoleIDs) {
 		idx := rand.Intn(4) + 1
 		str := strconv.FormatInt(int64(idx), 10)
-		image := fakeCDN + "/fortnite-" + str + ".gif"
+		image := fakeGif("fortnite" + str)
 		_, err := b.State.SendMessage(m.ChannelID, image)
 		if err != nil {
 			ctxlog.Error(ctx, "error sending message", zap.Error(err))
