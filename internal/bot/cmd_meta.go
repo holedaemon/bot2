@@ -52,3 +52,11 @@ func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.Inter
 
 	return respond("The game has been changed. 👉👌")
 }
+
+func (b *Bot) cmdPanic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	if !b.IsAdmin(data.Event.SenderID()) {
+		return respondError("I don't think so, weather man")
+	}
+
+	panic("boo lol!")
+}

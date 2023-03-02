@@ -38,6 +38,14 @@ var commands = []Command{
 	{
 		Scoped: testGuildID,
 		Data: api.CreateCommandData{
+			Name:                     "panic",
+			Description:              "Test the recoverer middleware",
+			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageGuild),
+		},
+	},
+	{
+		Scoped: testGuildID,
+		Data: api.CreateCommandData{
 			Name:        "jerkcity",
 			Description: "Various commands relating to Jerkcity",
 			Options: discord.CommandOptions{
