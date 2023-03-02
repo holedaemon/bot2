@@ -7,7 +7,7 @@
 *   *   - [x] Pronouns
 *   * Hole
 *   *   - [x] Fortnite summon
-*   *   - [ ] Mafia boss
+*   *   - [x] Mafia boss
 *   * Scrote
 *   *   - [ ] Egoraptor
 
