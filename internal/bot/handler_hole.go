@@ -53,8 +53,6 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 		if err := b.State.ModifyMember(m.GuildID, cache.Author.ID, api.ModifyMemberData{
 			CommunicationDisabledUntil: &ts,
 		}); err != nil {
-			ctxlog.Error(ctx, "error timing out user", zap.Error(err))
-
 			er := err.(*httputil.HTTPError)
 			if er.Code == 50013 {
 				if err := b.Reply(m.Message, "Sorry boss, I's forgots my gun"); err != nil {
@@ -62,6 +60,8 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 				}
 				return
 			}
+
+			ctxlog.Error(ctx, "error timing out user", zap.Error(err))
 
 			if err := b.Reply(m.Message, "Sorry boss, da feds got in da way"); err != nil {
 				ctxlog.Error(ctx, "error sending message", zap.Error(err))
