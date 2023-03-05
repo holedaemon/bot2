@@ -24,6 +24,8 @@ type Bot struct {
 
 	Admins map[discord.UserID]struct{}
 
+	imageCache     *ImageCache
+	egoraptorData  *egoraptorData
 	lastGameChange time.Time
 }
 
@@ -49,6 +51,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 	}
 
 	b.Jerkcity = jerkcity.New()
+	b.imageCache = NewImageCache()
 
 	b.State = state.New("Bot " + token)
 	b.State.AddHandler(b.onReady)

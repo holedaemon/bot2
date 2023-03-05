@@ -24,4 +24,8 @@ func (b *Bot) onMessage(m *gateway.MessageCreateEvent) {
 	if m.GuildID == holeGuildID {
 		b.onHoleMessage(ctx, m)
 	}
+
+	if m.GuildID == scroteGuildID {
+		b.onScroteMessage(ctx, m)
+	}
 }

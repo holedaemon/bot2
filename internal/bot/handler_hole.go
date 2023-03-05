@@ -39,7 +39,7 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 		}
 
 		if cache.Author.ID == m.Author.ID {
-			if err := b.Reply(m.Message, fakeJpg("snipes")); err != nil {
+			if err := b.Reply(m.Message, fakeJPG("snipes")); err != nil {
 				ctxlog.Error(ctx, "error sending reply", zap.Error(err))
 			}
 			return
