@@ -10,10 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
-	"github.com/diamondburned/arikawa/v3/utils/sendpart"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
@@ -90,36 +88,15 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 			return
 		}
 
-		image := b.imageCache.Get("egopussy")
-		if image == nil {
-			url := fakePNG("egopussy")
-			err := b.imageCache.Download(url)
-			if err != nil {
-				ctxlog.Error(ctx, "error downloading image", zap.Error(err), zap.String("url", url))
-				return
-			}
-
-			image = b.imageCache.Get("egopussy")
-		}
-
 		since := time.Since(data.LastTimestamp)
 		dur := fmtDur(since)
 
 		content := fmt.Sprintf("It has been %s since the last mention of egoraptor eating pussy", dur)
 
-		files := make([]sendpart.File, 0)
-		file := sendpart.File{
-			Name:   "egopussy.png",
-			Reader: image,
-		}
-		files = append(files, file)
-
-		_, err = b.State.SendMessageComplex(m.ChannelID, api.SendMessageData{
-			Content: content,
-			Files:   files,
-		})
+		image := fakePNG("egopussy")
+		err = b.SendImage(m.ChannelID, content, image)
 		if err != nil {
-			ctxlog.Error(ctx, "error sending message", zap.Error(err))
+			ctxlog.Error(ctx, "error sending image", zap.Error(err))
 			return
 		}
 

@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"path"
-	"strings"
 	"sync"
 )
 
@@ -37,13 +35,10 @@ func (i *ImageCache) Download(url string) error {
 		return err
 	}
 
-	rawName := path.Base(url)
-	name := strings.TrimSuffix(rawName, path.Ext(rawName))
-
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
-	i.images[name] = b
+	i.images[url] = b
 	return nil
 }
 

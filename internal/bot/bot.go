@@ -4,12 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"path"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
+	"github.com/diamondburned/arikawa/v3/utils/sendpart"
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
 	"go.uber.org/zap"
 )
@@ -125,4 +127,37 @@ func (b *Bot) Reply(m discord.Message, content string) error {
 func (b *Bot) Replyf(m discord.Message, content string, args ...interface{}) error {
 	msg := fmt.Sprintf(content, args...)
 	return b.Reply(m, msg)
+}
+
+func (b *Bot) SendImage(chID discord.ChannelID, content string, image string) error {
+	cachedImage := b.imageCache.Get(image)
+	if cachedImage == nil {
+		err := b.imageCache.Download(image)
+		if err != nil {
+			return err
+		}
+
+		cachedImage = b.imageCache.Get(image)
+	}
+
+	rawName := path.Base(image)
+
+	files := make([]sendpart.File, 0)
+	files = append(files, sendpart.File{
+		Name:   rawName,
+		Reader: cachedImage,
+	})
+
+	_, err := b.State.SendMessageComplex(
+		chID,
+		api.SendMessageData{
+			Content: content,
+			Files:   files,
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

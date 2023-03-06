@@ -95,66 +95,80 @@ func fakeJPG(path string) string {
 	return fakeCDN + "/" + path + ".jpg"
 }
 
+// Code adapted from https://github.com/hako/durafmt/blob/master/durafmt.go#L87
 func fmtDur(d time.Duration) string {
-	if d.Seconds() == 0 {
-		return "0 seconds"
+	remaining := int64(d / time.Microsecond)
+
+	var (
+		sb strings.Builder
+
+		weeks   int64
+		days    int64
+		hours   int64
+		minutes int64
+		seconds int64
+	)
+
+	weeks = remaining / (7 * 24 * 3600 * 1000000)
+	if weeks > 0 {
+		remaining -= weeks * 7 * 24 * 3600 * 1000000
 	}
 
-	d = d.Round(time.Second)
-
-	var sb strings.Builder
-
-	days := int(d.Hours() / 24)
-	hours := int(d.Hours())
-	minutes := int(d.Minutes())
-	seconds := int(d.Seconds())
-
+	days = remaining / (24 * 3600 * 1000000)
 	if days > 0 {
-		if days == 1 {
-			sb.WriteString("1 day")
-		} else {
-			sb.WriteString(fmt.Sprintf("%d days", days))
-		}
+		remaining -= days * 24 * 3600 * 1000000
 	}
 
+	hours = remaining / (3600 * 1000000)
 	if hours > 0 {
-		if days > 0 {
-			sb.WriteString(", ")
+		remaining -= hours * 3600 * 1000000
+	}
+
+	minutes = remaining / (60 * 1000000)
+	if minutes > 0 {
+		remaining -= minutes * 60 * 1000000
+	}
+
+	seconds = remaining / 1000000
+	if seconds > 0 {
+		remaining -= seconds * 1000000
+	}
+
+	type durMap struct {
+		name string
+		dur  int64
+	}
+
+	durs := []durMap{
+		{name: "week", dur: weeks},
+		{name: "day", dur: days},
+		{name: "hour", dur: hours},
+		{name: "minute", dur: minutes},
+		{name: "second", dur: seconds},
+	}
+
+	for i, dm := range durs {
+		dur := dm.dur
+		if dur <= 0 {
+			continue
 		}
 
-		if hours == 1 {
-			sb.WriteString("1 hour")
+		if dur == 1 {
+			sb.WriteString("1 " + dm.name)
 		} else {
 			sb.WriteString(
-				fmt.Sprintf(
-					"%d hours",
-					hours,
-				),
+				fmt.Sprintf("%d %ss", dur, dm.name),
 			)
 		}
-	}
 
-	if minutes > 0 {
-		if days > 0 || hours > 0 {
+		if i != len(durs)-1 {
 			sb.WriteString(", ")
-		}
-
-		if minutes == 1 {
-			sb.WriteString("1 minute")
-		} else {
-			sb.WriteString(fmt.Sprintf("%d minutes", minutes))
 		}
 	}
 
 	if sb.Len() == 0 {
-		if seconds > 0 {
-			if seconds == 1 {
-				sb.WriteString("1 second")
-			} else {
-				sb.WriteString(fmt.Sprintf("%d seconds", seconds))
-			}
-		}
+		return "0 seconds"
 	}
 
-	return sb.String()
+	return strings.TrimSuffix(sb.String(), ", ")
 }
