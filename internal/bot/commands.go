@@ -145,4 +145,28 @@ var commands = []Command{
 			},
 		},
 	},
+	{
+		Scoped: testGuildID,
+		Data: api.CreateCommandData{
+			Name:                     "egoraptor",
+			Description:              "Moderator commands for configuring the Egoraptor functionality",
+			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageGuild),
+			Options: discord.CommandOptions{
+				discord.NewSubcommandOption(
+					"toggle",
+					"Toggle timing users out",
+					discord.NewBooleanOption("toggled", "Whether to timeout or not", true),
+				),
+				discord.NewSubcommandOption(
+					"settimeout",
+					"Set the length of timeouts",
+					discord.NewIntegerOption(
+						"seconds",
+						"Number of seconds to time out for",
+						true,
+					),
+				),
+			},
+		},
+	},
 }

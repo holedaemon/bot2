@@ -67,5 +67,10 @@ func (b *Bot) router() *cmdroute.Router {
 		r.AddFunc("relinquish", b.cmdRoleRelinquish)
 	})
 
+	r.Sub("egoraptor", func(r *cmdroute.Router) {
+		r.AddFunc("toggle", b.cmdEgoraptorToggle)
+		r.AddFunc("settimeout", b.cmdEgoraptorSetTimeout)
+	})
+
 	return r
 }
