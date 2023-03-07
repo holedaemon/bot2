@@ -9,7 +9,7 @@
 *   *   - [x] Fortnite summon
 *   *   - [x] Mafia boss
 *   * Scrote
-*   *   - [ ] Egoraptor
+*   *   - [x] Egoraptor
 
 * New
 *   * General
