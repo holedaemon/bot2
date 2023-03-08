@@ -12,17 +12,19 @@ type Command struct {
 
 var commands = []Command{
 	{
-		Scoped: testGuildID,
+		Scoped: 0,
 		Data: api.CreateCommandData{
-			Name:        "ping",
-			Description: "The bot may have a little ping (as a treat)",
+			Name:           "ping",
+			Description:    "The bot may have a little ping (as a treat)",
+			NoDMPermission: true,
 		},
 	},
 	{
-		Scoped: testGuildID,
+		Scoped: 0,
 		Data: api.CreateCommandData{
-			Name:        "is-admin",
-			Description: "Debugging command to see if one is an admin",
+			Name:           "is-admin",
+			Description:    "Debugging command to see if one is an admin",
+			NoDMPermission: false,
 		},
 	},
 	{
@@ -33,6 +35,7 @@ var commands = []Command{
 			Options: discord.CommandOptions{
 				discord.NewStringOption("new-game", "The new game to change to", true),
 			},
+			NoDMPermission: false,
 		},
 	},
 	{
@@ -41,13 +44,15 @@ var commands = []Command{
 			Name:                     "panic",
 			Description:              "Test the recoverer middleware",
 			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageGuild),
+			NoDMPermission:           true,
 		},
 	},
 	{
 		Scoped: testGuildID,
 		Data: api.CreateCommandData{
-			Name:        "jerkcity",
-			Description: "Various commands relating to Jerkcity",
+			Name:           "jerkcity",
+			Description:    "Various commands relating to Jerkcity",
+			NoDMPermission: false,
 			Options: discord.CommandOptions{
 				discord.NewSubcommandOption(
 					"latest",
@@ -73,8 +78,10 @@ var commands = []Command{
 	{
 		Scoped: testGuildID,
 		Data: api.CreateCommandData{
-			Name:        "roles",
-			Description: "Moderator interface for vanity roles",
+			Name:                     "roles",
+			Description:              "Moderator interface for vanity roles",
+			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageRoles),
+			NoDMPermission:           true,
 			Options: discord.CommandOptions{
 				discord.NewSubcommandOption(
 					"create",
@@ -119,14 +126,14 @@ var commands = []Command{
 					discord.NewRoleOption("fifth", "Fifth role to import", false),
 				),
 			},
-			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageRoles),
 		},
 	},
 	{
 		Scoped: testGuildID,
 		Data: api.CreateCommandData{
-			Name:        "role",
-			Description: "Interface for vanity roles",
+			Name:           "role",
+			Description:    "Interface for vanity roles",
+			NoDMPermission: true,
 			Options: discord.CommandOptions{
 				discord.NewSubcommandOption(
 					"add",
@@ -151,6 +158,7 @@ var commands = []Command{
 			Name:                     "egoraptor",
 			Description:              "Moderator commands for configuring the Egoraptor functionality",
 			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageGuild),
+			NoDMPermission:           true,
 			Options: discord.CommandOptions{
 				discord.NewSubcommandOption(
 					"toggle",
