@@ -12,7 +12,7 @@ import (
 
 var (
 	dbError = &api.InteractionResponseData{
-		Content: option.NewNullableString("A database error has occurred xD"),
+		Content: option.NewNullableString("A database error has occurred, try again later or something"),
 		Flags:   discord.EphemeralMessage,
 	}
 )

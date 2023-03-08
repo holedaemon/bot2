@@ -50,7 +50,7 @@ func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.Inter
 
 	b.lastGameChange = time.Now()
 
-	return respond("The game has been changed. 👉👌")
+	return respond("The game has been changed 👉👌")
 }
 
 func (b *Bot) cmdPanic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {

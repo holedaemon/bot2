@@ -66,7 +66,7 @@ func (b *Bot) cmdRoleCreate(ctx context.Context, data cmdroute.CommandData) *api
 	tx, err := b.DB.BeginTx(ctx, nil)
 	if err != nil {
 		ctxlog.Error(ctx, "error creating transaction", zap.Error(err))
-		return respondError("Unable to create DB transaction, try again later")
+		return respondError("Error creating database transaction")
 	}
 
 	var color int32
@@ -85,7 +85,7 @@ func (b *Bot) cmdRoleCreate(ctx context.Context, data cmdroute.CommandData) *api
 	hoisted, err := data.Options.Find("hoisted").BoolValue()
 	if err != nil {
 		ctxlog.Error(ctx, "error converting option to bool", zap.Error(err))
-		return respondError("Unable to parse `hoisted` argument as boolean")
+		return respondError("Unable to parse argument as a boolean")
 	}
 
 	r, err := b.State.CreateRole(data.Event.GuildID, api.CreateRoleData{
@@ -96,8 +96,7 @@ func (b *Bot) cmdRoleCreate(ctx context.Context, data cmdroute.CommandData) *api
 	})
 	if err != nil {
 		ctxlog.Error(ctx, "error creating role", zap.Error(err))
-
-		return respondError("Error creating role, oops")
+		return respondError("Error creating role")
 	}
 
 	role := models.Role{
@@ -114,12 +113,12 @@ func (b *Bot) cmdRoleCreate(ctx context.Context, data cmdroute.CommandData) *api
 			ctxlog.Error(ctx, "error deleting role from Discord", zap.Error(err))
 		}
 
-		return respondError("A database error has occurred, try again later or something")
+		return dbError
 	}
 
 	if err := tx.Commit(); err != nil {
 		ctxlog.Error(ctx, "error committing transaction", zap.Error(err))
-		return respondError("A database error has occurred, try again later or something")
+		return dbError
 	}
 
 	return respondf("Role `%s` has been created", r.Name)
@@ -128,19 +127,19 @@ func (b *Bot) cmdRoleCreate(ctx context.Context, data cmdroute.CommandData) *api
 func (b *Bot) cmdRoleDelete(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	sf, err := data.Options.Find("role").SnowflakeValue()
 	if err != nil {
-		return respondError("Unable to convert the given argument into a Snowflake xD")
+		return respondError("Unable to convert the given argument into a snowflake")
 	}
 
 	tx, err := b.DB.BeginTx(ctx, nil)
 	if err != nil {
 		ctxlog.Error(ctx, "error beginning tx", zap.Error(err))
-		return respondError("A database error occurred :/")
+		return dbError
 	}
 
 	role, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).One(ctx, tx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return respondError("I'm not tracking a role by that ID, oop")
+			return respondError("I'm not tracking a role with that ID")
 		}
 
 		ctxlog.Error(ctx, "error querying for role", zap.Error(err))
@@ -158,7 +157,7 @@ func (b *Bot) cmdRoleDelete(ctx context.Context, data cmdroute.CommandData) *api
 
 	if err := b.State.DeleteRole(data.Event.GuildID, discord.RoleID(sf), "Deletion requested"); err != nil {
 		ctxlog.Error(ctx, "error deleting role", zap.Error(err))
-		return respondError("The API got mad at me when I tried deleting the role :/")
+		return respondError("The API got mad at me when I tried to delete the role")
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -166,7 +165,7 @@ func (b *Bot) cmdRoleDelete(ctx context.Context, data cmdroute.CommandData) *api
 		return dbError
 	}
 
-	return respond("Role has been deleted, woop woop")
+	return respond("Role has been deleted")
 }
 
 func (b *Bot) cmdRoleRelinquish(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
@@ -183,7 +182,7 @@ func (b *Bot) cmdRoleRelinquish(ctx context.Context, data cmdroute.CommandData) 
 		sf, err := opt.SnowflakeValue()
 		if err != nil {
 			ctxlog.Error(ctx, "error converting to snowflake", zap.Error(err))
-			return respondError("Unable to convert role to Snowflake")
+			return respondError("Unable to convert role to snowflake")
 		}
 
 		if !sf.IsValid() {
@@ -236,7 +235,7 @@ func (b *Bot) cmdRoleAdd(ctx context.Context, data cmdroute.CommandData) *api.In
 	}
 
 	if !exists {
-		return respondError("I'm not tracking that role!!!")
+		return respondError("I'm not tracking that role")
 	}
 
 	if err := b.State.AddRole(data.Event.GuildID, data.Event.SenderID(), discord.RoleID(sf), api.AddRoleData{
@@ -281,7 +280,7 @@ func (b *Bot) cmdRoleRename(ctx context.Context, data cmdroute.CommandData) *api
 
 	newName := data.Options.Find("new-name").String()
 	if newName == "" {
-		return respondError("You gotta give me a new name to use!!")
+		return respondError("You gotta give me a new name to use!")
 	}
 
 	exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).Exists(ctx, b.DB)
@@ -291,7 +290,7 @@ func (b *Bot) cmdRoleRename(ctx context.Context, data cmdroute.CommandData) *api
 	}
 
 	if !exists {
-		return respondError("I'm not tracking a role by that ID!!")
+		return respondError("I'm not tracking a role by that ID!")
 	}
 
 	if _, err := b.State.ModifyRole(data.Event.GuildID, discord.RoleID(sf), api.ModifyRoleData{
@@ -308,7 +307,7 @@ func (b *Bot) cmdRoleSetColor(ctx context.Context, data cmdroute.CommandData) *a
 	sf, err := data.Options.Find("role").SnowflakeValue()
 	if err != nil {
 		ctxlog.Error(ctx, "error parsing snowflake", zap.Error(err))
-		return respondError("The role you provided is invalid")
+		return respondError("Couldn't parse role argument as a snowflake")
 	}
 
 	role := discord.RoleID(sf)
@@ -320,7 +319,7 @@ func (b *Bot) cmdRoleSetColor(ctx context.Context, data cmdroute.CommandData) *a
 	}
 
 	if !exists {
-		return respondError("I'm not managing that role!")
+		return respondError("I'm not tracking that role!")
 	}
 
 	rawColor := data.Options.Find("color").String()
@@ -355,7 +354,7 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 		sf, err := opt.SnowflakeValue()
 		if err != nil {
 			ctxlog.Error(ctx, "error converting option to snowflake")
-			return respondError("Unable to convert option into Snowflake")
+			return respondError("Unable to convert option into snowflake")
 		}
 
 		if !sf.IsValid() {
@@ -405,13 +404,13 @@ func (b *Bot) cmdRoleList(ctx context.Context, data cmdroute.CommandData) *api.I
 		sf, err := discord.ParseSnowflake(r.RoleID)
 		if err != nil {
 			ctxlog.Error(ctx, "error parsing role ID into snowflake", zap.Error(err))
-			return respondError("OOPSIE WOOPSIE, unable to parse role ID into snowflake xD")
+			return respondError("Unable to convert role ID into snowflake")
 		}
 
 		role, err := b.State.Role(data.Event.GuildID, discord.RoleID(sf))
 		if err != nil {
 			ctxlog.Error(ctx, "error retrieving role from cabinet", zap.Error(err))
-			return respondError("Unable to retrieve role from cabinet :3")
+			return respondError("Unable to retrieve role from internal cache")
 		}
 
 		if i == len(roles)-1 {
