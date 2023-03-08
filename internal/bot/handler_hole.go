@@ -22,11 +22,12 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 		idx := rand.Intn(4) + 1
 		str := strconv.FormatInt(int64(idx), 10)
 		image := fakeGif("fortnite" + str)
-		_, err := b.State.SendMessage(m.ChannelID, image)
-		if err != nil {
-			ctxlog.Error(ctx, "error sending message", zap.Error(err))
-			return
+
+		if err := b.SendImage(m.ChannelID, "", image); err != nil {
+			ctxlog.Error(ctx, "error sending image to channel", zap.Error(err))
 		}
+
+		return
 	}
 
 	if regexTimeout.MatchString(m.Content) {
@@ -39,8 +40,8 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 		}
 
 		if cache.Author.ID == m.Author.ID {
-			if err := b.Reply(m.Message, fakeJPG("snipes")); err != nil {
-				ctxlog.Error(ctx, "error sending reply", zap.Error(err))
+			if err := b.SendImage(m.ChannelID, "", fakeJPG("snipes")); err != nil {
+				ctxlog.Error(ctx, "error sending image", zap.Error(err))
 			}
 			return
 		}
