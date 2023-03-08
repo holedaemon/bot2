@@ -37,6 +37,10 @@ func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.Inter
 		return respondError("You gotta gimme something to work with here!!!")
 	}
 
+	if len(newGame) > 128 {
+		return respondError("Game can only be 128 characters in length")
+	}
+
 	if err := b.State.Gateway().Send(ctx, &gateway.UpdatePresenceCommand{
 		Activities: []discord.Activity{{
 			Name: newGame,
