@@ -16,7 +16,7 @@ var commands = []Command{
 		Data: api.CreateCommandData{
 			Name:           "ping",
 			Description:    "The bot may have a little ping (as a treat)",
-			NoDMPermission: true,
+			NoDMPermission: false,
 		},
 	},
 	{
