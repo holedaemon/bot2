@@ -225,9 +225,7 @@ func (b *Bot) cmdRoleRelinquish(ctx context.Context, data cmdroute.CommandData) 
 	case 0:
 		return respond("Zero roles were relinquished")
 	case 1:
-		sb.WriteString("Role ")
-		sb.WriteString(roles[0])
-		sb.WriteString(" has been relinquished")
+		return respondf("Role %s has been relinquished", roles[0])
 	default:
 		sb.WriteString("Roles ")
 		for i, r := range roles {
@@ -424,9 +422,7 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 	case 0:
 		return respond("Zero roles were imported")
 	case 1:
-		sb.WriteString("Role ")
-		sb.WriteString(roles[0])
-		sb.WriteString(" has been imported into the database")
+		return respondf("Role %s has been imported into the database", roles[0])
 	default:
 		sb.WriteString("Roles ")
 		for i, r := range roles {
