@@ -3,11 +3,15 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/caarlos0/env/v7"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/holedaemon/bot2/internal/bot"
+	"github.com/holedaemon/bot2/internal/pkg/dbx"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 
@@ -15,50 +19,81 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
+type Options struct {
+	Debug             bool          `env:"BOT2_DEBUG" envDefault:"false"`
+	Admins            string        `env:"BOT2_ADMINS"`
+	Token             string        `env:"BOT2_TOKEN"`
+	DSN               string        `env:"BOT2_DSN"`
+	DBMaxAttempts     int           `env:"BOT2_DB_MAX_ATTEMPTS" envDefault:"10"`
+	DBTimeoutDuration time.Duration `env:"BOT2_DB_TIMEOUT_DURATION" envDefault:"20s"`
+}
+
 func main() {
-	rd := os.Getenv("BOT2_DEBUG")
-	debug := rd != ""
-	logger := ctxlog.New(debug)
+	opts := &Options{}
+	eo := env.Options{
+		RequiredIfNoDef: true,
+	}
 
-	rawAdmins := os.Getenv("BOT2_ADMINS")
+	if err := env.Parse(opts, eo); err != nil {
+		fmt.Fprintf(os.Stderr, "error parsing env variables into struct: %s\n", err.Error())
+		return
+	}
+
+	logger := ctxlog.New(opts.Debug)
+	ctx := ctxlog.WithLogger(context.Background(), logger)
+
+	rawAdmins := strings.Split(opts.Admins, ",")
 	admins := make(map[discord.UserID]struct{})
-	if rawAdmins != "" {
-		adminsSplit := strings.Split(rawAdmins, ",")
-		for _, a := range adminsSplit {
-			sf, err := discord.ParseSnowflake(a)
-			if err != nil {
-				logger.Fatal("error parsing admin ID into snowflake", zap.Error(err), zap.String("id", a))
-			}
-
-			admins[discord.UserID(sf)] = struct{}{}
+	for _, a := range rawAdmins {
+		sf, err := discord.ParseSnowflake(a)
+		if err != nil {
+			logger.Fatal("error parsing admin snowflake", zap.Error(err))
 		}
+
+		if _, ok := admins[discord.UserID(sf)]; ok {
+			continue
+		}
+
+		admins[discord.UserID(sf)] = struct{}{}
 	}
 
-	token := os.Getenv("BOT2_TOKEN")
-	if token == "" {
-		logger.Fatal("$BOT2_TOKEN is blank")
+	var (
+		db  *sql.DB
+		err error
+	)
+
+	connected := false
+	for i := 0; i < opts.DBMaxAttempts && !connected; i++ {
+		db, err = sql.Open(dbx.Driver, opts.DSN)
+		if err != nil {
+			logger.Error("unable to connect to database", zap.Error(err), zap.Int("attempt", i))
+			time.Sleep(opts.DBTimeoutDuration)
+			continue
+		}
+
+		if err = db.PingContext(ctx); err != nil {
+			logger.Error("unable to ping database", zap.Error(err), zap.Int("attempt", i))
+			time.Sleep(opts.DBTimeoutDuration)
+			continue
+		}
+
+		connected = true
 	}
 
-	dsn := os.Getenv("BOT2_DSN")
-	if dsn == "" {
-		logger.Fatal("$BOT2_DSN is blank")
+	if !connected {
+		logger.Fatal("max database attempts reached", zap.Int("attempts", opts.DBMaxAttempts))
 	}
 
-	db, err := sql.Open("pgx", dsn)
-	if err != nil {
-		logger.Fatal("error opening DB conn", zap.Error(err))
-	}
-
-	if err := db.Ping(); err != nil {
-		logger.Fatal("error pinging DB", zap.Error(err))
-	}
-
-	b, err := bot.New(token, bot.WithLogger(logger), bot.WithAdminMap(admins), bot.WithDB(db), bot.WithDebug(debug))
+	b, err := bot.New(
+		opts.Token,
+		bot.WithAdminMap(admins),
+		bot.WithDB(db),
+		bot.WithDebug(opts.Debug),
+	)
 	if err != nil {
 		logger.Fatal("error creating bot", zap.Error(err))
 	}
 
-	ctx := context.Background()
 	if err := b.Start(ctx); err != nil {
 		logger.Fatal("error starting bot", zap.Error(err))
 	}

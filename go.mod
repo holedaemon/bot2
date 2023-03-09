@@ -13,6 +13,8 @@ require (
 )
 
 require (
+	github.com/caarlos0/env v3.5.0+incompatible // indirect
+	github.com/caarlos0/env/v7 v7.1.0 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
