@@ -14,9 +14,6 @@ import (
 	"github.com/holedaemon/bot2/internal/pkg/dbx"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
-
-	// DB driver
-	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 type Options struct {
