@@ -53,7 +53,7 @@ func main() {
 		logger.Fatal("error pinging DB", zap.Error(err))
 	}
 
-	b, err := bot.New(token, bot.WithLogger(logger), bot.WithAdminMap(admins), bot.WithDB(db))
+	b, err := bot.New(token, bot.WithLogger(logger), bot.WithAdminMap(admins), bot.WithDB(db), bot.WithDebug(debug))
 	if err != nil {
 		logger.Fatal("error creating bot", zap.Error(err))
 	}

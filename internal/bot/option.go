@@ -10,6 +10,13 @@ import (
 // Option configures a Bot.
 type Option func(*Bot)
 
+// WithDebug toggles debug mode on a Bot.
+func WithDebug(debug bool) Option {
+	return func(b *Bot) {
+		b.Debug = debug
+	}
+}
+
 // WithLogger sets a Bot's logger.
 func WithLogger(l *zap.Logger) Option {
 	return func(b *Bot) {

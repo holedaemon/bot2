@@ -10,7 +10,15 @@ type Command struct {
 	Data   api.CreateCommandData
 }
 
-var commands = []Command{
+type commandList []Command
+
+func (cl commandList) Scoped(to discord.GuildID) {
+	for _, c := range cl {
+		c.Scoped = to
+	}
+}
+
+var commands = commandList{
 	{
 		Scoped: 0,
 		Data: api.CreateCommandData{

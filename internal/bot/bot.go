@@ -18,6 +18,8 @@ import (
 
 // Bot is a Discord bot account.
 type Bot struct {
+	Debug bool
+
 	State  *state.State
 	Logger *zap.Logger
 
@@ -63,6 +65,10 @@ func New(token string, opts ...Option) (*Bot, error) {
 	r := b.router()
 	b.State.AddInteractionHandler(r)
 	b.State.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages)
+
+	if b.Debug {
+		commands.Scoped(testGuildID)
+	}
 
 	cmds := make(map[discord.GuildID][]api.CreateCommandData)
 	for _, c := range commands {
