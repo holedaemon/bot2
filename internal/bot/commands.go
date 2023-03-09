@@ -161,7 +161,7 @@ var commands = commandList{
 		},
 	},
 	{
-		Scoped: testGuildID,
+		Scoped: scroteGuildID,
 		Data: api.CreateCommandData{
 			Name:                     "egoraptor",
 			Description:              "Moderator commands for configuring the Egoraptor functionality",
