@@ -230,9 +230,9 @@ func (b *Bot) cmdRoleRelinquish(ctx context.Context, data cmdroute.CommandData) 
 		sb.WriteString("Roles ")
 		for i, r := range roles {
 			if i == len(roles)-1 {
-				sb.WriteString(r + ", ")
-			} else {
 				sb.WriteString(r)
+			} else {
+				sb.WriteString(r + ", ")
 			}
 		}
 		sb.WriteString(" have been relinquished")
