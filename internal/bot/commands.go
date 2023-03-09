@@ -28,7 +28,7 @@ var commands = []Command{
 		},
 	},
 	{
-		Scoped: testGuildID,
+		Scoped: 0,
 		Data: api.CreateCommandData{
 			Name:        "game",
 			Description: "Change the bot's game presence",
@@ -48,7 +48,7 @@ var commands = []Command{
 		},
 	},
 	{
-		Scoped: testGuildID,
+		Scoped: 0,
 		Data: api.CreateCommandData{
 			Name:           "jerkcity",
 			Description:    "Various commands relating to Jerkcity",
@@ -76,7 +76,7 @@ var commands = []Command{
 		},
 	},
 	{
-		Scoped: testGuildID,
+		Scoped: 0,
 		Data: api.CreateCommandData{
 			Name:                     "roles",
 			Description:              "Moderator interface for vanity roles",
@@ -129,7 +129,7 @@ var commands = []Command{
 		},
 	},
 	{
-		Scoped: testGuildID,
+		Scoped: 0,
 		Data: api.CreateCommandData{
 			Name:           "role",
 			Description:    "Interface for vanity roles",
@@ -153,7 +153,7 @@ var commands = []Command{
 		},
 	},
 	{
-		Scoped: testGuildID,
+		Scoped: scroteGuildID,
 		Data: api.CreateCommandData{
 			Name:                     "egoraptor",
 			Description:              "Moderator commands for configuring the Egoraptor functionality",
