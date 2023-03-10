@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
@@ -9,9 +10,46 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"github.com/holedaemon/bot2/internal/version"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
+
+func (b *Bot) cmdInfo(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	user, err := b.State.Me()
+	if err != nil {
+		ctxlog.Error(ctx, "error getting user", zap.Error(err))
+		return respondError("Sorry, I'm having an identity crisis")
+	}
+
+	embed := discord.Embed{
+		Title:       fmt.Sprintf("Hi, I'm %s 👋", user.Username),
+		Description: "The winning submission of the 2016 Desert Bowl College STEM fair, submitted by James McCormick. James unfortunately passed away in an accident shortly after; this project is left running to honor his memory.",
+		Color:       discord.Color(4289797),
+		Author: &discord.EmbedAuthor{
+			Name: user.Username,
+			Icon: user.AvatarURL(),
+		},
+		Fields: []discord.EmbedField{
+			{
+				Name:   "Version",
+				Value:  version.Version(),
+				Inline: true,
+			},
+			{
+				Name:   "Uptime",
+				Value:  time.Since(b.connectedAt).Round(time.Second).String(),
+				Inline: true,
+			},
+			{
+				Name:  "Help",
+				Value: "[RTFM](https://holedaemon.net/bot/docs)",
+			},
+		},
+	}
+
+	return respondEmbeds(embed)
+}
 
 func (b *Bot) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	return &api.InteractionResponseData{

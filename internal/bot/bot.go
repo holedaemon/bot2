@@ -31,6 +31,7 @@ type Bot struct {
 	imageCache     *ImageCache
 	egoraptorData  *egoraptorData
 	lastGameChange time.Time
+	connectedAt    time.Time
 }
 
 // New creates a new Bot.
@@ -61,13 +62,14 @@ func New(token string, opts ...Option) (*Bot, error) {
 	b.State.AddHandler(b.onReady)
 	b.State.AddHandler(b.onGuildRoleDelete)
 	b.State.AddHandler(b.onMessage)
+	b.State.AddHandler(b.onReconnect)
 
 	r := b.router()
 	b.State.AddInteractionHandler(r)
 	b.State.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages)
 
 	if b.Debug {
-		commands.Scoped(testGuildID)
+		commands = commands.Scoped(testGuildID)
 	}
 
 	cmds := make(map[discord.GuildID][]api.CreateCommandData)

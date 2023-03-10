@@ -12,10 +12,17 @@ type Command struct {
 
 type commandList []Command
 
-func (cl commandList) Scoped(to discord.GuildID) {
+func (cl commandList) Scoped(to discord.GuildID) commandList {
+	newCmds := make(commandList, 0)
+
 	for _, c := range cl {
-		c.Scoped = to
+		newCmds = append(newCmds, Command{
+			Data:   c.Data,
+			Scoped: to,
+		})
 	}
+
+	return newCmds
 }
 
 var commands = commandList{
@@ -24,6 +31,22 @@ var commands = commandList{
 		Data: api.CreateCommandData{
 			Name:           "ping",
 			Description:    "The bot may have a little ping (as a treat)",
+			NoDMPermission: false,
+		},
+	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:           "info",
+			Description:    "Displays info about the bot",
+			NoDMPermission: false,
+		},
+	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:           "help",
+			Description:    "Displays info about the bot",
 			NoDMPermission: false,
 		},
 	},
@@ -161,7 +184,7 @@ var commands = commandList{
 		},
 	},
 	{
-		Scoped: scroteGuildID,
+		Scoped: testGuildID,
 		Data: api.CreateCommandData{
 			Name:                     "egoraptor",
 			Description:              "Moderator commands for configuring the Egoraptor functionality",

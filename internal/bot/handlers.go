@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	"time"
 
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/zikaeroh/ctxlog"
@@ -10,6 +11,14 @@ import (
 
 func (b *Bot) onReady(r *gateway.ReadyEvent) {
 	b.Logger.Info("connected to Discord gateway", zap.Any("user_id", r.User.ID))
+	if b.connectedAt.IsZero() {
+		b.connectedAt = time.Now()
+	}
+}
+
+func (b *Bot) onReconnect(r *gateway.ReconnectEvent) {
+	b.Logger.Info("reconnected to Discord gateway")
+	b.connectedAt = time.Now()
 }
 
 func (b *Bot) onMessage(m *gateway.MessageCreateEvent) {

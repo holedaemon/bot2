@@ -40,6 +40,8 @@ func (b *Bot) router() *cmdroute.Router {
 	r.Use(b.useRouter())
 	r.Use(recoverer())
 
+	r.AddFunc("info", b.cmdInfo)
+	r.AddFunc("help", b.cmdInfo)
 	r.AddFunc("ping", b.cmdPing)
 	r.AddFunc("is-admin", b.cmdIsAdmin)
 	r.AddFunc("game", b.cmdGame)
