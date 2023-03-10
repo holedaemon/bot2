@@ -9,7 +9,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
-	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/holedaemon/bot2/internal/version"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
@@ -52,9 +51,7 @@ func (b *Bot) cmdInfo(ctx context.Context, data cmdroute.CommandData) *api.Inter
 }
 
 func (b *Bot) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	return &api.InteractionResponseData{
-		Content: option.NewNullableString("Who up riding they pig !?"),
-	}
+	return respond("Who up riding they pig !?")
 }
 
 func (b *Bot) cmdIsAdmin(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
