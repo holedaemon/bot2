@@ -40,7 +40,7 @@ jobs:
       run: docker build --file Dockerfile --tag bot2:latest --tag bot2:${{ env.BOT2_VERSION }} --build-arg version=${{ env.BOT2_VERSION }} .
 
     - name: Push to GitHub
-      if: ${{ github.repository == 'bot2/bot2' && github.event_name == 'push' && github.ref == 'refs/heads/trunk' }}
+      if: ${{ github.repository == 'holedaemon/bot2' && github.event_name == 'push' && github.ref == 'refs/heads/trunk' }}
       run: |
         echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
         docker tag bot2:latest ghcr.io/holedaemon/bot2:latest
