@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - trunk
+  pull_request:
+    branches:
+      - trunk
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Get Version
+      run: |
+        BOT2_VERSION="r$(git rev-list --count HEAD).$(git rev-parse --short HEAD)"
+        echo BOT2_VERSION=$BOT2_VERSION >> $GITHUB_ENV
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '^1.20.2'
+
+    - name: Tidy modules
+      run: go mod tidy
+
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v2
+
+    - name: Turnstyle
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/head/trunk' }}
+      uses: softprops/turnstyle@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build Image
+      run: docker build --file Dockerfile --tag bot2:latest --tag bot2:${{ env.BOT2_VERSION }} --build-arg version=${{ env.BOT2_VERSION }}
+
+    - name: Push to GitHub
+      if: ${{ github.repository == 'bot2/bot2' && github.event_name == 'push' && github.ref == 'refs/heads/trunk' }}
+      run: |
+        echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+        docker tag bot2:latest ghcr.io/holedaemon/bot2:latest
+        docker tag bot2:${{ env.BOT2_VERSION }} ghcr.io/holedaemon/bot2:${{ env.BOT2_VERSION }}
+        docker push ghcr.io/holedaemon/bot2:latest
+        docker push ghcr.io/holedaemon/bot2:${{ env.BOT2_VERSION }}
