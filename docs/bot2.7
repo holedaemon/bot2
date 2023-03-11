@@ -1,0 +1,108 @@
+.TH "BOT2" "7" "2023\-03\-10" "BOT2" "BOT2 Manual"
+.SH NAME
+BOT2 \- It's another shitty Discord bot
+
+.SH DESCRIPTION
+The winning submission of the 2016 Desert Bowl College STEM fair, submitted by James McCormick. James unfortunately passed away in an accident shortly after; this project is left running to honor his memory.
+
+.SH HOW TO READ
+You could also use read the slash command descriptions on your client, you know. IT'S NOT MY JOB TO EDUCATE YOU
+
+Arguments wrapped in [] are optional.
+
+Arguments wrapped in <> are required.
+
+.SH COMMANDS
+
+.SS MISCELLANEOUS
+General commands, you get the idea
+
+.TP
+.B /info
+Learn about the bot. :)
+
+.TP
+.B /help
+Does the same as /info.
+
+.TP
+.B /ping
+"Pings" the bot.
+
+.TP
+.B /game <new-game>
+Change the bot's playing status. Only allowed once per hour.
+
+.SS JERKCITY
+An interface for Jerkcity/BoneQuest's API.
+
+.TP
+.B /jerkcity episode <number>
+Fetches an episode of Jerkcity by its number.
+
+.TP
+.B /jerkcity latest
+Fetches the latest episode of Jerkcity.
+
+.TP
+.B /jerkcity random
+Fetches a random episode of Jerkcity.
+
+.TP
+.B /jerkcity search <query>
+Searches the Jerkcity API for the given query.
+
+.SS ROLE
+User commands pertaining to vanity roles, AKA self-assignable roles. These replace the pronoun commands found in previous iterations of the bot. Roles must be created or imported by a server administrator before being assignable.
+
+.TP
+.B /role add <role>
+Add a vanity role to yourself.
+
+.TP
+.B /role remove <role>
+Remove a vanity role from yourself.
+
+.TP
+.B /role list
+List all the vanity roles being managed by the bot.
+
+.SS ROLES
+
+
+Moderator commands pertaining to vanity roles; under their own command because Discord sucks donkey balls. These commands require you to have MANAGE_ROLES on yr server.
+
+.TP
+.B /roles create <name> [color]
+Create a new Discord role with the given settings and add it to the database.
+
+.TP
+.B /roles delete <name>
+Delete a role from the server and database.
+
+.TP
+.B /roles rename <new-name>
+Rename a role. Kind of self-explanatory.
+
+.TP
+.B /roles setcolor <role> <color>
+Update a role's color.
+
+.TP
+.B /roles import <one> [two] [three] [four] [five]
+Import up to 5 roles into the database.
+
+.TP
+.B / roles relinquish <one> [two] [three] [four] [five]
+Remove up to 5 roles from the database.
+
+.SS EGORAPTOR
+Moderator commands for configuring the unfortunate egoraptor functionality. SCROTEGANG only.
+
+.TP
+.B /egoraptor toggle <toggled>
+Toggle timing users out when they mention egoraptor eating pussy. Requires MANAGE_GUILD.
+
+.TP
+.B /egoraptor settimeout <seconds>
+Sets the length of an egoraptor-related timeout.
