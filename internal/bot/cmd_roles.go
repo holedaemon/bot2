@@ -50,7 +50,9 @@ func (b *Bot) onGuildRoleDelete(e *gateway.GuildRoleDeleteEvent) {
 
 	if err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", e.GuildID.String(), e.RoleID.String())).DeleteAll(ctx, tx); err != nil {
 		log.Error("error deleting role", zap.Error(err))
-		tx.Rollback()
+		if err := tx.Rollback(); err != nil {
+			ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
+		}
 		return
 	}
 }
@@ -103,7 +105,9 @@ func (b *Bot) cmdRoleCreate(ctx context.Context, data cmdroute.CommandData) *api
 	}
 
 	if err := role.Insert(ctx, tx, boil.Infer()); err != nil {
-		tx.Rollback()
+		if err := tx.Rollback(); err != nil {
+			ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
+		}
 
 		if err := b.State.DeleteRole(data.Event.GuildID, r.ID, "rolling back"); err != nil {
 			ctxlog.Error(ctx, "error deleting role from Discord", zap.Error(err))
@@ -153,7 +157,9 @@ func (b *Bot) cmdRoleDelete(ctx context.Context, data cmdroute.CommandData) *api
 
 	if err := b.State.DeleteRole(data.Event.GuildID, discord.RoleID(sf), "Deletion requested"); err != nil {
 		ctxlog.Error(ctx, "error deleting role", zap.Error(err))
-		tx.Rollback()
+		if err := tx.Rollback(); err != nil {
+			ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
+		}
 		return respondError("The API got mad at me when I tried to delete the role")
 	}
 
@@ -198,13 +204,17 @@ func (b *Bot) cmdRoleRelinquish(ctx context.Context, data cmdroute.CommandData) 
 				continue
 			}
 
-			tx.Rollback()
 			ctxlog.Error(ctx, "error querying for role", zap.Error(err))
+			if err := tx.Rollback(); err != nil {
+				ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
+			}
 			return dbError
 		}
 
 		if err := role.Delete(ctx, tx); err != nil {
-			tx.Rollback()
+			if err := tx.Rollback(); err != nil {
+				ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
+			}
 			ctxlog.Error(ctx, "error deleting role", zap.Error(err))
 			return respondErrorf("There was an issue deleting <@&%s> from the database", sf.String())
 		}
@@ -387,7 +397,9 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 		exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", sf.String(), data.Event.GuildID.String())).Exists(ctx, tx)
 		if err != nil {
 			ctxlog.Error(ctx, "error checking for role in database", zap.Error(err))
-			tx.Rollback()
+			if err := tx.Rollback(); err != nil {
+				ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
+			}
 			return dbError
 		}
 
@@ -402,7 +414,9 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 
 		if err := role.Insert(ctx, tx, boil.Infer()); err != nil {
 			ctxlog.Error(ctx, "error inserting role", zap.Error(err))
-			tx.Rollback()
+			if err := tx.Rollback(); err != nil {
+				ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
+			}
 			return respondErrorf("There was an issue inserting <@&%s> into the database", sf.String())
 		}
 

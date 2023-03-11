@@ -130,9 +130,6 @@ func fmtDur(d time.Duration) string {
 	}
 
 	seconds = remaining / 1000000
-	if seconds > 0 {
-		remaining -= seconds * 1000000
-	}
 
 	type durMap struct {
 		name string
