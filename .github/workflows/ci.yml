@@ -37,7 +37,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build Image
-      run: docker build --file Dockerfile --tag bot2:latest --tag bot2:${{ env.BOT2_VERSION }} --build-arg version=${{ env.BOT2_VERSION }}
+      run: docker build --file Dockerfile --tag bot2:latest --tag bot2:${{ env.BOT2_VERSION }} --build-arg version=${{ env.BOT2_VERSION }} .
 
     - name: Push to GitHub
       if: ${{ github.repository == 'bot2/bot2' && github.event_name == 'push' && github.ref == 'refs/heads/trunk' }}
