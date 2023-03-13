@@ -5,6 +5,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
+	"github.com/holedaemon/bot2/internal/db/modelsx"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
@@ -18,18 +19,17 @@ func (b *Bot) cmdEgoraptorToggle(ctx context.Context, data cmdroute.CommandData)
 		return respondError("Error converting argument to boolean")
 	}
 
-	ego, err := b.loadEgoraptorData()
+	ego, err := modelsx.FetchMention(ctx, b.DB, data.Event.GuildID)
 	if err != nil {
-		ctxlog.Error(ctx, "error loading egoraptor data", zap.Error(err))
-		return respondError("Error loading egoraptor data")
+		ctxlog.Error(ctx, "error querying for egoraptor mention", zap.Error(err))
+		return dbError
 	}
 
-	ego.SetTimeout(toggled)
+	ego.TimeoutOnMention = toggled
 
-	err = b.writeEgoraptorData()
-	if err != nil {
-		ctxlog.Error(ctx, "error writing egoraptor data", zap.Error(err))
-		return respond("Error saving settings")
+	if err := modelsx.UpsertMention(ctx, b.DB, ego); err != nil {
+		ctxlog.Error(ctx, "error upserting egoraptor mention", zap.Error(err))
+		return dbError
 	}
 
 	if toggled {
@@ -54,18 +54,17 @@ func (b *Bot) cmdEgoraptorSetTimeout(ctx context.Context, data cmdroute.CommandD
 		return respondError("The number of seconds cannot exceed a week")
 	}
 
-	ego, err := b.loadEgoraptorData()
+	ego, err := modelsx.FetchMention(ctx, b.DB, data.Event.GuildID)
 	if err != nil {
-		ctxlog.Error(ctx, "error loading egoraptor data", zap.Error(err))
-		return respondError("Error loading egoraptor data")
+		ctxlog.Error(ctx, "error querying for egoraptor mention", zap.Error(err))
+		return dbError
 	}
 
-	ego.SetTimeoutLength(seconds)
+	ego.TimeoutLength = int(seconds)
 
-	err = b.writeEgoraptorData()
-	if err != nil {
-		ctxlog.Error(ctx, "error writing egoraptor data", zap.Error(err))
-		return respond("Error saving settings")
+	if err := modelsx.UpsertMention(ctx, b.DB, ego); err != nil {
+		ctxlog.Error(ctx, "error upserting egoraptor mention", zap.Error(err))
+		return dbError
 	}
 
 	if seconds == 1 {

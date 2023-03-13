@@ -29,7 +29,6 @@ type Bot struct {
 	Admins map[discord.UserID]struct{}
 
 	imageCache     *ImageCache
-	egoraptorData  *egoraptorData
 	lastGameChange time.Time
 	connectedAt    time.Time
 }

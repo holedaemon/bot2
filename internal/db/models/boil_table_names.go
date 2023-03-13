@@ -4,7 +4,9 @@
 package models
 
 var TableNames = struct {
-	Roles string
+	EgoraptorMentions string
+	Roles             string
 }{
-	Roles: "roles",
+	EgoraptorMentions: "egoraptor_mentions",
+	Roles:             "roles",
 }

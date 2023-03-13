@@ -9,21 +9,34 @@ import (
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"github.com/holedaemon/bot2/internal/db/modelsx"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
 
 var egoraptorRegexp = regexp.MustCompile(`.*(egoraptor|arin\shanson|arin).*(cunnilingus|pussy|cunt|vagina).*`)
 
+var azLoc *time.Location
+
+func init() {
+	loc, err := time.LoadLocation("America/Phoenix")
+	if err != nil {
+		panic(err)
+	}
+
+	azLoc = loc
+}
+
 func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent) {
 	if egoraptorRegexp.MatchString(m.Content) {
-		data, err := b.loadEgoraptorData()
+		data, err := modelsx.FetchMention(ctx, b.DB, m.GuildID)
 		if err != nil {
-			ctxlog.Error(ctx, "error loading egoraptor data", zap.Error(err))
+			ctxlog.Error(ctx, "error querying egoraptor mention", zap.Error(err))
 			return
 		}
 
-		since := time.Since(data.LastTimestamp)
+		timestamp := data.LastTimestamp
+		since := time.Since(timestamp)
 		dur := fmtDur(since)
 
 		content := fmt.Sprintf("It has been %s since the last mention of egoraptor eating pussy", dur)
@@ -48,10 +61,13 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 			}
 		}
 
-		data.Update(m.Author.ID)
-		if err := b.writeEgoraptorData(); err != nil {
-			ctxlog.Error(ctx, "error writing egoraptor data", zap.Error(err))
-			return
+		data.Count++
+		data.LastTimestamp = time.Now().In(azLoc)
+		data.LastUser = m.Author.ID.String()
+
+		err = modelsx.UpsertMention(ctx, b.DB, data)
+		if err != nil {
+			ctxlog.Error(ctx, "error upserting egoraptor mention", zap.Error(err))
 		}
 	}
 }
