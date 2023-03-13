@@ -12,17 +12,6 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
-const DefaultEgoraptorTimeout = 60
-
-var mentionUpdate = boil.Whitelist(
-	models.EgoraptorMentionColumns.UpdatedAt,
-	models.EgoraptorMentionColumns.LastTimestamp,
-	models.EgoraptorMentionColumns.LastUser,
-	models.EgoraptorMentionColumns.Count,
-	models.EgoraptorMentionColumns.TimeoutLength,
-	models.EgoraptorMentionColumns.TimeoutOnMention,
-)
-
 var azLoc *time.Location
 
 func init() {
@@ -33,6 +22,19 @@ func init() {
 
 	azLoc = loc
 }
+
+// DefaultEgoraptorTimeout is the default number of seconds to timeout
+// users.
+const DefaultEgoraptorTimeout = 60
+
+var mentionUpdate = boil.Whitelist(
+	models.EgoraptorMentionColumns.UpdatedAt,
+	models.EgoraptorMentionColumns.LastTimestamp,
+	models.EgoraptorMentionColumns.LastUser,
+	models.EgoraptorMentionColumns.Count,
+	models.EgoraptorMentionColumns.TimeoutLength,
+	models.EgoraptorMentionColumns.TimeoutOnMention,
+)
 
 // UpsertMention inserts a mention, or updates it should it have changed.
 func UpsertMention(ctx context.Context, exec boil.ContextExecutor, m *models.EgoraptorMention) error {
