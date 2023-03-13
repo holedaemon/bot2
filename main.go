@@ -11,7 +11,7 @@ import (
 	"github.com/caarlos0/env/v7"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/holedaemon/bot2/internal/bot"
-	"github.com/holedaemon/bot2/internal/pkg/dbx"
+	"github.com/holedaemon/bot2/internal/db/dbx"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
