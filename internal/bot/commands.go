@@ -174,7 +174,7 @@ var commands = commandList{
 				discord.NewSubcommandOption(
 					"remove",
 					"Remove a vanity role from yourself",
-					discord.NewStringOption("role", "The role to remove", true),
+					discord.NewRoleOption("role", "The role to remove", true),
 				),
 				discord.NewSubcommandOption(
 					"list",
