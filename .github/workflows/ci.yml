@@ -17,6 +17,7 @@ jobs:
     - name: Get Version
       run: |
         BOT2_VERSION="r$(git rev-list --count HEAD).$(git rev-parse --short HEAD)"
+        echo $BOT2_VERSION
         echo BOT2_VERSION=$BOT2_VERSION >> $GITHUB_ENV
 
     - name: Set up Go
