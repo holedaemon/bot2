@@ -30,7 +30,6 @@ type Bot struct {
 
 	imageCache     *ImageCache
 	lastGameChange time.Time
-	connectedAt    time.Time
 }
 
 // New creates a new Bot.

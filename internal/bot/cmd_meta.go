@@ -37,12 +37,13 @@ func (b *Bot) cmdInfo(ctx context.Context, data cmdroute.CommandData) *api.Inter
 			},
 			{
 				Name:   "Uptime",
-				Value:  time.Since(b.connectedAt).Round(time.Second).String(),
+				Value:  "∞",
 				Inline: true,
 			},
 			{
-				Name:  "Help",
-				Value: "[RTFM](https://holedaemon.net/bot/docs)",
+				Name:   "Help",
+				Value:  "[RTFM](https://holedaemon.net/bot/docs)",
+				Inline: true,
 			},
 		},
 	}
