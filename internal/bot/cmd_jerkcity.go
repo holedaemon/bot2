@@ -102,21 +102,28 @@ func (b *Bot) cmdJerkcitySearch(ctx context.Context, data cmdroute.CommandData) 
 	} else {
 		var sb strings.Builder
 
-		for i := 0; i < 10; i++ {
-			e := results.Episodes[i]
+		stop := 10
+
+		for i, e := range results.Episodes {
+			if i == stop-1 {
+				break
+			}
+
 			sb.WriteString(
 				fmt.Sprintf("[%d - %s](https://bonequest.com/%d)\n", e.Episode, e.Title, e.Episode),
 			)
 		}
 
-		more := len(results.Episodes[9:])
-		sb.WriteString(
-			fmt.Sprintf(
-				"[and %d more](https://bonequest.com/search/?q=%s)",
-				more,
-				url.QueryEscape(search),
-			),
-		)
+		if len(results.Episodes) > stop {
+			more := len(results.Episodes[9:])
+			sb.WriteString(
+				fmt.Sprintf(
+					"[and %d more](https://bonequest.com/search/?q=%s)",
+					more,
+					url.QueryEscape(search),
+				),
+			)
+		}
 
 		embed.Description = sb.String()
 	}
