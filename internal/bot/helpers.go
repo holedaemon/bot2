@@ -83,6 +83,17 @@ func roleInSlice(id discord.RoleID, list []discord.RoleID) bool {
 	return false
 }
 
+func wordInContent(content string, sl []string) bool {
+	content = strings.ToLower(content)
+	for _, s := range sl {
+		if strings.Contains(content, strings.ToLower(s)) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func fakePNG(path string) string {
 	return fakeCDN + "/" + path + ".png"
 }

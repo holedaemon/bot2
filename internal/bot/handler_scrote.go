@@ -3,7 +3,6 @@ package bot
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
@@ -14,7 +13,8 @@ import (
 	"go.uber.org/zap"
 )
 
-var egoraptorRegexp = regexp.MustCompile(`.*(egoraptor|arin\shanson|arin).*(cunnilingus|pussy|cunt|vagina).*`)
+var egoraptorNames = []string{"egoraptor", "arin hanson", "arin"}
+var egoraptorThings = []string{"cunnilingus", "pussy", "cunt", "vagina"}
 
 var azLoc *time.Location
 
@@ -28,7 +28,10 @@ func init() {
 }
 
 func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent) {
-	if egoraptorRegexp.MatchString(m.Content) {
+	namesCheck := wordInContent(m.Content, egoraptorNames)
+	thingsCheck := wordInContent(m.Content, egoraptorThings)
+
+	if namesCheck && thingsCheck {
 		data, err := modelsx.FetchMention(ctx, b.DB, m.GuildID)
 		if err != nil {
 			ctxlog.Error(ctx, "error querying egoraptor mention", zap.Error(err))
