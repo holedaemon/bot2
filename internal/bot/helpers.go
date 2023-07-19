@@ -180,3 +180,11 @@ func fmtDur(d time.Duration) string {
 
 	return strings.TrimSuffix(sb.String(), ", ")
 }
+
+func jumpLink(guild discord.GuildID, channel discord.ChannelID, message discord.MessageID) string {
+	return jumpLinkString(guild.String(), channel.String(), message.String())
+}
+
+func jumpLinkString(guild, channel, message string) string {
+	return fmt.Sprintf("https://discord.com/channels/%s/%s/%s", guild, channel, message)
+}

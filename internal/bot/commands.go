@@ -208,4 +208,15 @@ var commands = commandList{
 			},
 		},
 	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:        "q",
+			Description: "Query server quotes",
+			Options: discord.CommandOptions{
+				discord.NewIntegerOption("index", "Quote index", false),
+				discord.NewUserOption("user", "Member to query", false),
+			},
+		},
+	},
 }

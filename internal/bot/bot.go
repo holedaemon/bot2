@@ -61,10 +61,12 @@ func New(token string, opts ...Option) (*Bot, error) {
 	b.State.AddHandler(b.onGuildRoleDelete)
 	b.State.AddHandler(b.onMessage)
 	b.State.AddHandler(b.onReconnect)
+	b.State.AddHandler(b.onMessageReactionAdd)
+	b.State.AddHandler(b.onMessageEdit)
 
 	r := b.router()
 	b.State.AddInteractionHandler(r)
-	b.State.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages)
+	b.State.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages | gateway.IntentGuildMessageReactions)
 
 	if b.Debug {
 		commands = commands.Scoped(testGuildID)

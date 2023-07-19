@@ -74,5 +74,7 @@ func (b *Bot) router() *cmdroute.Router {
 		r.AddFunc("settimeout", b.cmdEgoraptorSetTimeout)
 	})
 
+	r.AddFunc("q", b.cmdQ)
+
 	return r
 }

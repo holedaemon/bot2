@@ -23,79 +23,100 @@ import (
 
 // Quote is an object representing the database table.
 type Quote struct {
-	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Quote     string    `boil:"quote" json:"quote" toml:"quote" yaml:"quote"`
-	Num       int64     `boil:"num" json:"num" toml:"num" yaml:"num"`
-	GuildID   string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
-	ChannelID string    `boil:"channel_id" json:"channel_id" toml:"channel_id" yaml:"channel_id"`
-	MessageID string    `boil:"message_id" json:"message_id" toml:"message_id" yaml:"message_id"`
-	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	ID             int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Quote          string    `boil:"quote" json:"quote" toml:"quote" yaml:"quote"`
+	Num            int       `boil:"num" json:"num" toml:"num" yaml:"num"`
+	QuoterID       string    `boil:"quoter_id" json:"quoter_id" toml:"quoter_id" yaml:"quoter_id"`
+	QuotedID       string    `boil:"quoted_id" json:"quoted_id" toml:"quoted_id" yaml:"quoted_id"`
+	QuotedUsername string    `boil:"quoted_username" json:"quoted_username" toml:"quoted_username" yaml:"quoted_username"`
+	GuildID        string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
+	ChannelID      string    `boil:"channel_id" json:"channel_id" toml:"channel_id" yaml:"channel_id"`
+	MessageID      string    `boil:"message_id" json:"message_id" toml:"message_id" yaml:"message_id"`
+	CreatedAt      time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt      time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *quoteR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L quoteL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var QuoteColumns = struct {
-	ID        string
-	Quote     string
-	Num       string
-	GuildID   string
-	ChannelID string
-	MessageID string
-	CreatedAt string
-	UpdatedAt string
+	ID             string
+	Quote          string
+	Num            string
+	QuoterID       string
+	QuotedID       string
+	QuotedUsername string
+	GuildID        string
+	ChannelID      string
+	MessageID      string
+	CreatedAt      string
+	UpdatedAt      string
 }{
-	ID:        "id",
-	Quote:     "quote",
-	Num:       "num",
-	GuildID:   "guild_id",
-	ChannelID: "channel_id",
-	MessageID: "message_id",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
+	ID:             "id",
+	Quote:          "quote",
+	Num:            "num",
+	QuoterID:       "quoter_id",
+	QuotedID:       "quoted_id",
+	QuotedUsername: "quoted_username",
+	GuildID:        "guild_id",
+	ChannelID:      "channel_id",
+	MessageID:      "message_id",
+	CreatedAt:      "created_at",
+	UpdatedAt:      "updated_at",
 }
 
 var QuoteTableColumns = struct {
-	ID        string
-	Quote     string
-	Num       string
-	GuildID   string
-	ChannelID string
-	MessageID string
-	CreatedAt string
-	UpdatedAt string
+	ID             string
+	Quote          string
+	Num            string
+	QuoterID       string
+	QuotedID       string
+	QuotedUsername string
+	GuildID        string
+	ChannelID      string
+	MessageID      string
+	CreatedAt      string
+	UpdatedAt      string
 }{
-	ID:        "quotes.id",
-	Quote:     "quotes.quote",
-	Num:       "quotes.num",
-	GuildID:   "quotes.guild_id",
-	ChannelID: "quotes.channel_id",
-	MessageID: "quotes.message_id",
-	CreatedAt: "quotes.created_at",
-	UpdatedAt: "quotes.updated_at",
+	ID:             "quotes.id",
+	Quote:          "quotes.quote",
+	Num:            "quotes.num",
+	QuoterID:       "quotes.quoter_id",
+	QuotedID:       "quotes.quoted_id",
+	QuotedUsername: "quotes.quoted_username",
+	GuildID:        "quotes.guild_id",
+	ChannelID:      "quotes.channel_id",
+	MessageID:      "quotes.message_id",
+	CreatedAt:      "quotes.created_at",
+	UpdatedAt:      "quotes.updated_at",
 }
 
 // Generated where
 
 var QuoteWhere = struct {
-	ID        whereHelperint64
-	Quote     whereHelperstring
-	Num       whereHelperint64
-	GuildID   whereHelperstring
-	ChannelID whereHelperstring
-	MessageID whereHelperstring
-	CreatedAt whereHelpertime_Time
-	UpdatedAt whereHelpertime_Time
+	ID             whereHelperint64
+	Quote          whereHelperstring
+	Num            whereHelperint
+	QuoterID       whereHelperstring
+	QuotedID       whereHelperstring
+	QuotedUsername whereHelperstring
+	GuildID        whereHelperstring
+	ChannelID      whereHelperstring
+	MessageID      whereHelperstring
+	CreatedAt      whereHelpertime_Time
+	UpdatedAt      whereHelpertime_Time
 }{
-	ID:        whereHelperint64{field: "\"quotes\".\"id\""},
-	Quote:     whereHelperstring{field: "\"quotes\".\"quote\""},
-	Num:       whereHelperint64{field: "\"quotes\".\"num\""},
-	GuildID:   whereHelperstring{field: "\"quotes\".\"guild_id\""},
-	ChannelID: whereHelperstring{field: "\"quotes\".\"channel_id\""},
-	MessageID: whereHelperstring{field: "\"quotes\".\"message_id\""},
-	CreatedAt: whereHelpertime_Time{field: "\"quotes\".\"created_at\""},
-	UpdatedAt: whereHelpertime_Time{field: "\"quotes\".\"updated_at\""},
+	ID:             whereHelperint64{field: "\"quotes\".\"id\""},
+	Quote:          whereHelperstring{field: "\"quotes\".\"quote\""},
+	Num:            whereHelperint{field: "\"quotes\".\"num\""},
+	QuoterID:       whereHelperstring{field: "\"quotes\".\"quoter_id\""},
+	QuotedID:       whereHelperstring{field: "\"quotes\".\"quoted_id\""},
+	QuotedUsername: whereHelperstring{field: "\"quotes\".\"quoted_username\""},
+	GuildID:        whereHelperstring{field: "\"quotes\".\"guild_id\""},
+	ChannelID:      whereHelperstring{field: "\"quotes\".\"channel_id\""},
+	MessageID:      whereHelperstring{field: "\"quotes\".\"message_id\""},
+	CreatedAt:      whereHelpertime_Time{field: "\"quotes\".\"created_at\""},
+	UpdatedAt:      whereHelpertime_Time{field: "\"quotes\".\"updated_at\""},
 }
 
 // QuoteRels is where relationship names are stored.
@@ -115,8 +136,8 @@ func (*quoteR) NewStruct() *quoteR {
 type quoteL struct{}
 
 var (
-	quoteAllColumns            = []string{"id", "quote", "num", "guild_id", "channel_id", "message_id", "created_at", "updated_at"}
-	quoteColumnsWithoutDefault = []string{"quote", "num", "guild_id", "channel_id", "message_id"}
+	quoteAllColumns            = []string{"id", "quote", "num", "quoter_id", "quoted_id", "quoted_username", "guild_id", "channel_id", "message_id", "created_at", "updated_at"}
+	quoteColumnsWithoutDefault = []string{"quote", "num", "quoter_id", "quoted_id", "quoted_username", "guild_id", "channel_id", "message_id"}
 	quoteColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	quotePrimaryKeyColumns     = []string{"id"}
 	quoteGeneratedColumns      = []string{}
