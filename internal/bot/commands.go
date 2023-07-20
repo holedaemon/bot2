@@ -211,8 +211,9 @@ var commands = commandList{
 	{
 		Scoped: 0,
 		Data: api.CreateCommandData{
-			Name:        "q",
-			Description: "Query server quotes",
+			Name:           "q",
+			Description:    "Query guild quotes",
+			NoDMPermission: true,
 			Options: discord.CommandOptions{
 				discord.NewIntegerOption("index", "Quote index", false),
 				discord.NewUserOption("user", "Member to query", false),
@@ -222,8 +223,9 @@ var commands = commandList{
 	{
 		Scoped: 0,
 		Data: api.CreateCommandData{
-			Name:        "quote",
-			Description: "Interact with server quotes",
+			Name:           "quote",
+			Description:    "Interact with guild quotes",
+			NoDMPermission: true,
 			Options: discord.CommandOptions{
 				discord.NewSubcommandOption(
 					"delete",
