@@ -19,7 +19,8 @@
 		"scope": "go",
 		"prefix": "cs",
 		"body": [
-			"func ${1:name}(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData"
-		]
+			"func (b *Bot) ${1:name}(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData"
+		],
+		"description": "Create a bot2 command function"
 	}
 }
