@@ -2,4 +2,6 @@ BEGIN;
 
 DROP TABLE quotes;
 
+DROP TABLE guilds;
+
 COMMIT;
