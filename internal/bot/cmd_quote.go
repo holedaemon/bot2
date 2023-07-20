@@ -11,6 +11,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/holedaemon/bot2/internal/db/models"
+	"github.com/holedaemon/bot2/internal/db/modelsx"
 	"github.com/volatiletech/null/v9"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -51,6 +52,20 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 			return
 		}
 	}()
+
+	guild, err := modelsx.FetchGuild(ctx, tx, ev.GuildID)
+	if err != nil {
+		log.Error("error fetching guild", zap.Error(err))
+		return
+	}
+	if guild == nil {
+		log.Warn("database record not found for guild")
+		return
+	}
+
+	if !guild.DoQuotes {
+		return
+	}
 
 	exists, err := models.Quotes(qm.Where("message_id = ?", ev.MessageID.String())).Exists(ctx, tx)
 	if err != nil {
@@ -169,6 +184,21 @@ func (b *Bot) cmdQ(ctx context.Context, data cmdroute.CommandData) *api.Interact
 	if err != nil {
 		ctxlog.Error(ctx, "error retrieving quote index", zap.Error(err))
 		return respondError("The index provided is malformed")
+	}
+
+	guild, err := modelsx.FetchGuild(ctx, b.DB, data.Event.GuildID)
+	if err != nil {
+		ctxlog.Error(ctx, "error fetching guild", zap.Error(err))
+		return dbError
+	}
+
+	if guild == nil {
+		ctxlog.Warn(ctx, "database record does not exist for guild")
+		return dbError
+	}
+
+	if !guild.DoQuotes {
+		return respondError("Use of quote commands is not enabled on this guild!!")
 	}
 
 	if idx > 0 {
