@@ -230,3 +230,31 @@ func (b *Bot) cmdQ(ctx context.Context, data cmdroute.CommandData) *api.Interact
 	embed := makeQuoteEmbed(quote)
 	return respondEmbeds(embed)
 }
+
+func (b *Bot) cmdQuoteDelete(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	index, err := data.Options.Find("index").IntValue()
+	if err != nil {
+		ctxlog.Error(ctx, "error parsing int value", zap.Error(err))
+		return respondError("Error parsing index value, oops")
+	}
+
+	quote, err := models.Quotes(
+		qm.Where("num = ?", index),
+		qm.Where("guild_id = ?", data.Event.GuildID.String()),
+	).One(ctx, b.DB)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return respond("There isn't a quote at that index, doofus")
+		}
+
+		ctxlog.Error(ctx, "error querying quote", zap.Error(err))
+		return dbError
+	}
+
+	if err := quote.Delete(ctx, b.DB); err != nil {
+		ctxlog.Error(ctx, "error deleting quote", zap.Error(err))
+		return dbError
+	}
+
+	return respondf("Quote #%d has been deleted", index)
+}

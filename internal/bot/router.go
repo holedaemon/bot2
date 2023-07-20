@@ -69,12 +69,15 @@ func (b *Bot) router() *cmdroute.Router {
 		r.AddFunc("relinquish", b.cmdRoleRelinquish)
 	})
 
+	r.AddFunc("q", b.cmdQ)
+	r.Sub("quote", func(r *cmdroute.Router) {
+		r.AddFunc("delete", b.cmdQuoteDelete)
+	})
+
 	r.Sub("egoraptor", func(r *cmdroute.Router) {
 		r.AddFunc("toggle", b.cmdEgoraptorToggle)
 		r.AddFunc("settimeout", b.cmdEgoraptorSetTimeout)
 	})
-
-	r.AddFunc("q", b.cmdQ)
 
 	return r
 }
