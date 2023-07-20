@@ -237,4 +237,24 @@ var commands = commandList{
 			},
 		},
 	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:                     "settings",
+			Description:              "Configure bot settings for the guild",
+			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageGuild),
+			NoDMPermission:           true,
+			Options: discord.CommandOptions{
+				discord.NewSubcommandOption(
+					"quotes",
+					"Toggle use of quotes in the guild",
+					discord.NewBooleanOption(
+						"toggled",
+						"Toggle quotes on or off",
+						true,
+					),
+				),
+			},
+		},
+	},
 }

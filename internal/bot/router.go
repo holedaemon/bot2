@@ -69,6 +69,10 @@ func (b *Bot) router() *cmdroute.Router {
 		r.AddFunc("relinquish", b.cmdRoleRelinquish)
 	})
 
+	r.Sub("settings", func(r *cmdroute.Router) {
+		r.AddFunc("quotes", b.cmdSettingsQuotes)
+	})
+
 	r.AddFunc("q", b.cmdQ)
 	r.Sub("quote", func(r *cmdroute.Router) {
 		r.AddFunc("delete", b.cmdQuoteDelete)
