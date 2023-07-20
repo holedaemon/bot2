@@ -41,8 +41,13 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 		timestamp := data.LastTimestamp
 		since := time.Since(timestamp)
 		dur := fmtDur(since)
+		var content string
 
-		content := fmt.Sprintf("It has been %s since the last mention of egoraptor eating pussy", dur)
+		if data.TimeoutOnMention {
+			content = fmt.Sprintf("It has been %s since the last mention of egoraptor eating pussy. You have 10 seconds to speak your piece. Please turn and face the wall.", dur)
+		} else {
+			content = fmt.Sprintf("It has been %s since the last mention of egoraptor eating pussy", dur)
+		}
 
 		image := fakePNG("egopussy")
 		err = b.SendImage(m.ChannelID, content, image)
@@ -52,6 +57,7 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 		}
 
 		if data.TimeoutOnMention {
+			time.Sleep(time.Second * 10)
 			duration := time.Duration(data.TimeoutLength) * time.Second
 			t := time.Now().Add(duration)
 			ts := discord.NewTimestamp(t)
