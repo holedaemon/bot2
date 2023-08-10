@@ -1,0 +1,6 @@
+{% code type IndexPage struct {
+    BasePage
+} %}
+
+{% func (p *IndexPage) Body() %}
+{% endfunc %}

@@ -12,11 +12,12 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/holedaemon/bot2/internal/bot"
 	"github.com/holedaemon/bot2/internal/db/dbx"
+	"github.com/holedaemon/bot2/internal/web"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
 
-type Options struct {
+type BotOptions struct {
 	Debug             bool          `env:"BOT2_DEBUG" envDefault:"false"`
 	Admins            string        `env:"BOT2_ADMINS"`
 	Token             string        `env:"BOT2_TOKEN"`
@@ -25,8 +26,30 @@ type Options struct {
 	DBTimeoutDuration time.Duration `env:"BOT2_DB_TIMEOUT_DURATION" envDefault:"20s"`
 }
 
+type WebOptions struct {
+	Debug bool   `env:"BOT2_DEBUG" envDefault:"false"`
+	Addr  string `env:"BOT2_WEB_ADDR" envDefault:":8080"`
+}
+
 func main() {
-	opts := &Options{}
+	if len(os.Args) == 1 {
+		fmt.Fprintf(os.Stderr, "missing required argument: bot, web")
+		return
+	}
+
+	cmd := strings.ToLower(os.Args[1])
+	switch cmd {
+	case "bot":
+		runBot()
+	case "web":
+		runWeb()
+	default:
+		fmt.Fprintf(os.Stderr, "invalid argument; accepted arguments: bot, web")
+	}
+}
+
+func runBot() {
+	opts := &BotOptions{}
 	eo := env.Options{
 		RequiredIfNoDef: true,
 	}
@@ -92,6 +115,33 @@ func main() {
 	}
 
 	if err := b.Start(ctx); err != nil {
+		logger.Fatal("error starting bot", zap.Error(err))
+	}
+}
+
+func runWeb() {
+	opts := &WebOptions{}
+	eo := env.Options{
+		RequiredIfNoDef: true,
+	}
+
+	if err := env.Parse(opts, eo); err != nil {
+		fmt.Fprintf(os.Stderr, "error parsing env variables into struct: %s\n", err.Error())
+		return
+	}
+
+	logger := ctxlog.New(opts.Debug)
+	ctx := ctxlog.WithLogger(context.Background(), logger)
+
+	s, err := web.New(
+		web.WithAddr(opts.Addr),
+	)
+
+	if err != nil {
+		logger.Fatal("error creating bot", zap.Error(err))
+	}
+
+	if err := s.Run(ctx); err != nil {
 		logger.Fatal("error starting bot", zap.Error(err))
 	}
 }
