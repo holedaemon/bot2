@@ -40,7 +40,6 @@ func StreamPageTemplate(qw422016 *qt422016.Writer, p Page) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/index.css">
     
-    
     `)
 	p.StreamMeta(qw422016)
 	qw422016.N().S(`
@@ -97,6 +96,7 @@ func PageTemplate(p Page) string {
 type BasePage struct{}
 
 func (p *BasePage) StreamTitle(qw422016 *qt422016.Writer) {
+	qw422016.N().S(`BOT/2`)
 }
 
 func (p *BasePage) WriteTitle(qq422016 qtio422016.Writer) {

@@ -15,7 +15,6 @@ Page {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/index.css">
     
-    
     {%= p.Meta() %}
     <body class="bg-white dark:bg-stone-950">
         <nav class="bg-white border-gray-200 dark:bg-stone-950">
@@ -49,7 +48,7 @@ Page {
 {% endfunc %}
 
 {% code type BasePage struct {} %}
-{% func (p *BasePage) Title() %}{% endfunc %}
+{% func (p *BasePage) Title() %}BOT/2{% endfunc %}
 {% func (p *BasePage) Meta() %}{% endfunc %}
 {% func (p *BasePage) Scripts() %}{% endfunc %}
 {% func (p *BasePage) Body() %}{% endfunc %}
