@@ -20,13 +20,15 @@ type IndexPage struct {
 
 func (p *IndexPage) StreamBody(qw422016 *qt422016.Writer) {
 	qw422016.N().S(`
-    <div class="grid grid-cols-1 h-screen text-center">
+    <div class="grid gap-y-10 grid-cols-1 h-screen text-center">
         <div class="m-auto">
-            <h1 class="dark:text-white mx-6 text-4xl md:text-5xl lg:text-5xl">The Workingman's Discord Bot</h1>
-            <h2 class="dark:text-white mx-6 mt-6 text-2xl">made for the blue-collar, by the blue-collar.</h2>
+            <h1 class="dark:text-white mx-6 text-4xl md:text-5xl">The Workingman's Discord Bot</h1>
+            <h2 class="dark:text-white mx-6 mt-6 text-2xl">
+                <span class="text-green-500">Quotes</span>, <span class="text-green-500">custom roles</span>, and <span class="text-green-500">20 year old web comics</span>. Made for the blue-collar, by the blue-collar.
+            </h2>
         </div>
-        <div class="invisible lg:visible pt-6 justify-self-end">
-            <img src="/static/lance.png">
+        <div class="invisible md:visible justify-self-end">
+            <img src="/static/lance.png" alt="a Microsoft Comic Chat character named Lance saying 'It can even suck your dick!'">
         </div>
     </div>
 `)
