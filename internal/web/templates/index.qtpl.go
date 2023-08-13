@@ -22,8 +22,8 @@ func (p *IndexPage) StreamBody(qw422016 *qt422016.Writer) {
 	qw422016.N().S(`
     <div class="grid gap-y-10 grid-cols-1 h-screen text-center">
         <div class="m-auto">
-            <h1 class="dark:text-white mx-6 text-4xl md:text-5xl">The Workingman's Discord Bot</h1>
-            <h2 class="dark:text-white mx-6 mt-6 text-2xl">
+            <h1 class="text-gray-900 dark:text-white mx-6 text-4xl md:text-5xl">The Workingman's Discord Bot</h1>
+            <h2 class="text-gray-900 dark:text-white mx-6 mt-6 text-2xl">
                 <span class="text-green-500">Quotes</span>, <span class="text-green-500">custom roles</span>, and <span class="text-green-500">20 year old web comics</span>. Made for the blue-collar, by the blue-collar.
             </h2>
         </div>

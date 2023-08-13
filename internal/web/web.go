@@ -47,6 +47,7 @@ func (s *Server) Run(ctx context.Context) error {
 	r := chi.NewMux()
 
 	r.Get("/", s.index)
+	r.Get("/about", s.about)
 
 	r.Handle("/static/*", http.StripPrefix("/static", http.FileServer(http.FS(assetsDir))))
 	r.Handle("/favicon.ico", http.RedirectHandler("/static/favicon.ico", http.StatusFound))
@@ -70,4 +71,8 @@ func (s *Server) Run(ctx context.Context) error {
 
 func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 	templates.WritePageTemplate(w, &templates.IndexPage{})
+}
+
+func (s *Server) about(w http.ResponseWriter, r *http.Request) {
+	templates.WritePageTemplate(w, &templates.AboutPage{})
 }
