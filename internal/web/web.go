@@ -49,6 +49,8 @@ func (s *Server) Run(ctx context.Context) error {
 	r.Get("/", s.index)
 	r.Get("/about", s.about)
 
+	r.NotFound(s.notFound)
+
 	r.Handle("/static/*", http.StripPrefix("/static", http.FileServer(http.FS(assetsDir))))
 	r.Handle("/favicon.ico", http.RedirectHandler("/static/favicon.ico", http.StatusFound))
 
