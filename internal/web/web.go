@@ -46,6 +46,11 @@ func New(opts ...Option) (*Server, error) {
 func (s *Server) Run(ctx context.Context) error {
 	r := chi.NewMux()
 
+	r.Use(s.recoverer)
+
+	logger := ctxlog.FromContext(ctx)
+	r.Use(requestLogger(logger))
+
 	r.Get("/", s.index)
 	r.Get("/about", s.about)
 
