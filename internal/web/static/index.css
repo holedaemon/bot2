@@ -1964,6 +1964,11 @@ input:checked + .toggle-bg {
   color: rgb(209 213 219 / var(--tw-text-opacity));
 }
 
+:is(.dark .dark\:hover\:text-green-500:hover) {
+  --tw-text-opacity: 1;
+  color: rgb(14 159 110 / var(--tw-text-opacity));
+}
+
 :is(.dark .dark\:hover\:text-slate-400:hover) {
   --tw-text-opacity: 1;
   color: rgb(148 163 184 / var(--tw-text-opacity));
@@ -2063,9 +2068,9 @@ input:checked + .toggle-bg {
     color: rgb(14 159 110 / var(--tw-text-opacity));
   }
 
-  :is(.dark .md\:dark\:bg-gray-950) {
+  :is(.dark .md\:dark\:bg-stone-950) {
     --tw-bg-opacity: 1;
-    background-color: rgb(3 7 18 / var(--tw-bg-opacity));
+    background-color: rgb(12 10 9 / var(--tw-bg-opacity));
   }
 
   :is(.dark .md\:dark\:bg-transparent) {
