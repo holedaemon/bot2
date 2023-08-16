@@ -5,7 +5,6 @@ go 1.20
 require (
 	github.com/alexedwards/scs/v2 v2.5.1
 	github.com/caarlos0/env/v7 v7.1.0
-	github.com/diamondburned/arikawa v1.3.14
 	github.com/diamondburned/arikawa/v3 v3.3.1
 	github.com/friendsofgo/errors v0.9.2
 	github.com/go-chi/chi/v5 v5.0.10
