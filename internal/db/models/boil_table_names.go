@@ -4,11 +4,13 @@
 package models
 
 var TableNames = struct {
+	DiscordTokens     string
 	EgoraptorMentions string
 	Guilds            string
 	Quotes            string
 	Roles             string
 }{
+	DiscordTokens:     "discord_tokens",
 	EgoraptorMentions: "egoraptor_mentions",
 	Guilds:            "guilds",
 	Quotes:            "quotes",

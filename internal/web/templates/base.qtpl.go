@@ -21,6 +21,9 @@ type Page interface {
 	Meta() string
 	StreamMeta(qw422016 *qt422016.Writer)
 	WriteMeta(qq422016 qtio422016.Writer)
+	Navbar() string
+	StreamNavbar(qw422016 *qt422016.Writer)
+	WriteNavbar(qq422016 qtio422016.Writer)
 	Scripts() string
 	StreamScripts(qw422016 *qt422016.Writer)
 	WriteScripts(qq422016 qtio422016.Writer)
@@ -44,26 +47,9 @@ func StreamPageTemplate(qw422016 *qt422016.Writer, p Page) {
 	p.StreamMeta(qw422016)
 	qw422016.N().S(`
     <body class="bg-white dark:bg-stone-950">
-        <nav class="bg-white border-gray-200 dark:bg-stone-950">
-            <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-                <a href="/" class="flex items-center">
-                    <span class="self-center dark:hover:text-green-500 text-2xl font-semibold whitespace-nowrap dark:text-white">DILF</span>
-                </a>
-                <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-green-500 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
-                    <span class="sr-only">Open main menu</span>
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
-                    </svg>
-                </button>
-                <div class="hidden w-full md:block md:w-auto" id="navbar-default">
-                    <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-stone-950 md:dark:bg-stone-950 dark:border-gray-700">
-                        <li>
-                            <a href="/about" class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-500 md:p-0 dark:text-white md:dark:hover:text-green-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">About</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        `)
+	p.StreamNavbar(qw422016)
+	qw422016.N().S(`
 
         `)
 	p.StreamBody(qw422016)
@@ -93,7 +79,9 @@ func PageTemplate(p Page) string {
 	return qs422016
 }
 
-type BasePage struct{}
+type BasePage struct {
+	Username string
+}
 
 func (p *BasePage) StreamTitle(qw422016 *qt422016.Writer) {
 	qw422016.N().S(`DILF`)
@@ -159,6 +147,73 @@ func (p *BasePage) WriteBody(qq422016 qtio422016.Writer) {
 func (p *BasePage) Body() string {
 	qb422016 := qt422016.AcquireByteBuffer()
 	p.WriteBody(qb422016)
+	qs422016 := string(qb422016.B)
+	qt422016.ReleaseByteBuffer(qb422016)
+	return qs422016
+}
+
+func (p *BasePage) StreamNavbar(qw422016 *qt422016.Writer) {
+	qw422016.N().S(`
+    
+<nav class="bg-white border-gray-200 dark:bg-stone-950">
+  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+    <a href="/" class="flex items-center">
+        <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">DILF</span>
+    </a>
+    <button data-collapse-toggle="navbar-dropdown" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-stone-700 dark:focus:ring-gray-600" aria-controls="navbar-dropdown" aria-expanded="false">
+        <span class="sr-only">Open main menu</span>
+        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+        </svg>
+    </button>
+    <div class="hidden w-full md:block md:w-auto" id="navbar-dropdown">
+      <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-stone-900 md:dark:bg-gray-950">
+        <li>
+          <a href="/about" class="block py-2 pl-3 pr-4 text-white rounded dark:hover:bg-green-500 md:p-0 md:dark:hover:text-green-500 md:dark:bg-transparent md:dark:hover:bg-transparent">About</a>
+        </li>
+
+        `)
+	if p.Username != "" {
+		qw422016.N().S(`
+            <li>
+                <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" class="flex items-center justify-between w-full py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-slate-50 md:hover:bg-transparent md:border-0 md:hover:text-green-500 md:p-0 md:w-auto dark:text-white md:dark:hover:text-green-500 dark:focus:text-white dark:hover:bg-stone-800 md:dark:hover:bg-transparent">Sup, `)
+		qw422016.E().S(p.Username)
+		qw422016.N().S(`? <svg class="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+    </svg></button>
+                <div id="dropdownNavbar" class="z-10 hidden font-normal bg-white divide-y divide-stone-100 rounded-lg shadow w-44 dark:bg-stone-800">
+                    <ul class="py-2 text-sm text-gray-700 dark:text-white" aria-labelledby="dropdownLargeButton">
+                    <li>
+                        <a href="/logout" class="block px-4 py-2 hover:text-green-500">Log out</a>
+                    </li>
+                    </ul>
+                </div>
+            </li>
+        `)
+	} else {
+		qw422016.N().S(`
+            <li>
+                <a href="/login" class="block py-2 pl-3 pr-4 text-white rounded dark:hover:bg-green-500 md:p-0 md:dark:hover:text-green-500 md:dark:bg-transparent md:dark:hover:bg-transparent">Log in</a>
+            </li>
+        `)
+	}
+	qw422016.N().S(`
+      </ul>
+    </div>
+  </div>
+</nav>
+`)
+}
+
+func (p *BasePage) WriteNavbar(qq422016 qtio422016.Writer) {
+	qw422016 := qt422016.AcquireWriter(qq422016)
+	p.StreamNavbar(qw422016)
+	qt422016.ReleaseWriter(qw422016)
+}
+
+func (p *BasePage) Navbar() string {
+	qb422016 := qt422016.AcquireByteBuffer()
+	p.WriteNavbar(qb422016)
 	qs422016 := string(qb422016.B)
 	qt422016.ReleaseByteBuffer(qb422016)
 	return qs422016

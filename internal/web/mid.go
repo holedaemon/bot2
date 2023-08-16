@@ -25,7 +25,7 @@ func (s *Server) recoverer(next http.Handler) http.Handler {
 				ctx := ctxlog.WithOptions(r.Context(), zap.AddStacktrace(zap.ErrorLevel))
 				ctxlog.Error(ctx, "PANIC", zap.Any("val", rvr))
 
-				s.internalError(w, "")
+				s.errorPage(w, r, http.StatusInternalServerError, "")
 			}
 		}()
 

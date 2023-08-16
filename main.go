@@ -12,9 +12,11 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/holedaemon/bot2/internal/bot"
 	"github.com/holedaemon/bot2/internal/db/dbx"
+	"github.com/holedaemon/bot2/internal/pkg/httpx/discordx"
 	"github.com/holedaemon/bot2/internal/web"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
+	"golang.org/x/oauth2"
 )
 
 type BotOptions struct {
@@ -27,8 +29,17 @@ type BotOptions struct {
 }
 
 type WebOptions struct {
-	Debug bool   `env:"BOT2_DEBUG" envDefault:"false"`
+	Debug bool   `env:"BOT2_WEB_DEBUG" envDefault:"false"`
 	Addr  string `env:"BOT2_WEB_ADDR" envDefault:":8080"`
+
+	DSN               string        `env:"BOT2_WEB_DSN"`
+	DBMaxAttempts     int           `env:"BOT2_WEB_DB_MAX_ATTEMPTS" envDefault:"10"`
+	DBTimeoutDuration time.Duration `env:"BOT2_WEB_DB_TIMEOUT_DURATION" envDefault:"20s"`
+
+	OAuth2ClientID     string   `env:"BOT2_WEB_OAUTH2_CLIENT_ID"`
+	OAuth2ClientSecret string   `env:"BOT2_WEB_OAUTH2_CLIENT_SECRET"`
+	OAuth2Scopes       []string `env:"BOT2_WEB_OAUTH2_SCOPES"`
+	OAuth2RedirectURL  string   `env:"BOT2_WEB_OAUTH2_REDIRECT_URL"`
 }
 
 func main() {
@@ -133,8 +144,42 @@ func runWeb() {
 	logger := ctxlog.New(opts.Debug)
 	ctx := ctxlog.WithLogger(context.Background(), logger)
 
+	oa := &oauth2.Config{
+		ClientID:     opts.OAuth2ClientID,
+		ClientSecret: opts.OAuth2ClientSecret,
+		Endpoint:     discordx.Endpoint,
+		RedirectURL:  opts.OAuth2RedirectURL,
+		Scopes:       opts.OAuth2Scopes,
+	}
+
+	var (
+		db  *sql.DB
+		err error
+	)
+
+	connected := false
+	for i := 0; i < opts.DBMaxAttempts && !connected; i++ {
+		db, err = sql.Open(dbx.Driver, opts.DSN)
+		if err != nil {
+			logger.Error("unable to connect to database", zap.Error(err), zap.Int("attempt", i))
+			time.Sleep(opts.DBTimeoutDuration)
+			continue
+		}
+
+		if err = db.PingContext(ctx); err != nil {
+			logger.Error("unable to ping database", zap.Error(err), zap.Int("attempt", i))
+			time.Sleep(opts.DBTimeoutDuration)
+			continue
+		}
+
+		connected = true
+	}
+
 	s, err := web.New(
+		web.WithDebug(opts.Debug),
 		web.WithAddr(opts.Addr),
+		web.WithDB(db),
+		web.WithOAuth2(oa),
 	)
 
 	if err != nil {
