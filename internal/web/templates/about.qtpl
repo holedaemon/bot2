@@ -5,6 +5,8 @@
 }
 %}
 
+{% func (p *AboutPage) Title() %}About{% endfunc %}
+
 {% func (p *AboutPage) Body() %}
     <div class="container m-auto grid grid-cols-1 xl:grid-cols-3 place-content-center">
         <div class="xl:col-start-2 xl:col-end-2 bg-slate-50 dark:bg-stone-900 text-gray-900 dark:text-white sm:rounded px-5 py-5">

@@ -38,7 +38,7 @@ func StreamPageTemplate(qw422016 *qt422016.Writer, p Page) {
 <html class="dark">
     <title>`)
 	p.StreamTitle(qw422016)
-	qw422016.N().S(`</title>
+	qw422016.N().S(` &mdash; DILF</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/index.css">
@@ -84,7 +84,6 @@ type BasePage struct {
 }
 
 func (p *BasePage) StreamTitle(qw422016 *qt422016.Writer) {
-	qw422016.N().S(`DILF`)
 }
 
 func (p *BasePage) WriteTitle(qq422016 qtio422016.Writer) {

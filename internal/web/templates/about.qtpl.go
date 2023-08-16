@@ -20,6 +20,24 @@ type AboutPage struct {
 	BasePage
 }
 
+func (p *AboutPage) StreamTitle(qw422016 *qt422016.Writer) {
+	qw422016.N().S(`About`)
+}
+
+func (p *AboutPage) WriteTitle(qq422016 qtio422016.Writer) {
+	qw422016 := qt422016.AcquireWriter(qq422016)
+	p.StreamTitle(qw422016)
+	qt422016.ReleaseWriter(qw422016)
+}
+
+func (p *AboutPage) Title() string {
+	qb422016 := qt422016.AcquireByteBuffer()
+	p.WriteTitle(qb422016)
+	qs422016 := string(qb422016.B)
+	qt422016.ReleaseByteBuffer(qb422016)
+	return qs422016
+}
+
 func (p *AboutPage) StreamBody(qw422016 *qt422016.Writer) {
 	qw422016.N().S(`
     <div class="container m-auto grid grid-cols-1 xl:grid-cols-3 place-content-center">

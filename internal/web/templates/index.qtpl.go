@@ -18,13 +18,31 @@ type IndexPage struct {
 	BasePage
 }
 
+func (p *IndexPage) StreamTitle(qw422016 *qt422016.Writer) {
+	qw422016.N().S(`Home`)
+}
+
+func (p *IndexPage) WriteTitle(qq422016 qtio422016.Writer) {
+	qw422016 := qt422016.AcquireWriter(qq422016)
+	p.StreamTitle(qw422016)
+	qt422016.ReleaseWriter(qw422016)
+}
+
+func (p *IndexPage) Title() string {
+	qb422016 := qt422016.AcquireByteBuffer()
+	p.WriteTitle(qb422016)
+	qs422016 := string(qb422016.B)
+	qt422016.ReleaseByteBuffer(qb422016)
+	return qs422016
+}
+
 func (p *IndexPage) StreamBody(qw422016 *qt422016.Writer) {
 	qw422016.N().S(`
     <div class="grid gap-y-10 grid-cols-1 h-screen text-center">
         <div class="m-auto">
             <h1 class="text-gray-900 dark:text-white mx-6 text-4xl md:text-5xl">The Workingman's Discord Bot</h1>
             <h2 class="text-gray-900 dark:text-white mx-6 mt-6 text-2xl">
-                <span class="text-green-500">Quotes</span>, <span class="text-green-500">custom roles</span>, and <span class="text-green-500">20 year old web comics</span>. Made for the blue-collar, by the blue-collar.
+                <span class="text-green-500">Quotes</span>, <span class="text-green-500">custom roles</span>, and <span class="text-green-500">25 year old web comics</span>. Made for the blue-collar, by the blue-collar.
             </h2>
         </div>
         <div class="invisible md:visible justify-self-end">
