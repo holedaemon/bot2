@@ -1,0 +1,26 @@
+{% code type Guild struct {
+    ID string
+    Name string
+    AvatarURL string
+}
+%}
+
+{% code type GuildsPage struct {
+    BasePage
+    Guilds []*Guild
+}
+%}
+
+{% func (p *GuildsPage) Title() %}Guilds{% endfunc %}
+
+{% func (p *GuildsPage) Body() %}
+    <li class="container m-auto grid grid-cols-1 xl:grid-cols-3 place-content-center">
+        <ul class="bg-slate-50 text-gray-900 dark:bg-stone-900 dark:text-white sm:rounded xl:col-start-2 xl:col-end-2 divide-y divide-stone-500">
+            {% for _, g := range p.Guilds %}
+                <div class="bg-transparent hover:bg-slate-100 text-gray-900 hover:text-blue-400 hover:dark:bg-stone-950 dark:text-white">
+                    <a href="/guild/{%s g.ID %}>{%s g.Name %}</a>
+                </div>
+            {% endfor %}
+        </ul>
+    </li>
+{% endfunc %}

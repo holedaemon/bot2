@@ -12,7 +12,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/holedaemon/bot2/internal/bot"
 	"github.com/holedaemon/bot2/internal/db/dbx"
-	"github.com/holedaemon/bot2/internal/pkg/httpx/discordx"
+	"github.com/holedaemon/bot2/internal/pkg/discordx"
 	"github.com/holedaemon/bot2/internal/web"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"

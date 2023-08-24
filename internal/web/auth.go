@@ -15,7 +15,7 @@ import (
 
 const (
 	sessionName      = "bot2-session-v1"
-	sessionDiscordSF = "discord_snowflake"
+	sessionDiscordID = "discord_id"
 	sessionUsername  = "discord_username"
 )
 
@@ -76,7 +76,7 @@ func (s *Server) authDiscordCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.sessionManager.Put(ctx, sessionDiscordSF, user.ID.String())
+	s.sessionManager.Put(ctx, sessionDiscordID, user.ID.String())
 	s.sessionManager.Put(ctx, sessionUsername, user.Username)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)

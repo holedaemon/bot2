@@ -1399,6 +1399,11 @@ input:checked + .toggle-bg {
   border-color: rgb(245 245 244 / var(--tw-divide-opacity));
 }
 
+.divide-stone-500 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-opacity: 1;
+  border-color: rgb(120 113 108 / var(--tw-divide-opacity));
+}
+
 .self-center {
   align-self: center;
 }
@@ -1508,6 +1513,10 @@ input:checked + .toggle-bg {
 .bg-slate-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity));
+}
+
+.bg-transparent {
+  background-color: transparent;
 }
 
 .bg-white {
@@ -1760,6 +1769,11 @@ input:checked + .toggle-bg {
   background-color: rgb(3 84 63 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-slate-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(241 245 249 / var(--tw-bg-opacity));
+}
+
 .hover\:bg-slate-50:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity));
@@ -1952,6 +1966,11 @@ input:checked + .toggle-bg {
 :is(.dark .dark\:hover\:bg-stone-800:hover) {
   --tw-bg-opacity: 1;
   background-color: rgb(41 37 36 / var(--tw-bg-opacity));
+}
+
+:is(.dark .hover\:dark\:bg-stone-950):hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(12 10 9 / var(--tw-bg-opacity));
 }
 
 :is(.dark .dark\:hover\:text-blue-500:hover) {

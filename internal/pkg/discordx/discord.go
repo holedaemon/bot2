@@ -1,4 +1,4 @@
-// Package discordx implements useful extensions to the arikawa/discord package.
+// Package discordx implements extensions for the arikawa/discord package.
 package discordx
 
 import "golang.org/x/oauth2"
