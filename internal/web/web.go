@@ -10,10 +10,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/alexedwards/scs/postgresstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/holedaemon/bot2/internal/pkg/httpx"
+	"github.com/holedaemon/bot2/internal/pkg/pgstore"
 	"github.com/holedaemon/bot2/internal/web/templates"
 	"github.com/patrickmn/go-cache"
 	"github.com/zikaeroh/ctxlog"
@@ -68,7 +68,6 @@ func New(opts ...Option) (*Server, error) {
 	}
 
 	sm := scs.New()
-	sm.Store = postgresstore.New(srv.DB)
 	sm.Cookie.Name = sessionName
 	sm.Cookie.Secure = !srv.Debug
 	srv.sessionManager = sm
@@ -99,6 +98,10 @@ func (s *Server) Run(ctx context.Context) error {
 
 	r.Handle("/static/*", http.StripPrefix("/static", http.FileServer(http.FS(assetsDir))))
 	r.Handle("/favicon.ico", http.RedirectHandler("/static/favicon.ico", http.StatusFound))
+
+	store := pgstore.New(s.DB)
+	store.Start(ctx)
+	s.sessionManager.Store = store
 
 	srv := &http.Server{
 		Addr:        s.Addr,

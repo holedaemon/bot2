@@ -3,7 +3,6 @@ module github.com/holedaemon/bot2
 go 1.20
 
 require (
-	github.com/alexedwards/scs/postgresstore v0.0.0-20230327161757-10d4299e3b24
 	github.com/alexedwards/scs/v2 v2.5.1
 	github.com/caarlos0/env/v7 v7.1.0
 	github.com/diamondburned/arikawa/v3 v3.3.2
