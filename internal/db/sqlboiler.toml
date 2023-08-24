@@ -12,4 +12,4 @@ host = "172.17.0.2"
 user = "b"
 pass = "b"
 sslmode = "disable"
-blacklist = ["schema_migrations"]
+blacklist = ["schema_migrations", "sessions"]

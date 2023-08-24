@@ -89,4 +89,6 @@ func (s *Server) logout(w http.ResponseWriter, r *http.Request) {
 		ctxlog.Error(ctx, "error destroying session", zap.Error(err))
 		s.errorPage(w, r, http.StatusInternalServerError, "")
 	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

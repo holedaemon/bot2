@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/alexedwards/scs/postgresstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/holedaemon/bot2/internal/pkg/httpx"
@@ -67,6 +68,7 @@ func New(opts ...Option) (*Server, error) {
 	}
 
 	sm := scs.New()
+	sm.Store = postgresstore.New(srv.DB)
 	sm.Cookie.Name = sessionName
 	sm.Cookie.Secure = !srv.Debug
 	srv.sessionManager = sm

@@ -45,4 +45,10 @@ CREATE TABLE discord_tokens (
     updated_at timestamp NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE sessions (
+    token text PRIMARY KEY,
+    data bytea NOT NULL,
+    expiry timestamptz NOT NULL
+);
+
 COMMIT;
