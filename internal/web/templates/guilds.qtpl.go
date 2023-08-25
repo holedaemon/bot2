@@ -45,23 +45,35 @@ func (p *GuildsPage) Title() string {
 
 func (p *GuildsPage) StreamBody(qw422016 *qt422016.Writer) {
 	qw422016.N().S(`
-    <li class="container m-auto grid grid-cols-1 xl:grid-cols-3 place-content-center">
-        <ul class="bg-slate-50 text-gray-900 dark:bg-stone-900 dark:text-white sm:rounded xl:col-start-2 xl:col-end-2 divide-y divide-stone-500">
-            `)
+    <div class="container mb-5 m-auto flex flex-col flex-wrap place-content-center gap-5 md:flex-row">
+        `)
 	for _, g := range p.Guilds {
 		qw422016.N().S(`
-                <div class="bg-transparent hover:bg-slate-100 text-gray-900 hover:text-blue-400 hover:dark:bg-stone-950 dark:text-white">
-                    <a href="/guild/`)
+            <a class="flex flex-col h-40 w-80 place-content-center rounded bg-green-500 hover:bg-green-600 text-3xl text-center text-white" href="/guild/`)
 		qw422016.E().S(g.ID)
-		qw422016.N().S(`>`)
-		qw422016.E().S(g.Name)
-		qw422016.N().S(`</a>
-                </div>
-            `)
+		qw422016.N().S(`">
+                `)
+		if g.AvatarURL != "" {
+			qw422016.N().S(`
+                    <img class="mx-auto my-3 rounded-full" src="`)
+			qw422016.E().S(g.AvatarURL)
+			qw422016.N().S(`" alt="The icon of the `)
+			qw422016.E().S(g.Name)
+			qw422016.N().S(` Discord guild" />
+                `)
+		} else {
+			qw422016.N().S(`
+                    `)
+			streamtrunc(qw422016, g.Name)
+			qw422016.N().S(`
+                `)
+		}
+		qw422016.N().S(`
+            </a>
+        `)
 	}
 	qw422016.N().S(`
-        </ul>
-    </li>
+    </div>
 `)
 }
 

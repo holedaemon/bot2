@@ -16,7 +16,9 @@ var (
 
 func streamtrunc(qw422016 *qt422016.Writer, s string) {
 	qw422016.N().S(`
-    return s[0:32]
+    `)
+	qw422016.E().S(s[0:32])
+	qw422016.N().S(`
 `)
 }
 

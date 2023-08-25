@@ -14,13 +14,15 @@
 {% func (p *GuildsPage) Title() %}Guilds{% endfunc %}
 
 {% func (p *GuildsPage) Body() %}
-    <li class="container m-auto grid grid-cols-1 xl:grid-cols-3 place-content-center">
-        <ul class="bg-slate-50 text-gray-900 dark:bg-stone-900 dark:text-white sm:rounded xl:col-start-2 xl:col-end-2 divide-y divide-stone-500">
-            {% for _, g := range p.Guilds %}
-                <div class="bg-transparent hover:bg-slate-100 text-gray-900 hover:text-blue-400 hover:dark:bg-stone-950 dark:text-white">
-                    <a href="/guild/{%s g.ID %}>{%s g.Name %}</a>
-                </div>
-            {% endfor %}
-        </ul>
-    </li>
+    <div class="container mb-5 m-auto flex flex-col flex-wrap place-content-center gap-5 md:flex-row">
+        {% for _, g := range p.Guilds %}
+            <a class="flex flex-col h-40 w-80 place-content-center rounded bg-green-500 hover:bg-green-600 text-3xl text-center text-white" href="/guild/{%s g.ID %}">
+                {% if g.AvatarURL != "" %}
+                    <img class="mx-auto my-3 rounded-full" src="{%s g.AvatarURL %}" alt="The icon of the {%s g.Name %} Discord guild" />
+                {% else %}
+                    {%= trunc(g.Name) %}
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
 {% endfunc %}
