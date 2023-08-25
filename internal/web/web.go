@@ -12,7 +12,6 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
-	"github.com/holedaemon/bot2/internal/pkg/httpx"
 	"github.com/holedaemon/bot2/internal/pkg/pgstore"
 	"github.com/holedaemon/bot2/internal/web/templates"
 	"github.com/patrickmn/go-cache"
@@ -41,18 +40,14 @@ type Server struct {
 	DB     *sql.DB
 	OAuth2 *oauth2.Config
 
-	httpClient     *http.Client
 	sessionManager *scs.SessionManager
 	stateCache     *cache.Cache
-	guildCache     *cache.Cache
 }
 
 // New creates a new Server.
 func New(opts ...Option) (*Server, error) {
 	srv := &Server{
-		httpClient: httpx.DefaultClient,
 		stateCache: cache.New(time.Hour, time.Hour*24),
-		guildCache: cache.New(time.Hour, time.Hour),
 	}
 
 	for _, o := range opts {
