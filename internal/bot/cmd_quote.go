@@ -53,13 +53,13 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 		}
 	}()
 
-	guild, err := modelsx.FetchGuild(ctx, tx, ev.GuildID)
+	guild, err := modelsx.FetchGuild(ctx, tx, ev.GuildID.String())
 	if err != nil {
-		log.Error("error fetching guild", zap.Error(err))
-		return
-	}
-	if guild == nil {
-		log.Warn("database record not found for guild")
+		if errors.Is(err, sql.ErrNoRows) {
+			log.Warn("database record not found for guild")
+		} else {
+			log.Error("error fetching guild", zap.Error(err))
+		}
 		return
 	}
 
@@ -186,14 +186,13 @@ func (b *Bot) cmdQ(ctx context.Context, data cmdroute.CommandData) *api.Interact
 		return respondError("The index provided is malformed")
 	}
 
-	guild, err := modelsx.FetchGuild(ctx, b.DB, data.Event.GuildID)
+	guild, err := modelsx.FetchGuild(ctx, b.DB, data.Event.GuildID.String())
 	if err != nil {
-		ctxlog.Error(ctx, "error fetching guild", zap.Error(err))
-		return dbError
-	}
-
-	if guild == nil {
-		ctxlog.Warn(ctx, "database record does not exist for guild")
+		if errors.Is(err, sql.ErrNoRows) {
+			ctxlog.Warn(ctx, "database record does not exist for guild")
+		} else {
+			ctxlog.Error(ctx, "error fetching guild", zap.Error(err))
+		}
 		return dbError
 	}
 

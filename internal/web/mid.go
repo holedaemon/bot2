@@ -1,8 +1,12 @@
 package web
 
 import (
+	"errors"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/holedaemon/bot2/internal/db/models"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
@@ -28,6 +32,60 @@ func (s *Server) recoverer(next http.Handler) http.Handler {
 				s.errorPage(w, r, http.StatusInternalServerError, "")
 			}
 		}()
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (s *Server) guildCheck(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		id := s.sessionManager.GetString(ctx, sessionDiscordID)
+		if id == "" {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		gid := chi.URLParam(r, "id")
+		if gid == "" {
+			s.errorPage(w, r, http.StatusBadRequest, "")
+			return
+		}
+
+		exists, err := models.Guilds(qm.Where("guild_id = ?", gid)).Exists(ctx, s.DB)
+		if err != nil {
+			ctxlog.Error(ctx, "error checking if guild exists", zap.Error(err))
+			s.errorPage(w, r, http.StatusInternalServerError, "")
+			return
+		}
+
+		if !exists {
+			s.errorPage(w, r, http.StatusNotFound, "That guild ain't real, guy")
+			return
+		}
+
+		guilds, err := s.fetchGuilds(ctx, id)
+		if err != nil {
+			if errors.Is(err, errNoGuilds) {
+				s.errorPage(w, r, http.StatusNotFound, "This site isn't tracking any guilds!")
+				return
+			}
+
+			if errors.Is(err, errTokenNotFound) {
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			}
+
+			ctxlog.Error(ctx, "error fetching guilds", zap.Error(err))
+			s.errorPage(w, r, http.StatusInternalServerError, "")
+			return
+		}
+
+		_, found := guilds.Get(gid)
+		if !found {
+			s.errorPage(w, r, http.StatusUnauthorized, "You aren't in that guild, fool!")
+			return
+		}
 
 		next.ServeHTTP(w, r)
 	})

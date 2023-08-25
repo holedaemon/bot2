@@ -20,7 +20,7 @@
                 {% if g.AvatarURL != "" %}
                     <img class="mx-auto my-3 rounded-full" src="{%s g.AvatarURL %}" alt="The icon of the {%s g.Name %} Discord guild" />
                 {% else %}
-                    {%= trunc(g.Name) %}
+                    {%= trunc(g.Name) %}...
                 {% endif %}
             </a>
         {% endfor %}

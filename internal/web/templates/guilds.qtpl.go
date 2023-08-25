@@ -65,7 +65,7 @@ func (p *GuildsPage) StreamBody(qw422016 *qt422016.Writer) {
 			qw422016.N().S(`
                     `)
 			streamtrunc(qw422016, g.Name)
-			qw422016.N().S(`
+			qw422016.N().S(`...
                 `)
 		}
 		qw422016.N().S(`

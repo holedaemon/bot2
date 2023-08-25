@@ -180,12 +180,15 @@ func (p *BasePage) StreamNavbar(qw422016 *qt422016.Writer) {
 		qw422016.N().S(`? <svg class="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
     </svg></button>
-                <div id="dropdownNavbar" class="z-10 hidden font-normal bg-white divide-y divide-stone-100 rounded-lg shadow w-44 dark:bg-stone-800">
+                <div id="dropdownNavbar" class="z-10 hidden font-normal bg-white divide-y divide-gray-100 dark:divide-stone-600 rounded-lg shadow w-44 dark:bg-stone-800">
                     <ul class="py-2 text-sm text-gray-700 dark:text-white" aria-labelledby="dropdownLargeButton">
                     <li>
-                        <a href="/logout" class="block px-4 py-2 hover:text-green-500">Log out</a>
+                        <a href="/guilds" class="block px-4 py-2 dark:hover:text-green-500">Guilds</a>
                     </li>
                     </ul>
+                    <div class="py-1">
+                        <a href="/logout" class="block px-4 py-2 text-gray-700 hover:text-green-500 dark:text-white hover:dark:text-green-500">Log out</a>
+                    </div>
                 </div>
             </li>
         `)

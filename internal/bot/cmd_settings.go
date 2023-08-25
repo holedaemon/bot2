@@ -2,6 +2,8 @@ package bot
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
@@ -18,15 +20,15 @@ func (b *Bot) cmdSettingsQuotes(ctx context.Context, data cmdroute.CommandData) 
 		return respondError("Error parsing bool value, oops")
 	}
 
-	guild, err := modelsx.FetchGuild(ctx, b.DB, data.Event.GuildID)
+	guild, err := modelsx.FetchGuild(ctx, b.DB, data.Event.GuildID.String())
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			ctxlog.Warn(ctx, "guild does not have record present in database")
+			return respondError("A database record for this guild hasn't been created. This shouldn't happen. Uh oh!")
+		}
+
 		ctxlog.Error(ctx, "error querying guild in database", zap.Error(err))
 		return dbError
-	}
-
-	if guild == nil {
-		ctxlog.Warn(ctx, "guild does not have record present in database")
-		return respondError("A database record for this guild hasn't been created. This shouldn't happen. Uh oh!")
 	}
 
 	guild.DoQuotes = val

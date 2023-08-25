@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"embed"
+	"errors"
 	"fmt"
 	"io/fs"
 	"net"
@@ -42,12 +43,14 @@ type Server struct {
 
 	sessionManager *scs.SessionManager
 	stateCache     *cache.Cache
+	guildCache     *cache.Cache
 }
 
 // New creates a new Server.
 func New(opts ...Option) (*Server, error) {
 	srv := &Server{
 		stateCache: cache.New(time.Hour, time.Hour*24),
+		guildCache: cache.New(time.Minute*2, time.Minute*10),
 	}
 
 	for _, o := range opts {
@@ -87,6 +90,10 @@ func (s *Server) Run(ctx context.Context) error {
 	r.Get("/auth/discord/callback", s.authDiscordCallback)
 	r.Get("/guilds", s.guilds)
 
+	r.Group(func(r chi.Router) {
+		r.Use(s.guildCheck)
+	})
+
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		s.errorPage(w, r, http.StatusNotFound, "Whatever you're looking for ain't here")
 	})
@@ -124,5 +131,32 @@ func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 func (s *Server) about(w http.ResponseWriter, r *http.Request) {
 	templates.WritePageTemplate(w, &templates.AboutPage{
 		BasePage: s.basePage(r),
+	})
+}
+
+func (s *Server) guilds(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	id := s.sessionManager.GetString(ctx, sessionDiscordID)
+	if id == "" {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	cache, err := s.fetchGuilds(ctx, id)
+	if err != nil {
+		if errors.Is(err, errTokenNotFound) {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		if !errors.Is(err, errNoGuilds) {
+			ctxlog.Error(ctx, "error fetching guilds", zap.Error(err))
+			s.errorPage(w, r, http.StatusInternalServerError, "")
+		}
+	}
+
+	templates.WritePageTemplate(w, &templates.GuildsPage{
+		BasePage: s.basePage(r),
+		Guilds:   cache.ToSlice(),
 	})
 }
