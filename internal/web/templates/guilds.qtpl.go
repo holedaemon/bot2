@@ -5,6 +5,8 @@ package templates
 
 import "github.com/aquilax/truncate"
 
+import "github.com/holedaemon/bot2/internal/db/models"
+
 import (
 	qtio422016 "io"
 
@@ -16,14 +18,9 @@ var (
 	_ = qt422016.AcquireByteBuffer
 )
 
-type Guild struct {
-	ID   string
-	Name string
-}
-
 type GuildsPage struct {
 	BasePage
-	Guilds []*Guild
+	Guilds []*models.Guild
 }
 
 func (p *GuildsPage) StreamTitle(qw422016 *qt422016.Writer) {
@@ -69,33 +66,46 @@ func (p *GuildsPage) Meta() string {
 func (p *GuildsPage) StreamBody(qw422016 *qt422016.Writer) {
 	qw422016.N().S(`
     <section class="section">
-        <div class="container">
-            <div class="columns is-centered">
-                <div class="column is-one-third">
-                    <nav class="panel is-success">
-                        <p class="panel-heading has-text-centered is-size-3">
-                            Guilds
-                        </p>
-                        `)
-	for _, g := range p.Guilds {
+        `)
+	if len(p.Guilds) == 0 {
 		qw422016.N().S(`
-                            <a href="/guild/`)
-		qw422016.E().S(g.ID)
-		qw422016.N().S(`"class="panel-block">
-                                <span class="panel-icon">
-                                    <i class="fa-brands fa-discord" aria-hidden="true"></i>
-                                </span>
-                                `)
-		qw422016.E().S(truncate.Truncate(g.Name, 32, "...", truncate.PositionEnd))
+            <div class="container has-text-centered">
+                <h1 class="title">Whoops!</h1>
+                <h2 class="subtitle">This site isn't tracking any guilds. How embarrassing. :3</h2>
+            </div>
+        `)
+	} else {
 		qw422016.N().S(`
-                            </a>
-                        `)
-	}
-	qw422016.N().S(`
-                    </nav>
+            <div class="container">
+                <div class="columns is-centered">
+                    <div class="column is-one-third">
+                        <nav class="panel is-success">
+                            <p class="panel-heading has-text-centered is-size-3">
+                                Guilds
+                            </p>
+                            `)
+		for _, g := range p.Guilds {
+			qw422016.N().S(`
+                                <a href="/guild/`)
+			qw422016.E().S(g.GuildID)
+			qw422016.N().S(`"class="panel-block">
+                                    <span class="panel-icon">
+                                        <i class="fa-brands fa-discord" aria-hidden="true"></i>
+                                    </span>
+                                    `)
+			qw422016.E().S(truncate.Truncate(g.GuildName, 32, "...", truncate.PositionEnd))
+			qw422016.N().S(`
+                                </a>
+                            `)
+		}
+		qw422016.N().S(`
+                        </nav>
+                    </div>
                 </div>
             </div>
-        </div>
+        `)
+	}
+	qw422016.N().S(`
     </section>
 `)
 }

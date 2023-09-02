@@ -1,6 +1,7 @@
 package web
 
 import (
+	"database/sql"
 	"errors"
 	"net/http"
 
@@ -66,13 +67,8 @@ func (s *Server) guildCheck(next http.Handler) http.Handler {
 
 		guilds, err := s.fetchGuilds(ctx, id)
 		if err != nil {
-			if errors.Is(err, errNoGuilds) {
-				s.errorPage(w, r, http.StatusNotFound, "This site isn't tracking any guilds!")
-				return
-			}
-
-			if errors.Is(err, errTokenNotFound) {
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
+			if errors.Is(err, sql.ErrNoRows) {
+				http.Redirect(w, r, "/login", http.StatusOK)
 				return
 			}
 
@@ -81,10 +77,8 @@ func (s *Server) guildCheck(next http.Handler) http.Handler {
 			return
 		}
 
-		_, found := guilds.Get(gid)
-		if !found {
-			s.errorPage(w, r, http.StatusUnauthorized, "You aren't in that guild, fool!")
-			return
+		if !stringInSlice(gid, guilds) {
+			s.errorPage(w, r, http.StatusForbidden, "CAN'T LET YOU DO THAT!!!!!")
 		}
 
 		next.ServeHTTP(w, r)

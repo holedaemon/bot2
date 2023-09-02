@@ -2,8 +2,6 @@ package web
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"strings"
 	"time"
 
@@ -11,9 +9,17 @@ import (
 	"github.com/diamondburned/arikawa/v3/utils/handler"
 	"github.com/holedaemon/bot2/internal/db/models"
 	"github.com/holedaemon/bot2/internal/db/modelsx"
-	"github.com/holedaemon/bot2/internal/web/templates"
-	"github.com/patrickmn/go-cache"
+	"github.com/jellydator/ttlcache/v3"
 )
+
+func (s *Server) newAPIClient(ctx context.Context, id string) (*state.State, error) {
+	tok, err := s.fetchToken(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return state.NewAPIOnlyState("Bearer "+tok.AccessToken, handler.New()), nil
+}
 
 // fetchToken retrieves a Discord token from the database, and refreshes it if necessary.
 func (s *Server) fetchToken(ctx context.Context, id string) (*models.DiscordToken, error) {
@@ -46,58 +52,38 @@ func (s *Server) fetchToken(ctx context.Context, id string) (*models.DiscordToke
 	return dt, nil
 }
 
-var (
-	errNoGuilds      = errors.New("web: no guilds in the database")
-	errTokenNotFound = errors.New("web: token not found")
-)
-
-func (s *Server) fetchGuilds(ctx context.Context, id string) (*cachedGuilds, error) {
-	gc, found := s.guildCache.Get(id)
-	if found {
-		cache, ok := gc.(*cachedGuilds)
-		if !ok {
-			return nil, nil
-		}
-
-		return cache, nil
+func (s *Server) fetchGuilds(ctx context.Context, userID string) ([]string, error) {
+	item := s.userCache.Get(userID)
+	if item != nil {
+		return item.Value(), nil
 	}
 
-	dbGuilds, err := models.Guilds().All(ctx, s.DB)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errNoGuilds
-		}
-
-		return nil, err
-	}
-
-	tok, err := s.fetchToken(ctx, id)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errTokenNotFound
-		}
-
-		return nil, err
-	}
-
-	cli := state.NewAPIOnlyState("Bearer "+tok.AccessToken, handler.New())
-	apiGuilds, err := cli.GuildsBefore(0, 0)
+	cli, err := s.newAPIClient(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	guilds := newGuildCache()
-	for _, ag := range apiGuilds {
-		for _, dg := range dbGuilds {
-			if strings.EqualFold(ag.ID.String(), dg.GuildID) {
-				guilds.Add(&templates.Guild{
-					ID:   ag.ID.String(),
-					Name: ag.Name,
-				})
-			}
+	guilds, err := cli.GuildsBefore(0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	ids := make([]string, 0, len(guilds))
+
+	for _, g := range guilds {
+		ids = append(ids, g.ID.String())
+	}
+
+	item = s.userCache.Set(userID, ids, ttlcache.DefaultTTL)
+	return item.Value(), nil
+}
+
+func stringInSlice(want string, in []string) bool {
+	for _, s := range in {
+		if strings.EqualFold(s, want) {
+			return true
 		}
 	}
 
-	s.guildCache.Set(id, guilds, cache.DefaultExpiration)
-	return s.fetchGuilds(ctx, id)
+	return false
 }

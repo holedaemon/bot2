@@ -8,7 +8,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/holedaemon/bot2/internal/db/models"
 	"github.com/holedaemon/bot2/internal/db/modelsx"
-	"github.com/patrickmn/go-cache"
+	"github.com/jellydator/ttlcache/v3"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
@@ -22,7 +22,7 @@ const (
 func (s *Server) authDiscord(w http.ResponseWriter, r *http.Request) {
 	state := uuid.Must(uuid.NewV4()).String()
 
-	s.stateCache.Set(state, struct{}{}, cache.DefaultExpiration)
+	s.stateCache.Set(state, true, ttlcache.DefaultTTL)
 	url := s.OAuth2.AuthCodeURL(state)
 	http.Redirect(w, r, url, http.StatusSeeOther)
 }
@@ -36,7 +36,7 @@ func (s *Server) authDiscordCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, ok := s.stateCache.Get(st); !ok {
+	if _, ok := s.stateCache.GetAndDelete(st); !ok {
 		s.errorPage(w, r, http.StatusBadRequest, "Unexpected state")
 		return
 	}

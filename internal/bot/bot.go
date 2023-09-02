@@ -59,6 +59,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 	b.State = state.New("Bot " + token)
 	b.State.AddHandler(b.onReady)
 	b.State.AddHandler(b.onGuildCreate)
+	b.State.AddHandler(b.onGuildUpdate)
 	b.State.AddHandler(b.onGuildRoleDelete)
 	b.State.AddHandler(b.onMessage)
 	b.State.AddHandler(b.onReconnect)

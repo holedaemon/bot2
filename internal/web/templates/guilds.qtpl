@@ -1,14 +1,9 @@
 {% import "github.com/aquilax/truncate" %}
-
-{% code type Guild struct {
-    ID string
-    Name string
-}
-%}
+{% import "github.com/holedaemon/bot2/internal/db/models" %}
 
 {% code type GuildsPage struct {
     BasePage
-    Guilds []*Guild
+    Guilds []*models.Guild
 }
 %}
 
@@ -20,24 +15,31 @@
 
 {% func (p *GuildsPage) Body() %}
     <section class="section">
-        <div class="container">
-            <div class="columns is-centered">
-                <div class="column is-one-third">
-                    <nav class="panel is-success">
-                        <p class="panel-heading has-text-centered is-size-3">
-                            Guilds
-                        </p>
-                        {% for _, g := range p.Guilds %}
-                            <a href="/guild/{%s g.ID %}"class="panel-block">
-                                <span class="panel-icon">
-                                    <i class="fa-brands fa-discord" aria-hidden="true"></i>
-                                </span>
-                                {%s truncate.Truncate(g.Name, 32, "...", truncate.PositionEnd) %}
-                            </a>
-                        {% endfor %}
-                    </nav>
+        {% if len(p.Guilds) == 0 %}
+            <div class="container has-text-centered">
+                <h1 class="title">Whoops!</h1>
+                <h2 class="subtitle">This site isn't tracking any guilds. How embarrassing. :3</h2>
+            </div>
+        {% else %}
+            <div class="container">
+                <div class="columns is-centered">
+                    <div class="column is-one-third">
+                        <nav class="panel is-success">
+                            <p class="panel-heading has-text-centered is-size-3">
+                                Guilds
+                            </p>
+                            {% for _, g := range p.Guilds %}
+                                <a href="/guild/{%s g.GuildID %}"class="panel-block">
+                                    <span class="panel-icon">
+                                        <i class="fa-brands fa-discord" aria-hidden="true"></i>
+                                    </span>
+                                    {%s truncate.Truncate(g.GuildName, 32, "...", truncate.PositionEnd) %}
+                                </a>
+                            {% endfor %}
+                        </nav>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
     </section>
 {% endfunc %}

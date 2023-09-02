@@ -9,13 +9,15 @@ import (
 	"io/fs"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
+	"github.com/holedaemon/bot2/internal/db/models"
 	"github.com/holedaemon/bot2/internal/pkg/pgstore"
 	"github.com/holedaemon/bot2/internal/web/templates"
-	"github.com/patrickmn/go-cache"
+	"github.com/jellydator/ttlcache/v3"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
@@ -42,15 +44,18 @@ type Server struct {
 	OAuth2 *oauth2.Config
 
 	sessionManager *scs.SessionManager
-	stateCache     *cache.Cache
-	guildCache     *cache.Cache
+
+	stateCache *ttlcache.Cache[string, bool]
+	userCache  *ttlcache.Cache[string, []string]
 }
 
 // New creates a new Server.
 func New(opts ...Option) (*Server, error) {
 	srv := &Server{
-		stateCache: cache.New(time.Hour, time.Hour*24),
-		guildCache: cache.New(time.Minute*2, time.Minute*10),
+		stateCache: ttlcache.New[string, bool](),
+		userCache: ttlcache.New[string, []string](
+			ttlcache.WithTTL[string, []string](5 * time.Minute),
+		),
 	}
 
 	for _, o := range opts {
@@ -101,6 +106,9 @@ func (s *Server) Run(ctx context.Context) error {
 	r.Handle("/static/*", http.StripPrefix("/static", http.FileServer(http.FS(assetsDir))))
 	r.Handle("/favicon.ico", http.RedirectHandler("/static/favicon.ico", http.StatusFound))
 
+	go s.stateCache.Start()
+	defer s.stateCache.Stop()
+
 	store := pgstore.New(s.DB)
 	store.Start(ctx)
 	s.sessionManager.Store = store
@@ -142,21 +150,39 @@ func (s *Server) guilds(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cache, err := s.fetchGuilds(ctx, id)
+	var guilds []*models.Guild
+
+	dbGuilds, err := models.Guilds().All(ctx, s.DB)
 	if err != nil {
-		if errors.Is(err, errTokenNotFound) {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+		if !errors.Is(err, sql.ErrNoRows) {
+			ctxlog.Error(ctx, "error fetching guilds", zap.Error(err))
+			s.errorPage(w, r, http.StatusInternalServerError, "")
+			return
+		}
+	}
+
+	userGuilds, err := s.fetchGuilds(ctx, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			http.Redirect(w, r, "/login", http.StatusOK)
 			return
 		}
 
-		if !errors.Is(err, errNoGuilds) {
-			ctxlog.Error(ctx, "error fetching guilds", zap.Error(err))
-			s.errorPage(w, r, http.StatusInternalServerError, "")
+		ctxlog.Error(ctx, "error fetching guilds", zap.Error(err))
+		s.errorPage(w, r, http.StatusInternalServerError, "")
+		return
+	}
+
+	for _, ug := range userGuilds {
+		for _, dg := range dbGuilds {
+			if strings.EqualFold(ug, dg.GuildID) {
+				guilds = append(guilds, dg)
+			}
 		}
 	}
 
 	templates.WritePageTemplate(w, &templates.GuildsPage{
 		BasePage: s.basePage(r),
-		Guilds:   cache.ToSlice(),
+		Guilds:   guilds,
 	})
 }

@@ -25,6 +25,7 @@ import (
 type Guild struct {
 	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
 	GuildID   string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
+	GuildName string    `boil:"guild_name" json:"guild_name" toml:"guild_name" yaml:"guild_name"`
 	DoQuotes  bool      `boil:"do_quotes" json:"do_quotes" toml:"do_quotes" yaml:"do_quotes"`
 	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
@@ -36,12 +37,14 @@ type Guild struct {
 var GuildColumns = struct {
 	ID        string
 	GuildID   string
+	GuildName string
 	DoQuotes  string
 	CreatedAt string
 	UpdatedAt string
 }{
 	ID:        "id",
 	GuildID:   "guild_id",
+	GuildName: "guild_name",
 	DoQuotes:  "do_quotes",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
@@ -50,12 +53,14 @@ var GuildColumns = struct {
 var GuildTableColumns = struct {
 	ID        string
 	GuildID   string
+	GuildName string
 	DoQuotes  string
 	CreatedAt string
 	UpdatedAt string
 }{
 	ID:        "guilds.id",
 	GuildID:   "guilds.guild_id",
+	GuildName: "guilds.guild_name",
 	DoQuotes:  "guilds.do_quotes",
 	CreatedAt: "guilds.created_at",
 	UpdatedAt: "guilds.updated_at",
@@ -66,12 +71,14 @@ var GuildTableColumns = struct {
 var GuildWhere = struct {
 	ID        whereHelperint64
 	GuildID   whereHelperstring
+	GuildName whereHelperstring
 	DoQuotes  whereHelperbool
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
 }{
 	ID:        whereHelperint64{field: "\"guilds\".\"id\""},
 	GuildID:   whereHelperstring{field: "\"guilds\".\"guild_id\""},
+	GuildName: whereHelperstring{field: "\"guilds\".\"guild_name\""},
 	DoQuotes:  whereHelperbool{field: "\"guilds\".\"do_quotes\""},
 	CreatedAt: whereHelpertime_Time{field: "\"guilds\".\"created_at\""},
 	UpdatedAt: whereHelpertime_Time{field: "\"guilds\".\"updated_at\""},
@@ -94,8 +101,8 @@ func (*guildR) NewStruct() *guildR {
 type guildL struct{}
 
 var (
-	guildAllColumns            = []string{"id", "guild_id", "do_quotes", "created_at", "updated_at"}
-	guildColumnsWithoutDefault = []string{"guild_id"}
+	guildAllColumns            = []string{"id", "guild_id", "guild_name", "do_quotes", "created_at", "updated_at"}
+	guildColumnsWithoutDefault = []string{"guild_id", "guild_name"}
 	guildColumnsWithDefault    = []string{"id", "do_quotes", "created_at", "updated_at"}
 	guildPrimaryKeyColumns     = []string{"id"}
 	guildGeneratedColumns      = []string{}

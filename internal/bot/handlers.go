@@ -2,9 +2,13 @@ package bot
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"strings"
 
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/holedaemon/bot2/internal/db/models"
+	"github.com/holedaemon/bot2/internal/db/modelsx"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/zikaeroh/ctxlog"
@@ -34,7 +38,8 @@ func (b *Bot) onGuildCreate(g *gateway.GuildCreateEvent) {
 	}
 
 	guild := &models.Guild{
-		GuildID: g.ID.String(),
+		GuildID:   g.ID.String(),
+		GuildName: g.Name,
 	}
 
 	if err := guild.Insert(ctx, b.DB, boil.Infer()); err != nil {
@@ -43,6 +48,35 @@ func (b *Bot) onGuildCreate(g *gateway.GuildCreateEvent) {
 	}
 
 	log.Info("created record for guild")
+}
+
+func (b *Bot) onGuildUpdate(g *gateway.GuildUpdateEvent) {
+	ctx := context.Background()
+	log := b.Logger.With(zap.String("guild_id", g.ID.String()))
+
+	log.Info("guild settings have changed")
+
+	guild, err := modelsx.FetchGuild(ctx, b.DB, g.ID.String())
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			guild = &models.Guild{
+				GuildID: g.ID.String(),
+			}
+		} else {
+			log.Error("error fetching guild", zap.Error(err))
+			return
+		}
+	}
+
+	if strings.EqualFold(g.Name, guild.GuildName) {
+		return
+	}
+
+	guild.GuildName = g.Name
+
+	if err := modelsx.UpsertGuild(ctx, b.DB, guild); err != nil {
+		log.Error("error upserting guild record", zap.Error(err))
+	}
 }
 
 func (b *Bot) onMessage(m *gateway.MessageCreateEvent) {
