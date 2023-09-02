@@ -5,15 +5,13 @@
 {% func (p *IndexPage) Title() %}Home{% endfunc %}
 
 {% func (p *IndexPage) Body() %}
-    <div class="grid gap-y-10 grid-cols-1 h-screen text-center">
-        <div class="m-auto">
-            <h1 class="text-gray-900 dark:text-white mx-6 text-4xl md:text-5xl">The Workingman's Discord Bot</h1>
-            <h2 class="text-gray-900 dark:text-white mx-6 mt-6 text-2xl">
-                <span class="text-green-500">Quotes</span>, <span class="text-green-500">custom roles</span>, and <span class="text-green-500">25 year old web comics</span>. Made for the blue-collar, by the blue-collar.
-            </h2>
+    <section class="section">
+        <div class="container has-text-centered">
+        <h1 class="title">The Workingman's Discord Bot</h1>
+        <h2 class="subtitle"><span class="has-text-success">Quotes</span>, <span class="has-text-success">custom
+            roles</span>, and <span class="has-text-success">25 year old web comics</span>. Made for the blue collar by
+            the blue collar.</h2>
         </div>
-        <div class="invisible md:visible justify-self-end">
-            <img src="/static/lance.png" alt="a Microsoft Comic Chat character named Lance saying 'It can even suck your dick!'">
-        </div>
-    </div>
+    </section>
+    <img id="bot2-lance" class="is-hidden-mobile" src="/static/lance.png">
 {% endfunc %}

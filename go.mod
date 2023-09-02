@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/alexedwards/scs/v2 v2.5.1
+	github.com/aquilax/truncate v1.0.0
 	github.com/caarlos0/env/v7 v7.1.0
 	github.com/diamondburned/arikawa/v3 v3.3.2
 	github.com/friendsofgo/errors v0.9.2

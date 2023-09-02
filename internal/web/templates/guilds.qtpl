@@ -1,7 +1,8 @@
+{% import "github.com/aquilax/truncate" %}
+
 {% code type Guild struct {
     ID string
     Name string
-    AvatarURL string
 }
 %}
 
@@ -13,16 +14,30 @@
 
 {% func (p *GuildsPage) Title() %}Guilds{% endfunc %}
 
+{% func (p *GuildsPage) Meta() %}
+    {%s= importFontAwesome() %}
+{% endfunc %}
+
 {% func (p *GuildsPage) Body() %}
-    <div class="container mb-5 m-auto flex flex-col flex-wrap place-content-center gap-5 md:flex-row">
-        {% for _, g := range p.Guilds %}
-            <a class="flex flex-col h-40 w-80 place-content-center rounded bg-green-500 hover:bg-green-600 text-3xl text-center text-white" href="/guild/{%s g.ID %}">
-                {% if g.AvatarURL != "" %}
-                    <img class="mx-auto my-3 rounded-full" src="{%s g.AvatarURL %}" alt="The icon of the {%s g.Name %} Discord guild" />
-                {% else %}
-                    {%= trunc(g.Name) %}...
-                {% endif %}
-            </a>
-        {% endfor %}
-    </div>
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-one-third">
+                    <nav class="panel is-success">
+                        <p class="panel-heading has-text-centered is-size-3">
+                            Guilds
+                        </p>
+                        {% for _, g := range p.Guilds %}
+                            <a href="/guild/{%s g.ID %}"class="panel-block">
+                                <span class="panel-icon">
+                                    <i class="fa-brands fa-discord" aria-hidden="true"></i>
+                                </span>
+                                {%s truncate.Truncate(g.Name, 32, "...", truncate.PositionEnd) %}
+                            </a>
+                        {% endfor %}
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endfunc %}

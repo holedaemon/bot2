@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/utils/handler"
 	"github.com/holedaemon/bot2/internal/db/models"
@@ -92,9 +91,8 @@ func (s *Server) fetchGuilds(ctx context.Context, id string) (*cachedGuilds, err
 		for _, dg := range dbGuilds {
 			if strings.EqualFold(ag.ID.String(), dg.GuildID) {
 				guilds.Add(&templates.Guild{
-					ID:        ag.ID.String(),
-					Name:      ag.Name,
-					AvatarURL: ag.IconURLWithType(discord.JPEGImage),
+					ID:   ag.ID.String(),
+					Name: ag.Name,
 				})
 			}
 		}

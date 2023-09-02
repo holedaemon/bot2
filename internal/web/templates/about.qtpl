@@ -8,18 +8,23 @@
 {% func (p *AboutPage) Title() %}About{% endfunc %}
 
 {% func (p *AboutPage) Body() %}
-    <div class="container m-auto grid grid-cols-1 xl:grid-cols-3 place-content-center">
-        <div class="xl:col-start-2 xl:col-end-2 bg-slate-50 dark:bg-stone-900 text-gray-900 dark:text-white sm:rounded px-5 py-5">
-            <h1 class="text-gray-900 dark:text-white text-3xl">DILF</h1>
-            <p class="text-gray-900 dark:text-white mt-3">...is a Discord bot created and maintained by <a class="text-blue-300 hover:text-blue-400 dark:text-slate-300 dark:hover:text-slate-400" href="https://holedaemon.net" target="_blank">holedaemon</a>. It's primarily written in Go, but uses some other technologies. You can find the source code on <a class="text-blue-300 hover:text-blue-400 dark:text-slate-300 dark:hover:text-slate-400" href="https://github.com/holedaemon/bot2" target="_blank">GitHub</a>. Check out the <a class="text-blue-300 hover:text-blue-400 dark:text-slate-300 dark:hover:text-slate-400" href="/docs">docs</a> to find out more about what the bot can do.</p>
+    <section class="section">
+    <div class="container">
+      <div class="columns is-mobile is-centered">
+        <div class="column is-half has-background-success-dark box">
+          <h1 class="title">DILF</h1>
+          <p class="subtitle">...is a Discord bot created and maintained by <a class="has-text-warning"
+              href="https://holedaemon.net" target="_blank">holedaemon</a>. It's primarily written in Go, but uses some
+            other technologies. You can find the source code on <a class="has-text-warning"
+              href="https://github.com/holedaemon/bot2" target="_blank">GitHub</a>. Check out the <a
+              class="has-text-warning" href="/docs">docs</a> to find out more about what the bot can do.</p>
 
-            <p class="text-gray-900 dark:text-white mt-3">
-            If you'd like to add DILF to your server, please contact <a class="text-blue-300 hover:text-blue-400 dark:text-slate-300 dark:hover:text-slate-400" href="https://discord.com/users/67803413605253120" target=_blank">@holedaemon</a> on Discord.
-            </p>
+          <p class="subtitle">If you'd like to add DILF to your server, please contact <a class="has-text-warning"
+              href="https://discord.com/users/67803413605253120" target="_blank">@holedaemon</a> on Discord.</p>
 
-            <p class="text-gray-900 dark:text-white mt-3">
-            This site is running version <code class="text-blue-500 dark:text-green-500">{%s version.Version() %}</code>.
-            </p>
+          <p class="subtitle">This site is running version <code>{%s version.Version() %}</code>.</p>
         </div>
+      </div>
     </div>
+  </section>
 {% endfunc %}

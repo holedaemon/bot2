@@ -35,18 +35,20 @@ type Page interface {
 func StreamPageTemplate(qw422016 *qt422016.Writer, p Page) {
 	qw422016.N().S(`
 <!DOCTYPE html>
-<html class="dark">
-    <title>`)
+<html>
+    <head>
+      <title>`)
 	p.StreamTitle(qw422016)
 	qw422016.N().S(` &mdash; DILF</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/index.css">
-    
-    `)
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="/static/bot2.css">
+
+      `)
 	p.StreamMeta(qw422016)
 	qw422016.N().S(`
-    <body class="bg-white dark:bg-stone-950">
+    </head>
+    <body>
         `)
 	p.StreamNavbar(qw422016)
 	qw422016.N().S(`
@@ -54,13 +56,27 @@ func StreamPageTemplate(qw422016 *qt422016.Writer, p Page) {
         `)
 	p.StreamBody(qw422016)
 	qw422016.N().S(`
-
-        <script src="/static/flowbite.min.js"></script>
     </body>
 
-    `)
+    <script>
+      `)
 	p.StreamScripts(qw422016)
 	qw422016.N().S(`
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const burgers = Array.prototype.slice.call(document.querySelectorAll(".navbar-burger"), 0);
+
+        burgers.forEach(el => {
+          el.addEventListener("click", () => {
+            const target = el.dataset.target;
+            const targetElement = document.getElementById(target);
+
+            el.classList.toggle("is-active");
+            targetElement.classList.toggle("is-active");
+          });
+        });
+      });
+    </script>
 </html>
 `)
 }
@@ -153,57 +169,52 @@ func (p *BasePage) Body() string {
 
 func (p *BasePage) StreamNavbar(qw422016 *qt422016.Writer) {
 	qw422016.N().S(`
-    
-<nav class="bg-white border-gray-200 dark:bg-stone-950">
-  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-    <a href="/" class="flex items-center">
-        <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white dark:hover:text-green-500">DILF</span>
-    </a>
-    <button data-collapse-toggle="navbar-dropdown" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-stone-700 dark:focus:ring-gray-600" aria-controls="navbar-dropdown" aria-expanded="false">
-        <span class="sr-only">Open main menu</span>
-        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
-        </svg>
-    </button>
-    <div class="hidden w-full md:block md:w-auto" id="navbar-dropdown">
-      <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-stone-900 md:dark:bg-stone-950">
-        <li>
-          <a href="/about" class="block py-2 pl-3 pr-4 text-white rounded dark:hover:bg-stone-800 md:p-0 md:dark:hover:text-green-500 md:dark:bg-transparent md:dark:hover:bg-transparent">About</a>
-        </li>
+  <div class="container">
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item is-size-3" href="/">
+          DILF
+        </a>
 
-        `)
-	if p.Username != "" {
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="bot2-main-navbar">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="bot2-main-navbar" class="navbar-menu">
+        <div class="navbar-end">
+          <a href="/about" class="navbar-item">About</a>
+
+          `)
+	if p.Username == "" {
 		qw422016.N().S(`
-            <li>
-                <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" class="flex items-center justify-between w-full py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-slate-50 md:hover:bg-transparent md:border-0 md:hover:text-green-500 md:p-0 md:w-auto dark:text-white md:dark:hover:text-green-500 dark:focus:text-white dark:hover:bg-stone-800 md:dark:hover:bg-transparent">Sup, `)
-		qw422016.E().S(p.Username)
-		qw422016.N().S(`? <svg class="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-    </svg></button>
-                <div id="dropdownNavbar" class="z-10 hidden font-normal bg-white divide-y divide-gray-100 dark:divide-stone-600 rounded-lg shadow w-44 dark:bg-stone-800">
-                    <ul class="py-2 text-sm text-gray-700 dark:text-white" aria-labelledby="dropdownLargeButton">
-                    <li>
-                        <a href="/guilds" class="block px-4 py-2 dark:hover:text-green-500">Guilds</a>
-                    </li>
-                    </ul>
-                    <div class="py-1">
-                        <a href="/logout" class="block px-4 py-2 text-gray-700 hover:text-green-500 dark:text-white hover:dark:text-green-500">Log out</a>
-                    </div>
-                </div>
-            </li>
-        `)
+            <a href="/login" class="navbar-item">Log in</a>
+          `)
 	} else {
 		qw422016.N().S(`
-            <li>
-                <a href="/login" class="block py-2 pl-3 pr-4 text-white rounded dark:hover:bg-green-500 md:p-0 md:dark:hover:text-green-500 md:dark:bg-transparent md:dark:hover:bg-transparent">Log in</a>
-            </li>
-        `)
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">
+                Sup, holedaemon?
+              </a>
+
+              <div class="navbar-dropdown">
+                <a href="/guilds" class="navbar-item">
+                  Guilds
+                </a>
+                <a href="/logout" class="navbar-item">
+                  Log out
+                </a>
+              </div>
+            </div>
+          `)
 	}
 	qw422016.N().S(`
-      </ul>
-    </div>
+        </div>
+      </div>
+    </nav>
   </div>
-</nav>
 `)
 }
 

@@ -14,23 +14,21 @@ var (
 	_ = qt422016.AcquireByteBuffer
 )
 
-func streamtrunc(qw422016 *qt422016.Writer, s string) {
+func streamimportFontAwesome(qw422016 *qt422016.Writer) {
 	qw422016.N().S(`
-    `)
-	qw422016.E().S(s[0:32])
-	qw422016.N().S(`
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 `)
 }
 
-func writetrunc(qq422016 qtio422016.Writer, s string) {
+func writeimportFontAwesome(qq422016 qtio422016.Writer) {
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	streamtrunc(qw422016, s)
+	streamimportFontAwesome(qw422016)
 	qt422016.ReleaseWriter(qw422016)
 }
 
-func trunc(s string) string {
+func importFontAwesome() string {
 	qb422016 := qt422016.AcquireByteBuffer()
-	writetrunc(qb422016, s)
+	writeimportFontAwesome(qb422016)
 	qs422016 := string(qb422016.B)
 	qt422016.ReleaseByteBuffer(qb422016)
 	return qs422016

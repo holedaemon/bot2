@@ -90,7 +90,7 @@ func (s *Server) Run(ctx context.Context) error {
 	r.Get("/auth/discord/callback", s.authDiscordCallback)
 	r.Get("/guilds", s.guilds)
 
-	r.Group(func(r chi.Router) {
+	r.Route("/guild/{id}", func(r chi.Router) {
 		r.Use(s.guildCheck)
 	})
 

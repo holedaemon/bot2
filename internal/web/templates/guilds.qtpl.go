@@ -3,6 +3,8 @@
 
 package templates
 
+import "github.com/aquilax/truncate"
+
 import (
 	qtio422016 "io"
 
@@ -15,9 +17,8 @@ var (
 )
 
 type Guild struct {
-	ID        string
-	Name      string
-	AvatarURL string
+	ID   string
+	Name string
 }
 
 type GuildsPage struct {
@@ -43,37 +44,59 @@ func (p *GuildsPage) Title() string {
 	return qs422016
 }
 
+func (p *GuildsPage) StreamMeta(qw422016 *qt422016.Writer) {
+	qw422016.N().S(`
+    `)
+	qw422016.N().S(importFontAwesome())
+	qw422016.N().S(`
+`)
+}
+
+func (p *GuildsPage) WriteMeta(qq422016 qtio422016.Writer) {
+	qw422016 := qt422016.AcquireWriter(qq422016)
+	p.StreamMeta(qw422016)
+	qt422016.ReleaseWriter(qw422016)
+}
+
+func (p *GuildsPage) Meta() string {
+	qb422016 := qt422016.AcquireByteBuffer()
+	p.WriteMeta(qb422016)
+	qs422016 := string(qb422016.B)
+	qt422016.ReleaseByteBuffer(qb422016)
+	return qs422016
+}
+
 func (p *GuildsPage) StreamBody(qw422016 *qt422016.Writer) {
 	qw422016.N().S(`
-    <div class="container mb-5 m-auto flex flex-col flex-wrap place-content-center gap-5 md:flex-row">
-        `)
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-one-third">
+                    <nav class="panel is-success">
+                        <p class="panel-heading has-text-centered is-size-3">
+                            Guilds
+                        </p>
+                        `)
 	for _, g := range p.Guilds {
 		qw422016.N().S(`
-            <a class="flex flex-col h-40 w-80 place-content-center rounded bg-green-500 hover:bg-green-600 text-3xl text-center text-white" href="/guild/`)
+                            <a href="/guild/`)
 		qw422016.E().S(g.ID)
-		qw422016.N().S(`">
-                `)
-		if g.AvatarURL != "" {
-			qw422016.N().S(`
-                    <img class="mx-auto my-3 rounded-full" src="`)
-			qw422016.E().S(g.AvatarURL)
-			qw422016.N().S(`" alt="The icon of the `)
-			qw422016.E().S(g.Name)
-			qw422016.N().S(` Discord guild" />
-                `)
-		} else {
-			qw422016.N().S(`
-                    `)
-			streamtrunc(qw422016, g.Name)
-			qw422016.N().S(`...
-                `)
-		}
+		qw422016.N().S(`"class="panel-block">
+                                <span class="panel-icon">
+                                    <i class="fa-brands fa-discord" aria-hidden="true"></i>
+                                </span>
+                                `)
+		qw422016.E().S(truncate.Truncate(g.Name, 32, "...", truncate.PositionEnd))
 		qw422016.N().S(`
-            </a>
-        `)
+                            </a>
+                        `)
 	}
 	qw422016.N().S(`
-    </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
 `)
 }
 

@@ -40,22 +40,23 @@ func (p *ErrorPage) Title() string {
 
 func (p *ErrorPage) StreamBody(qw422016 *qt422016.Writer) {
 	qw422016.N().S(`
-    <div class="container m-auto h-screen gap-y-4 grid grid-cols-1 place-content-center">
-        <h1 class="text-gray-900 dark:text-white italic font-extrabold text-center text-4xl sm:text-6xl"> Uh oh sisters!</h1>
-        <h2 class="text-gray-900 dark:text-white text-center text-3xl sm:text-5xl">`)
+    <section class="section">
+        <div class="container has-text-centered">
+            <h1 class="title">`)
 	qw422016.E().S(p.ErrorHead)
-	qw422016.N().S(`</h2>
-        `)
+	qw422016.N().S(`</h1>
+            `)
 	if p.ErrorText != "" {
 		qw422016.N().S(`
-            <p class="text-gray-900 dark:text-white text-center text-2xl">`)
+                <h2 class="subtitle">`)
 		qw422016.E().S(p.ErrorText)
-		qw422016.N().S(`</p>
-        `)
+		qw422016.N().S(`</h2>
+            `)
 	}
 	qw422016.N().S(`
-        <a class="justify-self-center focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800" href="/">Home</a>
-    </div>
+            <a href="/" class="button is-success">Home</a>
+        </div>
+  </section>
 `)
 }
 
