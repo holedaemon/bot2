@@ -92,7 +92,7 @@ func (s *Server) guildCheck(next http.Handler) http.Handler {
 type contextKey int
 
 const (
-	channelKey contextKey = iota
+	guildKey contextKey = iota
 )
 
 func (s *Server) guildMiddleware(next http.Handler) http.Handler {
@@ -105,13 +105,13 @@ func (s *Server) guildMiddleware(next http.Handler) http.Handler {
 			if err == sql.ErrNoRows {
 				s.errorPage(w, r, http.StatusNotFound, "The bot isn't in that guild!!!!")
 			} else {
-				ctxlog.Error(ctx, "error querying channel", zap.Error(err))
+				ctxlog.Error(ctx, "error querying guild", zap.Error(err))
 				s.errorPage(w, r, http.StatusInternalServerError, "")
 			}
 			return
 		}
 
-		ctx = context.WithValue(ctx, channelKey, guild)
+		ctx = context.WithValue(ctx, guildKey, guild)
 		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)
@@ -119,5 +119,5 @@ func (s *Server) guildMiddleware(next http.Handler) http.Handler {
 }
 
 func getGuild(ctx context.Context) *models.Guild {
-	return ctx.Value(channelKey).(*models.Guild)
+	return ctx.Value(guildKey).(*models.Guild)
 }
