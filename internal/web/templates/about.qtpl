@@ -8,7 +8,7 @@
 {% func (p *AboutPage) Title() %}About{% endfunc %}
 
 {% func (p *AboutPage) Body() %}
-    <section class="section">
+  <section class="section">
     <div class="container">
       <div class="columns is-mobile is-centered">
         <div class="column is-half has-background-success box">
