@@ -18,6 +18,7 @@ import (
 	"github.com/holedaemon/bot2/internal/pkg/pgstore"
 	"github.com/holedaemon/bot2/internal/web/templates"
 	"github.com/jellydator/ttlcache/v3"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
@@ -97,6 +98,11 @@ func (s *Server) Run(ctx context.Context) error {
 
 	r.Route("/guild/{id}", func(r chi.Router) {
 		r.Use(s.guildCheck)
+		r.Use(s.guildMiddleware)
+
+		r.Get("/", s.guild)
+		r.Get("/quotes", s.guildQuotes)
+		r.Get("/roles", s.guildRoles)
 	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
@@ -184,5 +190,64 @@ func (s *Server) guilds(w http.ResponseWriter, r *http.Request) {
 	templates.WritePageTemplate(w, &templates.GuildsPage{
 		BasePage: s.basePage(r),
 		Guilds:   guilds,
+	})
+}
+
+func (s *Server) guildPage(r *http.Request, g *models.Guild) templates.GuildPage {
+	return templates.GuildPage{
+		BasePage: s.basePage(r),
+		Guild:    g,
+	}
+}
+
+func (s *Server) guild(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	guild := getGuild(ctx)
+
+	templates.WritePageTemplate(w, &templates.GuildPage{
+		BasePage: s.basePage(r),
+		Guild:    guild,
+	})
+}
+
+func (s *Server) guildQuotes(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	guild := getGuild(ctx)
+
+	id := chi.URLParam(r, "id")
+
+	quotes, err := models.Quotes(qm.Where("guild_id = ?", id)).All(ctx, s.DB)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			ctxlog.Error(ctx, "error fetching quotes", zap.Error(err))
+			s.errorPage(w, r, http.StatusInternalServerError, "")
+			return
+		}
+	}
+
+	templates.WritePageTemplate(w, &templates.GuildQuotesPage{
+		GuildPage: s.guildPage(r, guild),
+		Quotes:    quotes,
+	})
+}
+
+func (s *Server) guildRoles(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	guild := getGuild(ctx)
+
+	id := chi.URLParam(r, "id")
+
+	roles, err := models.Roles(qm.Where("guild_id = ?", id)).All(ctx, s.DB)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			ctxlog.Error(ctx, "error fetching quotes", zap.Error(err))
+			s.errorPage(w, r, http.StatusInternalServerError, "")
+			return
+		}
+	}
+
+	templates.WritePageTemplate(w, &templates.GuildRolesPage{
+		GuildPage: s.guildPage(r, guild),
+		Roles:     roles,
 	})
 }

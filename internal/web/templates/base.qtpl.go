@@ -58,11 +58,11 @@ func StreamPageTemplate(qw422016 *qt422016.Writer, p Page) {
 	qw422016.N().S(`
     </body>
 
-    <script>
-      `)
+    `)
 	p.StreamScripts(qw422016)
 	qw422016.N().S(`
 
+    <script>
       document.addEventListener("DOMContentLoaded", () => {
         const burgers = Array.prototype.slice.call(document.querySelectorAll(".navbar-burger"), 0);
 

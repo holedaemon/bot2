@@ -1,12 +1,16 @@
 package web
 
+// Most of this is borrowed from HortBot's own web package.
+
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/holedaemon/bot2/internal/db/models"
+	"github.com/holedaemon/bot2/internal/db/modelsx"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
@@ -83,4 +87,37 @@ func (s *Server) guildCheck(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+type contextKey int
+
+const (
+	channelKey contextKey = iota
+)
+
+func (s *Server) guildMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		id := chi.URLParam(r, "id")
+
+		guild, err := modelsx.FetchGuild(ctx, s.DB, id)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				s.errorPage(w, r, http.StatusNotFound, "The bot isn't in that guild!!!!")
+			} else {
+				ctxlog.Error(ctx, "error querying channel", zap.Error(err))
+				s.errorPage(w, r, http.StatusInternalServerError, "")
+			}
+			return
+		}
+
+		ctx = context.WithValue(ctx, channelKey, guild)
+		r = r.WithContext(ctx)
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func getGuild(ctx context.Context) *models.Guild {
+	return ctx.Value(channelKey).(*models.Guild)
 }

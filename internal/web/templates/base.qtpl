@@ -25,9 +25,9 @@ Page {
         {%= p.Body() %}
     </body>
 
-    <script>
-      {%= p.Scripts() %}
+    {%= p.Scripts() %}
 
+    <script>
       document.addEventListener("DOMContentLoaded", () => {
         const burgers = Array.prototype.slice.call(document.querySelectorAll(".navbar-burger"), 0);
 

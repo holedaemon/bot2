@@ -1,0 +1,175 @@
+{% import "github.com/holedaemon/bot2/internal/db/models" %}
+
+{% func isActive(item string, class string) %}
+    {% if item == class %}
+        is-active
+    {% endif %}
+{% endfunc %}
+
+{% func quoteLink(q *models.Quote) %}
+    discord://discord.com/channels/{%s q.GuildID %}/{%s q.ChannelID %}/{%s q.MessageID %}
+{% endfunc %}
+
+{% code type GuildPage struct {
+    BasePage
+    Guild *models.Guild
+}
+%}
+
+{% func (p *GuildPage) Navigation() %}
+<div class="container">
+    <nav class="navbar is-hidden-tablet is-dark" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <div class="navbar-item">
+                Navigation
+            </div>
+
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
+                data-target="bot2-guild-navbar">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="bot2-guild-navbar" class="navbar-menu">
+            <div class="navbar-end">
+                <a href="/guild/{%s p.Guild.GuildID %}" class="navbar-item">General</a>
+                <a href="/guild/{%s p.Guild.GuildID %}/roles" class="navbar-item">Roles</a>
+                <a href="/guild/{%s p.Guild.GuildID %}/quotes" class="navbar-item">Quotes</a>
+            </div>
+        </div>
+    </nav>
+{% endfunc %}
+
+{% func (p *GuildPage) Sidebar(item string) %}
+    <div class="column is-hidden-mobile is-narrow">
+        <aside class="menu">
+            <ul class="menu-list">
+                <li><a href="/guild/{%s p.Guild.GuildID %}" class='{%= isActive(item, "general") %}'>General</a></li>
+                <li><a href="/guild/{%s p.Guild.GuildID %}/roles" class='{%= isActive(item, "roles") %}'>Roles</a></li>
+                <li><a href="/guild/{%s p.Guild.GuildID %}/quotes" class='{%= isActive(item, "quotes") %}'>Quotes</a></li>
+            </ul>
+        </aside>
+    </div>
+{% endfunc %}
+
+{% func (p *GuildPage) Title() %}{%s p.Guild.GuildName %}{% endfunc %}
+
+{% func (p *GuildPage) Body() %}
+    {%= p.Navigation() %}
+    <div class="container mt-6">
+        <div class="columns is-variable is-8">
+            {%= p.Sidebar("general") %}
+            <div class="column mx-6">
+                <h1 class="title">{%s p.Guild.GuildName %}</h1>
+                <hr>
+                <p class="subtitle">Quotes: {%v p.Guild.DoQuotes %}</p>
+            </div>
+        </div>
+    </div>
+{% endfunc %}
+
+{% code type GuildQuotesPage struct {
+    GuildPage
+    Quotes models.QuoteSlice
+}
+%}
+
+{% func (p *GuildQuotesPage) Title() %}Quotes &mdash; {%s p.Guild.GuildName %}{% endfunc %}
+
+{% func (p *GuildQuotesPage) Meta() %}
+    {%= importBootstrapTableBulmaCSS() %}
+    {%= importFontAwesome() %}
+{% endfunc %}
+
+{% func (p *GuildQuotesPage) Scripts() %}
+    {%= importJquery() %}
+    {%= importBootstrapTableJS() %}
+{% endfunc %}
+
+{% func (p *GuildQuotesPage) Body() %}
+    {%= p.Navigation() %}
+    <div class="container mt-6">
+        <div class="columns is-variable is-8">
+            {%= p.Sidebar("quotes") %}
+            <div class="column mx-6">
+                <h1 class="title">Quotes &mdash; {%s p.Guild.GuildName %}</h1>
+                <hr>
+                {% if len(p.Quotes) == 0 %}
+                    <h1 class="title">No quotes!!!</h1>
+                {% else %}
+                    <table data-toggle="table" data-pagination="true" data-search="true">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Quote</th>
+                                <th>User</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for _, q := range p.Quotes %}
+                                <tr>
+                                    <td>{%d q.Num %}</td>
+                                    <td>{%s q.Quote %}</td>
+                                    <td>{%s q.QuotedUsername %}</td>
+                                    <td><a class="button is-success" href="{%= quoteLink(q) %}">Link</a></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endfunc %}
+
+{% code type GuildRolesPage struct {
+    GuildPage
+    Roles models.RoleSlice
+}
+%}
+
+{% func (p *GuildRolesPage) Title() %}Roles &mdash; {%s p.Guild.GuildName %}{% endfunc %}
+
+{% func (p *GuildRolesPage) Meta() %}
+    {%= importBootstrapTableBulmaCSS() %}
+    {%= importFontAwesome() %}
+{% endfunc %}
+
+{% func (p *GuildRolesPage) Scripts() %}
+    {%= importJquery() %}
+    {%= importBootstrapTableJS() %}
+{% endfunc %}
+
+{% func (p *GuildRolesPage) Body() %}
+    {%= p.Navigation() %}
+    <div class="container mt-6">
+        <div class="columns is-variable is-8">
+            {%= p.Sidebar("roles") %}
+            <div class="column mx-6">
+                <h1 class="title">Roles &mdash; {%s p.Guild.GuildName %}</h1>
+                <hr>
+                {% if len(p.Roles) == 0 %}
+                    <h1 class="title">No roles!!!</h1>
+                {% else %}
+                    <table data-toggle="table" data-pagination="true" data-search="true">
+                        <thead>
+                            <tr>
+                               <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for _, r := range p.Roles %}
+                                <tr>
+                                    <td>{%s r.RoleID %}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endfunc %}
