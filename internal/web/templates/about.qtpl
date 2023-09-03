@@ -11,7 +11,7 @@
     <section class="section">
     <div class="container">
       <div class="columns is-mobile is-centered">
-        <div class="column is-half has-background-success-dark box">
+        <div class="column is-half has-background-success box">
           <h1 class="title">DILF</h1>
           <p class="subtitle">...is a Discord bot created and maintained by <a class="has-text-warning"
               href="https://holedaemon.net" target="_blank">holedaemon</a>. It's primarily written in Go, but uses some

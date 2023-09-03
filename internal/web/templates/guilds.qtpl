@@ -29,7 +29,7 @@
                                 Guilds
                             </p>
                             {% for _, g := range p.Guilds %}
-                                <a href="/guild/{%s g.GuildID %}"class="panel-block">
+                                <a href="/guild/{%s g.GuildID %}" class="panel-block">
                                     <span class="panel-icon">
                                         <i class="fa-brands fa-discord" aria-hidden="true"></i>
                                     </span>

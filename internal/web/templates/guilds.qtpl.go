@@ -88,7 +88,7 @@ func (p *GuildsPage) StreamBody(qw422016 *qt422016.Writer) {
 			qw422016.N().S(`
                                 <a href="/guild/`)
 			qw422016.E().S(g.GuildID)
-			qw422016.N().S(`"class="panel-block">
+			qw422016.N().S(`" class="panel-block">
                                     <span class="panel-icon">
                                         <i class="fa-brands fa-discord" aria-hidden="true"></i>
                                     </span>
