@@ -40,7 +40,7 @@ func (p *AboutPage) Title() string {
 
 func (p *AboutPage) StreamBody(qw422016 *qt422016.Writer) {
 	qw422016.N().S(`
-    <section class="section">
+  <section class="section">
     <div class="container">
       <div class="columns is-mobile is-centered">
         <div class="column is-half has-background-success box">
