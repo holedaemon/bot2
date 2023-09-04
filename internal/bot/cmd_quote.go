@@ -40,20 +40,7 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 	ctx := context.Background()
 	log := b.Logger.With(zap.String("guild_id", ev.GuildID.String()))
 
-	tx, err := b.DB.BeginTx(ctx, nil)
-	if err != nil {
-		log.Error("error creating transaction", zap.Error(err))
-		return
-	}
-
-	defer func() {
-		if err := tx.Commit(); err != nil {
-			log.Error("error committing transaction", zap.Error(err))
-			return
-		}
-	}()
-
-	guild, err := modelsx.FetchGuild(ctx, tx, ev.GuildID.String())
+	guild, err := modelsx.FetchGuild(ctx, b.DB, ev.GuildID.String())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			log.Warn("database record not found for guild")
@@ -67,7 +54,7 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 		return
 	}
 
-	exists, err := models.Quotes(qm.Where("message_id = ?", ev.MessageID.String())).Exists(ctx, tx)
+	exists, err := models.Quotes(qm.Where("message_id = ?", ev.MessageID.String())).Exists(ctx, b.DB)
 	if err != nil {
 		log.Error("error checking if quote exists", zap.Error(err))
 		return
@@ -90,7 +77,7 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 	err = models.Quotes(
 		qm.Where("guild_id = ?", ev.GuildID.String()),
 		qm.Select("max("+models.QuoteColumns.Num+") as max_num"),
-	).Bind(ctx, tx, &row)
+	).Bind(ctx, b.DB, &row)
 	if err != nil {
 		log.Error("error getting latest quote number from database", zap.Error(err))
 		return
@@ -109,7 +96,7 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 		Num:            nextNum,
 	}
 
-	if err := quote.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err := quote.Insert(ctx, b.DB, boil.Infer()); err != nil {
 		log.Error("error inserting quote", zap.Error(err))
 		return
 	}
@@ -134,19 +121,7 @@ func (b *Bot) onMessageEdit(e *gateway.MessageUpdateEvent) {
 	ctx := context.Background()
 	log := b.Logger.With(zap.String("guild_id", e.GuildID.String()), zap.String("message_id", e.ID.String()))
 
-	tx, err := b.DB.BeginTx(ctx, nil)
-	if err != nil {
-		log.Error("error creating transaction", zap.Error(err))
-		return
-	}
-
-	defer func() {
-		if err := tx.Commit(); err != nil {
-			log.Error("error committing transaction", zap.Error(err))
-		}
-	}()
-
-	quote, err := models.Quotes(qm.Where("message_id = ?", e.ID.String())).One(ctx, tx)
+	quote, err := models.Quotes(qm.Where("message_id = ?", e.ID.String())).One(ctx, b.DB)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return
@@ -157,12 +132,8 @@ func (b *Bot) onMessageEdit(e *gateway.MessageUpdateEvent) {
 	}
 
 	quote.Quote = e.Content
-	if err := quote.Update(ctx, tx, boil.Infer()); err != nil {
+	if err := quote.Update(ctx, b.DB, boil.Infer()); err != nil {
 		log.Error("error updating quote", zap.Error(err))
-		if err := tx.Rollback(); err != nil {
-			log.Error("error rolling back transaction", zap.Error(err))
-			return
-		}
 	}
 }
 
