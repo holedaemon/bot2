@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -101,6 +102,7 @@ func (s *Server) Run(ctx context.Context) error {
 	r.Get("/auth/discord", s.authDiscord)
 	r.Get("/auth/discord/callback", s.authDiscordCallback)
 	r.Get("/guilds", s.guilds)
+	r.Get("/docs", s.docs)
 
 	r.Route("/admin", s.routeAdmin)
 
@@ -152,6 +154,29 @@ func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 func (s *Server) about(w http.ResponseWriter, r *http.Request) {
 	templates.WritePageTemplate(w, &templates.AboutPage{
 		BasePage: s.basePage(r),
+	})
+}
+
+func (s *Server) docs(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	file, err := assetsDir.Open("docs.json")
+	if err != nil {
+		ctxlog.Error(ctx, "error reading docs.json", zap.Error(err))
+		s.errorPage(w, r, http.StatusInternalServerError, "")
+		return
+	}
+
+	var commands []*templates.CommandGroup
+	if err := json.NewDecoder(file).Decode(&commands); err != nil {
+		ctxlog.Error(ctx, "error unmarshaling docs.json", zap.Error(err))
+		s.errorPage(w, r, http.StatusInternalServerError, "")
+		return
+	}
+
+	templates.WritePageTemplate(w, &templates.DocsPage{
+		BasePage: s.basePage(r),
+		Commands: commands,
 	})
 }
 

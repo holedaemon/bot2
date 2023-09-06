@@ -185,6 +185,7 @@ func (p *BasePage) StreamNavbar(qw422016 *qt422016.Writer) {
 
       <div id="bot2-main-navbar" class="navbar-menu">
         <div class="navbar-end">
+          <a href="/docs" class="navbar-item">Docs</a>
           <a href="/about" class="navbar-item">About</a>
 
           `)

@@ -47,6 +47,7 @@ $navbar-divider-background-color: $border;
 @import "node_modules/bulma/sass/elements/image.sass";
 @import "node_modules/bulma/sass/elements/table.sass";
 @import "node_modules/bulma/sass/elements/button.sass";
+@import "node_modules/bulma/sass/elements/other.sass";
 
 @import "node_modules/bulma/sass/layout/section.sass";
 
@@ -64,4 +65,8 @@ $navbar-divider-background-color: $border;
     right: 0px;
     width: 288px;
     height: 288px;
+}
+
+.bot2-tag {
+    tab-size: 2;
 }

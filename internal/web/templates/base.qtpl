@@ -70,6 +70,7 @@ Page {
 
       <div id="bot2-main-navbar" class="navbar-menu">
         <div class="navbar-end">
+          <a href="/docs" class="navbar-item">Docs</a>
           <a href="/about" class="navbar-item">About</a>
 
           {% if p.Username == "" %}
