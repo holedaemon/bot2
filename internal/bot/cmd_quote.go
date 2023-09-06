@@ -12,7 +12,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/holedaemon/bot2/internal/db/models"
 	"github.com/holedaemon/bot2/internal/db/modelsx"
-	"github.com/volatiletech/null/v9"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/zikaeroh/ctxlog"
@@ -90,7 +90,7 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 		GuildID:        ev.GuildID.String(),
 		ChannelID:      ev.ChannelID.String(),
 		MessageID:      ev.MessageID.String(),
-		QuoterID:       ev.UserID.String(),
+		QuoterID:       null.StringFrom(ev.UserID.String()),
 		QuotedID:       msg.Author.ID.String(),
 		QuotedUsername: msg.Author.Tag(),
 		Num:            nextNum,

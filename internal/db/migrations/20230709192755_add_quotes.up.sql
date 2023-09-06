@@ -6,7 +6,7 @@ CREATE TABLE quotes (
     quote text NOT NULL,
     num int NOT NULL,
 
-    quoter_id text NOT NULL, -- Person that quoted the message
+    quoter_id text, -- Person that quoted the message
     quoted_id text NOT NULL, -- Person that was quoted
     quoted_username text NOT NULL,
 

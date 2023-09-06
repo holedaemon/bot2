@@ -13,7 +13,7 @@ require (
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/jellydator/ttlcache/v3 v3.1.0
 	github.com/valyala/quicktemplate v1.7.0
-	github.com/volatiletech/null/v9 v9.0.0
+	github.com/volatiletech/null/v8 v8.1.2
 	github.com/volatiletech/sqlboiler/v4 v4.15.0
 	github.com/volatiletech/strmangle v0.0.5
 	github.com/zikaeroh/ctxlog v0.0.0-20210526021226-f475ac537d51
@@ -32,6 +32,7 @@ require (
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
+	github.com/volatiletech/randomize v0.0.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/net v0.14.0 // indirect

@@ -43,6 +43,7 @@ type Server struct {
 	Addr   string
 	DB     *sql.DB
 	OAuth2 *oauth2.Config
+	Admins map[string]string
 
 	sessionManager *scs.SessionManager
 
@@ -71,6 +72,10 @@ func New(opts ...Option) (*Server, error) {
 		return nil, fmt.Errorf("web: missing oauth2 config")
 	}
 
+	if srv.Admins == nil {
+		srv.Admins = make(map[string]string)
+	}
+
 	sm := scs.New()
 	sm.Cookie.Name = sessionName
 	sm.Cookie.Secure = !srv.Debug
@@ -95,6 +100,8 @@ func (s *Server) Run(ctx context.Context) error {
 	r.Get("/auth/discord", s.authDiscord)
 	r.Get("/auth/discord/callback", s.authDiscordCallback)
 	r.Get("/guilds", s.guilds)
+
+	r.Route("/admin", s.routeAdmin)
 
 	r.Route("/guild/{id}", func(r chi.Router) {
 		r.Use(s.guildCheck)

@@ -29,8 +29,9 @@ type BotOptions struct {
 }
 
 type WebOptions struct {
-	Debug bool   `env:"BOT2_WEB_DEBUG" envDefault:"false"`
-	Addr  string `env:"BOT2_WEB_ADDR" envDefault:":8080"`
+	Debug  bool              `env:"BOT2_WEB_DEBUG" envDefault:"false"`
+	Addr   string            `env:"BOT2_WEB_ADDR" envDefault:":8080"`
+	Admins map[string]string `env:"BOT2_WEB_ADMINS"`
 
 	DSN               string        `env:"BOT2_WEB_DSN"`
 	DBMaxAttempts     int           `env:"BOT2_WEB_DB_MAX_ATTEMPTS" envDefault:"10"`
@@ -180,6 +181,7 @@ func runWeb() {
 		web.WithAddr(opts.Addr),
 		web.WithDB(db),
 		web.WithOAuth2(oa),
+		web.WithAdmins(opts.Admins),
 	)
 
 	if err != nil {

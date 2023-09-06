@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"net/http"
 	"strings"
 	"time"
 
@@ -19,6 +20,14 @@ func (s *Server) newAPIClient(ctx context.Context, id string) (*state.State, err
 	}
 
 	return state.NewAPIOnlyState("Bearer "+tok.AccessToken, handler.New()), nil
+}
+
+func (s *Server) notAuthorized(w http.ResponseWriter, r *http.Request, header bool) {
+	if header {
+		w.Header().Add("WWW-Authenticate", `Basic realm="dilf"`)
+	}
+
+	s.errorPage(w, r, http.StatusUnauthorized, "You need special pants to open this door")
 }
 
 // fetchToken retrieves a Discord token from the database, and refreshes it if necessary.

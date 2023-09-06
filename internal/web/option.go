@@ -36,3 +36,10 @@ func WithOAuth2(oa *oauth2.Config) Option {
 		s.OAuth2 = oa
 	}
 }
+
+// WithAdmins sets a Server's admin accounts.
+func WithAdmins(admins map[string]string) Option {
+	return func(s *Server) {
+		s.Admins = admins
+	}
+}
