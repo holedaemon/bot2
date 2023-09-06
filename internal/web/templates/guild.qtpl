@@ -163,7 +163,11 @@
                         <tbody>
                             {% for _, r := range p.Roles %}
                                 <tr>
-                                    <td>{%s r.RoleID %}</td>
+                                    {% if r.RoleName == "" %}
+                                        <td>N/A</td>
+                                    {% else %}
+                                        <td>{%s r.RoleName %}</td>
+                                    {% endif %}
                                 </tr>
                             {% endfor %}
                         </tbody>

@@ -475,9 +475,19 @@ func (p *GuildRolesPage) StreamBody(qw422016 *qt422016.Writer) {
 		for _, r := range p.Roles {
 			qw422016.N().S(`
                                 <tr>
-                                    <td>`)
-			qw422016.E().S(r.RoleID)
-			qw422016.N().S(`</td>
+                                    `)
+			if r.RoleName == "" {
+				qw422016.N().S(`
+                                        <td>N/A</td>
+                                    `)
+			} else {
+				qw422016.N().S(`
+                                        <td>`)
+				qw422016.E().S(r.RoleName)
+				qw422016.N().S(`</td>
+                                    `)
+			}
+			qw422016.N().S(`
                                 </tr>
                             `)
 		}
