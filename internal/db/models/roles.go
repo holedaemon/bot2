@@ -28,6 +28,7 @@ type Role struct {
 	GuildID   string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
 	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	RoleName  string    `boil:"role_name" json:"role_name" toml:"role_name" yaml:"role_name"`
 
 	R *roleR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L roleL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -39,12 +40,14 @@ var RoleColumns = struct {
 	GuildID   string
 	CreatedAt string
 	UpdatedAt string
+	RoleName  string
 }{
 	ID:        "id",
 	RoleID:    "role_id",
 	GuildID:   "guild_id",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
+	RoleName:  "role_name",
 }
 
 var RoleTableColumns = struct {
@@ -53,12 +56,14 @@ var RoleTableColumns = struct {
 	GuildID   string
 	CreatedAt string
 	UpdatedAt string
+	RoleName  string
 }{
 	ID:        "roles.id",
 	RoleID:    "roles.role_id",
 	GuildID:   "roles.guild_id",
 	CreatedAt: "roles.created_at",
 	UpdatedAt: "roles.updated_at",
+	RoleName:  "roles.role_name",
 }
 
 // Generated where
@@ -69,12 +74,14 @@ var RoleWhere = struct {
 	GuildID   whereHelperstring
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
+	RoleName  whereHelperstring
 }{
 	ID:        whereHelperint64{field: "\"roles\".\"id\""},
 	RoleID:    whereHelperstring{field: "\"roles\".\"role_id\""},
 	GuildID:   whereHelperstring{field: "\"roles\".\"guild_id\""},
 	CreatedAt: whereHelpertime_Time{field: "\"roles\".\"created_at\""},
 	UpdatedAt: whereHelpertime_Time{field: "\"roles\".\"updated_at\""},
+	RoleName:  whereHelperstring{field: "\"roles\".\"role_name\""},
 }
 
 // RoleRels is where relationship names are stored.
@@ -94,8 +101,8 @@ func (*roleR) NewStruct() *roleR {
 type roleL struct{}
 
 var (
-	roleAllColumns            = []string{"id", "role_id", "guild_id", "created_at", "updated_at"}
-	roleColumnsWithoutDefault = []string{"role_id", "guild_id"}
+	roleAllColumns            = []string{"id", "role_id", "guild_id", "created_at", "updated_at", "role_name"}
+	roleColumnsWithoutDefault = []string{"role_id", "guild_id", "role_name"}
 	roleColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	rolePrimaryKeyColumns     = []string{"id"}
 	roleGeneratedColumns      = []string{}

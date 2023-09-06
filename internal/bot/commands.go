@@ -156,6 +156,10 @@ var commands = commandList{
 					discord.NewRoleOption("fourth", "Fourth role to import", false),
 					discord.NewRoleOption("fifth", "Fifth role to import", false),
 				),
+				discord.NewSubcommandOption(
+					"fix",
+					"Update the database to include role names for tracked roles without.",
+				),
 			},
 		},
 	},

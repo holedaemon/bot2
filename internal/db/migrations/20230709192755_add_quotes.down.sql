@@ -1,5 +1,7 @@
 BEGIN;
 
+ALTER TABLE roles DROP COLUMN role_name;
+
 DROP TABLE quotes;
 
 DROP TABLE guilds;

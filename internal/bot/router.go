@@ -67,6 +67,7 @@ func (b *Bot) router() *cmdroute.Router {
 		r.AddFunc("setcolor", b.cmdRoleSetColor)
 		r.AddFunc("import", b.cmdRoleImport)
 		r.AddFunc("relinquish", b.cmdRoleRelinquish)
+		r.AddFunc("fix", b.cmdRoleFix)
 	})
 
 	r.Sub("settings", func(r *cmdroute.Router) {
