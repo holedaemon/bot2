@@ -15,6 +15,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/holedaemon/bot2/internal/db/models"
+	"github.com/holedaemon/bot2/internal/db/modelsx"
 	"github.com/holedaemon/bot2/internal/pkg/pgstore"
 	"github.com/holedaemon/bot2/internal/web/templates"
 	"github.com/jellydator/ttlcache/v3"
@@ -105,7 +106,6 @@ func (s *Server) Run(ctx context.Context) error {
 
 	r.Route("/guild/{id}", func(r chi.Router) {
 		r.Use(s.guildCheck)
-		r.Use(s.guildMiddleware)
 
 		r.Get("/", s.guild)
 		r.Get("/quotes", s.guildQuotes)
@@ -209,7 +209,18 @@ func (s *Server) guildPage(r *http.Request, g *models.Guild) templates.GuildPage
 
 func (s *Server) guild(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	guild := getGuild(ctx)
+	id := chi.URLParam(r, "id")
+
+	guild, err := modelsx.FetchGuild(ctx, s.DB, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			s.errorPage(w, r, http.StatusNotFound, "")
+		} else {
+			ctxlog.Error(ctx, "error fetching guild", zap.String("guild_id", id), zap.Error(err))
+			s.errorPage(w, r, http.StatusInternalServerError, "")
+		}
+		return
+	}
 
 	templates.WritePageTemplate(w, &templates.GuildPage{
 		BasePage: s.basePage(r),
@@ -219,11 +230,20 @@ func (s *Server) guild(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) guildQuotes(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	guild := getGuild(ctx)
-
 	id := chi.URLParam(r, "id")
 
-	quotes, err := models.Quotes(qm.Where("guild_id = ?", id)).All(ctx, s.DB)
+	guild, err := modelsx.FetchGuild(ctx, s.DB, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			s.errorPage(w, r, http.StatusNotFound, "")
+		} else {
+			ctxlog.Error(ctx, "error fetching guild", zap.String("guild_id", id), zap.Error(err))
+			s.errorPage(w, r, http.StatusInternalServerError, "")
+		}
+		return
+	}
+
+	quotes, err := models.Quotes(qm.Where("guild_id = ?", id), qm.OrderBy("num")).All(ctx, s.DB)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			ctxlog.Error(ctx, "error fetching quotes", zap.Error(err))
@@ -240,9 +260,18 @@ func (s *Server) guildQuotes(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) guildRoles(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	guild := getGuild(ctx)
-
 	id := chi.URLParam(r, "id")
+
+	guild, err := modelsx.FetchGuild(ctx, s.DB, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			s.errorPage(w, r, http.StatusNotFound, "")
+		} else {
+			ctxlog.Error(ctx, "error fetching guild", zap.String("guild_id", id), zap.Error(err))
+			s.errorPage(w, r, http.StatusInternalServerError, "")
+		}
+		return
+	}
 
 	roles, err := models.Roles(qm.Where("guild_id = ?", id)).All(ctx, s.DB)
 	if err != nil {
