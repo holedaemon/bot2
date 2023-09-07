@@ -571,6 +571,6 @@ func (b *Bot) cmdRoleFix(ctx context.Context, data cmdroute.CommandData) *api.In
 	if count == 0 {
 		return respond("None of the tracked roles were missing their names, yaay")
 	} else {
-		return respondf("Updated %d tracked roles to include their names in the database")
+		return respondf("Updated %d tracked roles to include their names in the database", count)
 	}
 }
