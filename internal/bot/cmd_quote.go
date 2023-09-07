@@ -70,6 +70,10 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 		return
 	}
 
+	if msg.Content == "" {
+		return
+	}
+
 	var row struct {
 		MaxNum null.Int
 	}
