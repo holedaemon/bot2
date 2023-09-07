@@ -41,8 +41,8 @@ func (b *Bot) cmdInfo(ctx context.Context, data cmdroute.CommandData) *api.Inter
 				Inline: true,
 			},
 			{
-				Name:   "Help",
-				Value:  "[RTFM](https://holedaemon.net/bot/docs)",
+				Name:   "Wow",
+				Value:  "[Website](https://dilf.holedaemon.net)",
 				Inline: true,
 			},
 		},

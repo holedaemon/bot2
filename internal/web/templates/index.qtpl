@@ -1,0 +1,17 @@
+{% code type IndexPage struct {
+    BasePage
+} %}
+
+{% func (p *IndexPage) Title() %}Home{% endfunc %}
+
+{% func (p *IndexPage) Body() %}
+    <section class="section">
+        <div class="container has-text-centered">
+        <h1 class="title">The Workingman's Discord Bot</h1>
+        <h2 class="subtitle"><span class="has-text-success">Quotes</span>, <span class="has-text-success">custom
+            roles</span>, and <span class="has-text-success">25 year old web comics</span>. Made for the blue collar by
+            the blue collar.</h2>
+        </div>
+    </section>
+    <img id="bot2-lance" class="is-hidden-mobile" src="/static/lance.png">
+{% endfunc %}

@@ -67,6 +67,16 @@ func (b *Bot) router() *cmdroute.Router {
 		r.AddFunc("setcolor", b.cmdRoleSetColor)
 		r.AddFunc("import", b.cmdRoleImport)
 		r.AddFunc("relinquish", b.cmdRoleRelinquish)
+		r.AddFunc("fix", b.cmdRoleFix)
+	})
+
+	r.Sub("settings", func(r *cmdroute.Router) {
+		r.AddFunc("quotes", b.cmdSettingsQuotes)
+	})
+
+	r.AddFunc("q", b.cmdQ)
+	r.Sub("quote", func(r *cmdroute.Router) {
+		r.AddFunc("delete", b.cmdQuoteDelete)
 	})
 
 	r.Sub("egoraptor", func(r *cmdroute.Router) {

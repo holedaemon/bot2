@@ -1,0 +1,45 @@
+{% import "github.com/aquilax/truncate" %}
+{% import "github.com/holedaemon/bot2/internal/db/models" %}
+
+{% code type GuildsPage struct {
+    BasePage
+    Guilds []*models.Guild
+}
+%}
+
+{% func (p *GuildsPage) Title() %}Guilds{% endfunc %}
+
+{% func (p *GuildsPage) Meta() %}
+    {%s= importFontAwesome() %}
+{% endfunc %}
+
+{% func (p *GuildsPage) Body() %}
+    <section class="section">
+        {% if len(p.Guilds) == 0 %}
+            <div class="container has-text-centered">
+                <h1 class="title">Whoops!</h1>
+                <h2 class="subtitle">This site isn't tracking any guilds. How embarrassing. :3</h2>
+            </div>
+        {% else %}
+            <div class="container">
+                <div class="columns is-centered">
+                    <div class="column is-one-third">
+                        <nav class="panel is-success">
+                            <p class="panel-heading has-text-centered is-size-3">
+                                Guilds
+                            </p>
+                            {% for _, g := range p.Guilds %}
+                                <a href="/guild/{%s g.GuildID %}" class="panel-block">
+                                    <span class="panel-icon">
+                                        <i class="fa-brands fa-discord" aria-hidden="true"></i>
+                                    </span>
+                                    {%s truncate.Truncate(g.GuildName, 32, "...", truncate.PositionEnd) %}
+                                </a>
+                            {% endfor %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+{% endfunc %}

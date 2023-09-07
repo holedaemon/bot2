@@ -21,114 +21,114 @@ import (
 	"github.com/volatiletech/strmangle"
 )
 
-// Role is an object representing the database table.
-type Role struct {
+// Guild is an object representing the database table.
+type Guild struct {
 	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	RoleID    string    `boil:"role_id" json:"role_id" toml:"role_id" yaml:"role_id"`
 	GuildID   string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
+	GuildName string    `boil:"guild_name" json:"guild_name" toml:"guild_name" yaml:"guild_name"`
+	DoQuotes  bool      `boil:"do_quotes" json:"do_quotes" toml:"do_quotes" yaml:"do_quotes"`
 	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	RoleName  string    `boil:"role_name" json:"role_name" toml:"role_name" yaml:"role_name"`
 
-	R *roleR `boil:"-" json:"-" toml:"-" yaml:"-"`
-	L roleL  `boil:"-" json:"-" toml:"-" yaml:"-"`
+	R *guildR `boil:"-" json:"-" toml:"-" yaml:"-"`
+	L guildL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
-var RoleColumns = struct {
+var GuildColumns = struct {
 	ID        string
-	RoleID    string
 	GuildID   string
+	GuildName string
+	DoQuotes  string
 	CreatedAt string
 	UpdatedAt string
-	RoleName  string
 }{
 	ID:        "id",
-	RoleID:    "role_id",
 	GuildID:   "guild_id",
+	GuildName: "guild_name",
+	DoQuotes:  "do_quotes",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
-	RoleName:  "role_name",
 }
 
-var RoleTableColumns = struct {
+var GuildTableColumns = struct {
 	ID        string
-	RoleID    string
 	GuildID   string
+	GuildName string
+	DoQuotes  string
 	CreatedAt string
 	UpdatedAt string
-	RoleName  string
 }{
-	ID:        "roles.id",
-	RoleID:    "roles.role_id",
-	GuildID:   "roles.guild_id",
-	CreatedAt: "roles.created_at",
-	UpdatedAt: "roles.updated_at",
-	RoleName:  "roles.role_name",
+	ID:        "guilds.id",
+	GuildID:   "guilds.guild_id",
+	GuildName: "guilds.guild_name",
+	DoQuotes:  "guilds.do_quotes",
+	CreatedAt: "guilds.created_at",
+	UpdatedAt: "guilds.updated_at",
 }
 
 // Generated where
 
-var RoleWhere = struct {
+var GuildWhere = struct {
 	ID        whereHelperint64
-	RoleID    whereHelperstring
 	GuildID   whereHelperstring
+	GuildName whereHelperstring
+	DoQuotes  whereHelperbool
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
-	RoleName  whereHelperstring
 }{
-	ID:        whereHelperint64{field: "\"roles\".\"id\""},
-	RoleID:    whereHelperstring{field: "\"roles\".\"role_id\""},
-	GuildID:   whereHelperstring{field: "\"roles\".\"guild_id\""},
-	CreatedAt: whereHelpertime_Time{field: "\"roles\".\"created_at\""},
-	UpdatedAt: whereHelpertime_Time{field: "\"roles\".\"updated_at\""},
-	RoleName:  whereHelperstring{field: "\"roles\".\"role_name\""},
+	ID:        whereHelperint64{field: "\"guilds\".\"id\""},
+	GuildID:   whereHelperstring{field: "\"guilds\".\"guild_id\""},
+	GuildName: whereHelperstring{field: "\"guilds\".\"guild_name\""},
+	DoQuotes:  whereHelperbool{field: "\"guilds\".\"do_quotes\""},
+	CreatedAt: whereHelpertime_Time{field: "\"guilds\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"guilds\".\"updated_at\""},
 }
 
-// RoleRels is where relationship names are stored.
-var RoleRels = struct {
+// GuildRels is where relationship names are stored.
+var GuildRels = struct {
 }{}
 
-// roleR is where relationships are stored.
-type roleR struct {
+// guildR is where relationships are stored.
+type guildR struct {
 }
 
 // NewStruct creates a new relationship struct
-func (*roleR) NewStruct() *roleR {
-	return &roleR{}
+func (*guildR) NewStruct() *guildR {
+	return &guildR{}
 }
 
-// roleL is where Load methods for each relationship are stored.
-type roleL struct{}
+// guildL is where Load methods for each relationship are stored.
+type guildL struct{}
 
 var (
-	roleAllColumns            = []string{"id", "role_id", "guild_id", "created_at", "updated_at", "role_name"}
-	roleColumnsWithoutDefault = []string{"role_id", "guild_id", "role_name"}
-	roleColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
-	rolePrimaryKeyColumns     = []string{"id"}
-	roleGeneratedColumns      = []string{}
+	guildAllColumns            = []string{"id", "guild_id", "guild_name", "do_quotes", "created_at", "updated_at"}
+	guildColumnsWithoutDefault = []string{"guild_id", "guild_name"}
+	guildColumnsWithDefault    = []string{"id", "do_quotes", "created_at", "updated_at"}
+	guildPrimaryKeyColumns     = []string{"id"}
+	guildGeneratedColumns      = []string{}
 )
 
 type (
-	// RoleSlice is an alias for a slice of pointers to Role.
-	// This should almost always be used instead of []Role.
-	RoleSlice []*Role
+	// GuildSlice is an alias for a slice of pointers to Guild.
+	// This should almost always be used instead of []Guild.
+	GuildSlice []*Guild
 
-	roleQuery struct {
+	guildQuery struct {
 		*queries.Query
 	}
 )
 
 // Cache for insert, update and upsert
 var (
-	roleType                 = reflect.TypeOf(&Role{})
-	roleMapping              = queries.MakeStructMapping(roleType)
-	rolePrimaryKeyMapping, _ = queries.BindMapping(roleType, roleMapping, rolePrimaryKeyColumns)
-	roleInsertCacheMut       sync.RWMutex
-	roleInsertCache          = make(map[string]insertCache)
-	roleUpdateCacheMut       sync.RWMutex
-	roleUpdateCache          = make(map[string]updateCache)
-	roleUpsertCacheMut       sync.RWMutex
-	roleUpsertCache          = make(map[string]insertCache)
+	guildType                 = reflect.TypeOf(&Guild{})
+	guildMapping              = queries.MakeStructMapping(guildType)
+	guildPrimaryKeyMapping, _ = queries.BindMapping(guildType, guildMapping, guildPrimaryKeyColumns)
+	guildInsertCacheMut       sync.RWMutex
+	guildInsertCache          = make(map[string]insertCache)
+	guildUpdateCacheMut       sync.RWMutex
+	guildUpdateCache          = make(map[string]updateCache)
+	guildUpsertCacheMut       sync.RWMutex
+	guildUpsertCache          = make(map[string]insertCache)
 )
 
 var (
@@ -139,9 +139,9 @@ var (
 	_ = qmhelper.Where
 )
 
-// One returns a single role record from the query.
-func (q roleQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Role, error) {
-	o := &Role{}
+// One returns a single guild record from the query.
+func (q guildQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Guild, error) {
+	o := &Guild{}
 
 	queries.SetLimit(q.Query, 1)
 
@@ -150,26 +150,26 @@ func (q roleQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Role, e
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: failed to execute a one query for roles")
+		return nil, errors.Wrap(err, "models: failed to execute a one query for guilds")
 	}
 
 	return o, nil
 }
 
-// All returns all Role records from the query.
-func (q roleQuery) All(ctx context.Context, exec boil.ContextExecutor) (RoleSlice, error) {
-	var o []*Role
+// All returns all Guild records from the query.
+func (q guildQuery) All(ctx context.Context, exec boil.ContextExecutor) (GuildSlice, error) {
+	var o []*Guild
 
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
-		return nil, errors.Wrap(err, "models: failed to assign all query results to Role slice")
+		return nil, errors.Wrap(err, "models: failed to assign all query results to Guild slice")
 	}
 
 	return o, nil
 }
 
-// Count returns the count of all Role records in the query.
-func (q roleQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+// Count returns the count of all Guild records in the query.
+func (q guildQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -177,14 +177,14 @@ func (q roleQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64,
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to count roles rows")
+		return 0, errors.Wrap(err, "models: failed to count guilds rows")
 	}
 
 	return count, nil
 }
 
 // Exists checks if the row exists in the table.
-func (q roleQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+func (q guildQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -193,54 +193,54 @@ func (q roleQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool,
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return false, errors.Wrap(err, "models: failed to check if roles exists")
+		return false, errors.Wrap(err, "models: failed to check if guilds exists")
 	}
 
 	return count > 0, nil
 }
 
-// Roles retrieves all the records using an executor.
-func Roles(mods ...qm.QueryMod) roleQuery {
-	mods = append(mods, qm.From("\"roles\""))
+// Guilds retrieves all the records using an executor.
+func Guilds(mods ...qm.QueryMod) guildQuery {
+	mods = append(mods, qm.From("\"guilds\""))
 	q := NewQuery(mods...)
 	if len(queries.GetSelect(q)) == 0 {
-		queries.SetSelect(q, []string{"\"roles\".*"})
+		queries.SetSelect(q, []string{"\"guilds\".*"})
 	}
 
-	return roleQuery{q}
+	return guildQuery{q}
 }
 
-// FindRole retrieves a single record by ID with an executor.
+// FindGuild retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindRole(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*Role, error) {
-	roleObj := &Role{}
+func FindGuild(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*Guild, error) {
+	guildObj := &Guild{}
 
 	sel := "*"
 	if len(selectCols) > 0 {
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"roles\" where \"id\"=$1", sel,
+		"select %s from \"guilds\" where \"id\"=$1", sel,
 	)
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(ctx, exec, roleObj)
+	err := q.Bind(ctx, exec, guildObj)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: unable to select from roles")
+		return nil, errors.Wrap(err, "models: unable to select from guilds")
 	}
 
-	return roleObj, nil
+	return guildObj, nil
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *Role) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
+func (o *Guild) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no roles provided for insertion")
+		return errors.New("models: no guilds provided for insertion")
 	}
 
 	var err error
@@ -255,33 +255,33 @@ func (o *Role) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 		}
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(roleColumnsWithDefault, o)
+	nzDefaults := queries.NonZeroDefaultSet(guildColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
-	roleInsertCacheMut.RLock()
-	cache, cached := roleInsertCache[key]
-	roleInsertCacheMut.RUnlock()
+	guildInsertCacheMut.RLock()
+	cache, cached := guildInsertCache[key]
+	guildInsertCacheMut.RUnlock()
 
 	if !cached {
 		wl, returnColumns := columns.InsertColumnSet(
-			roleAllColumns,
-			roleColumnsWithDefault,
-			roleColumnsWithoutDefault,
+			guildAllColumns,
+			guildColumnsWithDefault,
+			guildColumnsWithoutDefault,
 			nzDefaults,
 		)
 
-		cache.valueMapping, err = queries.BindMapping(roleType, roleMapping, wl)
+		cache.valueMapping, err = queries.BindMapping(guildType, guildMapping, wl)
 		if err != nil {
 			return err
 		}
-		cache.retMapping, err = queries.BindMapping(roleType, roleMapping, returnColumns)
+		cache.retMapping, err = queries.BindMapping(guildType, guildMapping, returnColumns)
 		if err != nil {
 			return err
 		}
 		if len(wl) != 0 {
-			cache.query = fmt.Sprintf("INSERT INTO \"roles\" (\"%s\") %%sVALUES (%s)%%s", strings.Join(wl, "\",\""), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
+			cache.query = fmt.Sprintf("INSERT INTO \"guilds\" (\"%s\") %%sVALUES (%s)%%s", strings.Join(wl, "\",\""), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
 		} else {
-			cache.query = "INSERT INTO \"roles\" %sDEFAULT VALUES%s"
+			cache.query = "INSERT INTO \"guilds\" %sDEFAULT VALUES%s"
 		}
 
 		var queryOutput, queryReturning string
@@ -309,22 +309,22 @@ func (o *Role) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 	}
 
 	if err != nil {
-		return errors.Wrap(err, "models: unable to insert into roles")
+		return errors.Wrap(err, "models: unable to insert into guilds")
 	}
 
 	if !cached {
-		roleInsertCacheMut.Lock()
-		roleInsertCache[key] = cache
-		roleInsertCacheMut.Unlock()
+		guildInsertCacheMut.Lock()
+		guildInsertCache[key] = cache
+		guildInsertCacheMut.Unlock()
 	}
 
 	return nil
 }
 
-// Update uses an executor to update the Role.
+// Update uses an executor to update the Guild.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *Role) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
+func (o *Guild) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
@@ -333,28 +333,28 @@ func (o *Role) Update(ctx context.Context, exec boil.ContextExecutor, columns bo
 
 	var err error
 	key := makeCacheKey(columns, nil)
-	roleUpdateCacheMut.RLock()
-	cache, cached := roleUpdateCache[key]
-	roleUpdateCacheMut.RUnlock()
+	guildUpdateCacheMut.RLock()
+	cache, cached := guildUpdateCache[key]
+	guildUpdateCacheMut.RUnlock()
 
 	if !cached {
 		wl := columns.UpdateColumnSet(
-			roleAllColumns,
-			rolePrimaryKeyColumns,
+			guildAllColumns,
+			guildPrimaryKeyColumns,
 		)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
 		}
 		if len(wl) == 0 {
-			return errors.New("models: unable to update roles, could not build whitelist")
+			return errors.New("models: unable to update guilds, could not build whitelist")
 		}
 
-		cache.query = fmt.Sprintf("UPDATE \"roles\" SET %s WHERE %s",
+		cache.query = fmt.Sprintf("UPDATE \"guilds\" SET %s WHERE %s",
 			strmangle.SetParamNames("\"", "\"", 1, wl),
-			strmangle.WhereClause("\"", "\"", len(wl)+1, rolePrimaryKeyColumns),
+			strmangle.WhereClause("\"", "\"", len(wl)+1, guildPrimaryKeyColumns),
 		)
-		cache.valueMapping, err = queries.BindMapping(roleType, roleMapping, append(wl, rolePrimaryKeyColumns...))
+		cache.valueMapping, err = queries.BindMapping(guildType, guildMapping, append(wl, guildPrimaryKeyColumns...))
 		if err != nil {
 			return err
 		}
@@ -369,32 +369,32 @@ func (o *Role) Update(ctx context.Context, exec boil.ContextExecutor, columns bo
 	}
 	_, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to update roles row")
+		return errors.Wrap(err, "models: unable to update guilds row")
 	}
 
 	if !cached {
-		roleUpdateCacheMut.Lock()
-		roleUpdateCache[key] = cache
-		roleUpdateCacheMut.Unlock()
+		guildUpdateCacheMut.Lock()
+		guildUpdateCache[key] = cache
+		guildUpdateCacheMut.Unlock()
 	}
 
 	return nil
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q roleQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) error {
+func (q guildQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) error {
 	queries.SetUpdate(q.Query, cols)
 
 	_, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to update all for roles")
+		return errors.Wrap(err, "models: unable to update all for guilds")
 	}
 
 	return nil
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o RoleSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) error {
+func (o GuildSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) error {
 	ln := int64(len(o))
 	if ln == 0 {
 		return nil
@@ -416,13 +416,13 @@ func (o RoleSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 
 	// Append all of the primary key values for each column
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), rolePrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), guildPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := fmt.Sprintf("UPDATE \"roles\" SET %s WHERE %s",
+	sql := fmt.Sprintf("UPDATE \"guilds\" SET %s WHERE %s",
 		strmangle.SetParamNames("\"", "\"", 1, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, rolePrimaryKeyColumns, len(o)))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, guildPrimaryKeyColumns, len(o)))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -431,7 +431,7 @@ func (o RoleSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 	}
 	_, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to update all in role slice")
+		return errors.Wrap(err, "models: unable to update all in guild slice")
 	}
 
 	return nil
@@ -439,9 +439,9 @@ func (o RoleSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *Role) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *Guild) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no roles provided for upsert")
+		return errors.New("models: no guilds provided for upsert")
 	}
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
@@ -452,7 +452,7 @@ func (o *Role) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnCo
 		o.UpdatedAt = currTime
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(roleColumnsWithDefault, o)
+	nzDefaults := queries.NonZeroDefaultSet(guildColumnsWithDefault, o)
 
 	// Build cache key in-line uglily - mysql vs psql problems
 	buf := strmangle.GetBuffer()
@@ -482,42 +482,42 @@ func (o *Role) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnCo
 	key := buf.String()
 	strmangle.PutBuffer(buf)
 
-	roleUpsertCacheMut.RLock()
-	cache, cached := roleUpsertCache[key]
-	roleUpsertCacheMut.RUnlock()
+	guildUpsertCacheMut.RLock()
+	cache, cached := guildUpsertCache[key]
+	guildUpsertCacheMut.RUnlock()
 
 	var err error
 
 	if !cached {
 		insert, ret := insertColumns.InsertColumnSet(
-			roleAllColumns,
-			roleColumnsWithDefault,
-			roleColumnsWithoutDefault,
+			guildAllColumns,
+			guildColumnsWithDefault,
+			guildColumnsWithoutDefault,
 			nzDefaults,
 		)
 
 		update := updateColumns.UpdateColumnSet(
-			roleAllColumns,
-			rolePrimaryKeyColumns,
+			guildAllColumns,
+			guildPrimaryKeyColumns,
 		)
 
 		if updateOnConflict && len(update) == 0 {
-			return errors.New("models: unable to upsert roles, could not build update column list")
+			return errors.New("models: unable to upsert guilds, could not build update column list")
 		}
 
 		conflict := conflictColumns
 		if len(conflict) == 0 {
-			conflict = make([]string, len(rolePrimaryKeyColumns))
-			copy(conflict, rolePrimaryKeyColumns)
+			conflict = make([]string, len(guildPrimaryKeyColumns))
+			copy(conflict, guildPrimaryKeyColumns)
 		}
-		cache.query = buildUpsertQueryPostgres(dialect, "\"roles\"", updateOnConflict, ret, update, conflict, insert)
+		cache.query = buildUpsertQueryPostgres(dialect, "\"guilds\"", updateOnConflict, ret, update, conflict, insert)
 
-		cache.valueMapping, err = queries.BindMapping(roleType, roleMapping, insert)
+		cache.valueMapping, err = queries.BindMapping(guildType, guildMapping, insert)
 		if err != nil {
 			return err
 		}
 		if len(ret) != 0 {
-			cache.retMapping, err = queries.BindMapping(roleType, roleMapping, ret)
+			cache.retMapping, err = queries.BindMapping(guildType, guildMapping, ret)
 			if err != nil {
 				return err
 			}
@@ -545,27 +545,27 @@ func (o *Role) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnCo
 		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 	if err != nil {
-		return errors.Wrap(err, "models: unable to upsert roles")
+		return errors.Wrap(err, "models: unable to upsert guilds")
 	}
 
 	if !cached {
-		roleUpsertCacheMut.Lock()
-		roleUpsertCache[key] = cache
-		roleUpsertCacheMut.Unlock()
+		guildUpsertCacheMut.Lock()
+		guildUpsertCache[key] = cache
+		guildUpsertCacheMut.Unlock()
 	}
 
 	return nil
 }
 
-// Delete deletes a single Role record with an executor.
+// Delete deletes a single Guild record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *Role) Delete(ctx context.Context, exec boil.ContextExecutor) error {
+func (o *Guild) Delete(ctx context.Context, exec boil.ContextExecutor) error {
 	if o == nil {
-		return errors.New("models: no Role provided for delete")
+		return errors.New("models: no Guild provided for delete")
 	}
 
-	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), rolePrimaryKeyMapping)
-	sql := "DELETE FROM \"roles\" WHERE \"id\"=$1"
+	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), guildPrimaryKeyMapping)
+	sql := "DELETE FROM \"guilds\" WHERE \"id\"=$1"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -574,42 +574,42 @@ func (o *Role) Delete(ctx context.Context, exec boil.ContextExecutor) error {
 	}
 	_, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to delete from roles")
+		return errors.Wrap(err, "models: unable to delete from guilds")
 	}
 
 	return nil
 }
 
 // DeleteAll deletes all matching rows.
-func (q roleQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) error {
+func (q guildQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if q.Query == nil {
-		return errors.New("models: no roleQuery provided for delete all")
+		return errors.New("models: no guildQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
 	_, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to delete all from roles")
+		return errors.Wrap(err, "models: unable to delete all from guilds")
 	}
 
 	return nil
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o RoleSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) error {
+func (o GuildSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if len(o) == 0 {
 		return nil
 	}
 
 	var args []interface{}
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), rolePrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), guildPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "DELETE FROM \"roles\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, rolePrimaryKeyColumns, len(o))
+	sql := "DELETE FROM \"guilds\" WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, guildPrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -618,7 +618,7 @@ func (o RoleSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) err
 	}
 	_, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to delete all from role slice")
+		return errors.Wrap(err, "models: unable to delete all from guild slice")
 	}
 
 	return nil
@@ -626,8 +626,8 @@ func (o RoleSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) err
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *Role) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindRole(ctx, exec, o.ID)
+func (o *Guild) Reload(ctx context.Context, exec boil.ContextExecutor) error {
+	ret, err := FindGuild(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -638,26 +638,26 @@ func (o *Role) Reload(ctx context.Context, exec boil.ContextExecutor) error {
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *RoleSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
+func (o *GuildSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
 
-	slice := RoleSlice{}
+	slice := GuildSlice{}
 	var args []interface{}
 	for _, obj := range *o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), rolePrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), guildPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "SELECT \"roles\".* FROM \"roles\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, rolePrimaryKeyColumns, len(*o))
+	sql := "SELECT \"guilds\".* FROM \"guilds\" WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, guildPrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
 	err := q.Bind(ctx, exec, &slice)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to reload all in RoleSlice")
+		return errors.Wrap(err, "models: unable to reload all in GuildSlice")
 	}
 
 	*o = slice
@@ -665,10 +665,10 @@ func (o *RoleSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) er
 	return nil
 }
 
-// RoleExists checks if the Role row exists.
-func RoleExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
+// GuildExists checks if the Guild row exists.
+func GuildExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"roles\" where \"id\"=$1 limit 1)"
+	sql := "select exists(select 1 from \"guilds\" where \"id\"=$1 limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -679,13 +679,13 @@ func RoleExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool,
 
 	err := row.Scan(&exists)
 	if err != nil {
-		return false, errors.Wrap(err, "models: unable to check if roles exists")
+		return false, errors.Wrap(err, "models: unable to check if guilds exists")
 	}
 
 	return exists, nil
 }
 
-// Exists checks if the Role row exists.
-func (o *Role) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
-	return RoleExists(ctx, exec, o.ID)
+// Exists checks if the Guild row exists.
+func (o *Guild) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+	return GuildExists(ctx, exec, o.ID)
 }

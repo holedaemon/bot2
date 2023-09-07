@@ -156,6 +156,10 @@ var commands = commandList{
 					discord.NewRoleOption("fourth", "Fourth role to import", false),
 					discord.NewRoleOption("fifth", "Fifth role to import", false),
 				),
+				discord.NewSubcommandOption(
+					"fix",
+					"Update the database to include role names for tracked roles without.",
+				),
 			},
 		},
 	},
@@ -202,6 +206,57 @@ var commands = commandList{
 					discord.NewIntegerOption(
 						"seconds",
 						"Number of seconds to time out for",
+						true,
+					),
+				),
+			},
+		},
+	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:           "q",
+			Description:    "Query guild quotes",
+			NoDMPermission: true,
+			Options: discord.CommandOptions{
+				discord.NewIntegerOption("index", "Quote index", false),
+				discord.NewUserOption("user", "Member to query", false),
+			},
+		},
+	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:           "quote",
+			Description:    "Interact with guild quotes",
+			NoDMPermission: true,
+			Options: discord.CommandOptions{
+				discord.NewSubcommandOption(
+					"delete",
+					"Delete a quote",
+					discord.NewIntegerOption(
+						"index",
+						"The index to delete",
+						true,
+					),
+				),
+			},
+		},
+	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:                     "settings",
+			Description:              "Configure bot settings for the guild",
+			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageGuild),
+			NoDMPermission:           true,
+			Options: discord.CommandOptions{
+				discord.NewSubcommandOption(
+					"quotes",
+					"Toggle use of quotes in the guild",
+					discord.NewBooleanOption(
+						"toggled",
+						"Toggle quotes on or off",
 						true,
 					),
 				),

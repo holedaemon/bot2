@@ -100,8 +100,9 @@ func (b *Bot) cmdRoleCreate(ctx context.Context, data cmdroute.CommandData) *api
 	}
 
 	role := models.Role{
-		GuildID: data.Event.GuildID.String(),
-		RoleID:  r.ID.String(),
+		RoleName: name,
+		GuildID:  data.Event.GuildID.String(),
+		RoleID:   r.ID.String(),
 	}
 
 	if err := role.Insert(ctx, tx, boil.Infer()); err != nil {
@@ -329,6 +330,23 @@ func (b *Bot) cmdRoleRename(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("The API got mad at me when I tried updating the role")
 	}
 
+	role, err := models.Roles(qm.Where("role_id = ? AND guild_id = ?", sf.String(), data.Event.GuildID.String())).One(ctx, b.DB)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return respondError("Uh oh! Role doesn't exist in database... This shouldn't happen. Lol")
+		}
+
+		ctxlog.Error(ctx, "error fetching role from database", zap.Error(err))
+		return dbError
+	}
+
+	role.RoleName = newName
+
+	if err := role.Update(ctx, b.DB, boil.Infer()); err != nil {
+		ctxlog.Error(ctx, "error updating role", zap.Error(err))
+		return dbError
+	}
+
 	return respond("Role name has been updated")
 }
 
@@ -394,7 +412,7 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 			continue
 		}
 
-		exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", sf.String(), data.Event.GuildID.String())).Exists(ctx, tx)
+		exists, err := models.Roles(qm.Where("role_id = ? AND guild_id = ?", sf.String(), data.Event.GuildID.String())).Exists(ctx, tx)
 		if err != nil {
 			ctxlog.Error(ctx, "error checking for role in database", zap.Error(err))
 			if err := tx.Rollback(); err != nil {
@@ -407,9 +425,16 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 			continue
 		}
 
+		discordRole, err := b.State.Role(data.Event.GuildID, discord.RoleID(sf))
+		if err != nil {
+			ctxlog.Error(ctx, "error fetching role from Discord")
+			return respondError("Error fetching role from Discord!!!")
+		}
+
 		role := models.Role{
-			RoleID:  sf.String(),
-			GuildID: data.Event.GuildID.String(),
+			RoleName: discordRole.Name,
+			RoleID:   sf.String(),
+			GuildID:  data.Event.GuildID.String(),
 		}
 
 		if err := role.Insert(ctx, tx, boil.Infer()); err != nil {
@@ -487,4 +512,64 @@ func (b *Bot) cmdRoleList(ctx context.Context, data cmdroute.CommandData) *api.I
 	}
 
 	return respond(sb.String())
+}
+
+func (b *Bot) cmdRoleFix(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	tx, err := b.DB.BeginTx(ctx, nil)
+	if err != nil {
+		ctxlog.Error(ctx, "error starting transaction", zap.Error(err))
+		return dbError
+	}
+
+	defer tx.Rollback()
+
+	roles, err := models.Roles(qm.Where("guild_id = ?", data.Event.GuildID.String())).All(ctx, tx)
+	if err != nil {
+		ctxlog.Error(ctx, "error querying roles", zap.Error(err))
+		return dbError
+	}
+
+	if len(roles) == 0 {
+		return respond("I am not tracking any roles in this server")
+	}
+
+	count := 0
+
+	for _, role := range roles {
+		if role.RoleName != "" {
+			continue
+		}
+
+		sf, err := discord.ParseSnowflake(role.RoleID)
+		if err != nil {
+			ctxlog.Error(ctx, "error parsing snowflake from role_id", zap.Error(err))
+			return respond("Error parsing snowflake from role_id???")
+		}
+
+		discordRole, err := b.State.Role(data.Event.GuildID, discord.RoleID(sf))
+		if err != nil {
+			ctxlog.Error(ctx, "error fetching role from Discord", zap.Error(err))
+			return respond("Error fetching role from Discord xD")
+		}
+
+		role.RoleName = discordRole.Name
+
+		if err := role.Update(ctx, tx, boil.Infer()); err != nil {
+			ctxlog.Error(ctx, "error updating role in database", zap.Error(err))
+			return dbError
+		}
+
+		count++
+	}
+
+	if err := tx.Commit(); err != nil {
+		ctxlog.Error(ctx, "error committing transaction", zap.Error(err))
+		return dbError
+	}
+
+	if count == 0 {
+		return respond("None of the tracked roles were missing their names, yaay")
+	} else {
+		return respondf("Updated %d tracked roles to include their names in the database")
+	}
 }

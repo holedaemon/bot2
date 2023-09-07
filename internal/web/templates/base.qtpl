@@ -1,0 +1,98 @@
+{% interface 
+Page {
+    Title()
+    Meta()
+    Navbar()
+    Scripts()
+    Body()
+}
+%}
+
+{% func PageTemplate(p Page) %}
+<!DOCTYPE html>
+<html>
+    <head>
+      <title>{%= p.Title() %} &mdash; DILF</title>
+
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="/static/bot2.css">
+
+      {%= p.Meta() %}
+    </head>
+    <body>
+        {%= p.Navbar() %}
+
+        {%= p.Body() %}
+    </body>
+
+    {%= p.Scripts() %}
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const burgers = Array.prototype.slice.call(document.querySelectorAll(".navbar-burger"), 0);
+
+        burgers.forEach(el => {
+          el.addEventListener("click", () => {
+            const target = el.dataset.target;
+            const targetElement = document.getElementById(target);
+
+            el.classList.toggle("is-active");
+            targetElement.classList.toggle("is-active");
+          });
+        });
+      });
+    </script>
+</html>
+{% endfunc %}
+
+{% code type BasePage struct {
+    Username string
+} %}
+{% func (p *BasePage) Title() %}{% endfunc %}
+{% func (p *BasePage) Meta() %}{% endfunc %}
+{% func (p *BasePage) Scripts() %}{% endfunc %}
+{% func (p *BasePage) Body() %}{% endfunc %}
+
+{% func (p *BasePage) Navbar() %}
+  <div class="container">
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item is-size-3" href="/">
+          DILF
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="bot2-main-navbar">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="bot2-main-navbar" class="navbar-menu">
+        <div class="navbar-end">
+          <a href="/docs" class="navbar-item">Docs</a>
+          <a href="/about" class="navbar-item">About</a>
+
+          {% if p.Username == "" %}
+            <a href="/login" class="navbar-item">Log in</a>
+          {% else %}
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">
+                Sup, holedaemon?
+              </a>
+
+              <div class="navbar-dropdown">
+                <a href="/guilds" class="navbar-item">
+                  Guilds
+                </a>
+                <a href="/logout" class="navbar-item">
+                  Log out
+                </a>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+  </div>
+{% endfunc %}

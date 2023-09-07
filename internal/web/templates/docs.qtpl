@@ -1,0 +1,58 @@
+{% code type CommandGroup struct {
+    Title string `json:"title"`
+    Description string `json:"description"`
+    Commands []*Command `json:"commands"`
+}
+%}
+
+{% code type Command struct {
+    Name string `json:"name"`
+    Description string `json:"description"`
+}
+%}
+
+{% code type DocsPage struct {
+    BasePage
+    Commands []*CommandGroup
+}
+%}
+
+{% func (p *DocsPage) Title() %}Docs{% endfunc %}
+
+{% func (p *DocsPage) Body() %}
+    <section class="section">
+        <div class="container">
+            <h1 class="title">HOW TO READ</h1>
+            <h2 class="subtitle">You could also read the slash command descriptions on your client, you know. IT'S NOT MY JOB TO EDUCATE YOU!!!!</h2>
+
+            <div class="block">
+                <p>Arguments wrapped in <code class="code">[]</code> are optional.</p>
+            </div>
+
+            <div class="block">
+                <p>Arguments wrapped in <code class="code"><></code> are required.</p>
+            </div>
+        </div>
+    </div>
+
+    <section class="section">
+        <div class="container">
+            <h1 class="title">COMMANDS</h1>
+            {% if len(p.Commands) == 0 %}
+                <h2 class="subtitle">THERE AIN'T SHIT HERE</h2>
+            {% else %}
+                {% for _, g := range p.Commands %}
+                    <div class="block">
+                        <p class="is-size-4 has-text-weight-bold">{%s g.Title %}</p>
+                        <p class="is-size-5 mb-5">{%s g.Description %}</p>
+
+                        {% for _, c := range g.Commands %}
+                            <p class="is-size-5 has-text-weight-bold">/{%s c.Name %}</p>
+                            <p class="is-size-5 ml-5">   {%s c.Description %}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </section>
+{% endfunc %}

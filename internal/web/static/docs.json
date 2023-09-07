@@ -1,0 +1,112 @@
+[
+    {
+        "title": "MISCELLANEOUS",
+        "description": "General commands, you get the idea",
+        "commands": [
+            {
+                "name": "info",
+                "description": "Learn about the bot. :)"
+            },
+            {
+                "name": "help",
+                "description": "Alias for /info"
+            },
+            {
+                "name": "ping",
+                "description": "\"Pings\" DILF"
+            },
+            {
+                "name": "game <new-game>",
+                "description": "Set's DILF's playing status. Only allowed once per hour."
+            }
+        ]
+    },
+    {
+        "title": "JERKCITY",
+        "description": "An interface for Jerkcity/BoneQuest's API",
+        "commands": [
+            {
+                "name": "jerkcity episode <number>",
+                "description": "Fetches an episode of Jerkcity by its number"
+            },
+            {
+                "name": "jerkcity latest",
+                "description": "Fetches the latest episode of Jerkcity"
+            },
+            {
+                "name": "jerkcity random",
+                "description": "Fetches a random episode of Jerkcity"
+            },
+            {
+                "name": "jerkcity search <query>",
+                "description": "Searches the Jerkcity API for the given query"
+            }
+        ]
+    },
+    {
+        "title": "ROLE",
+        "description": "User commands pertaining to vanity roles, AKA self-assignable roles. These replace the pronoun commands found in previous iterations of the bot. Roles must be created or imported by a server administrator before being assignable",
+        "commands": [
+            {
+                "name": "role add <role>",
+                "description": "Add a vanity role to yourself"
+            },
+            {
+                "name": "role remove <role>",
+                "description": "Remove a vanity role from yourself"
+            },
+            {
+                "name": "role list",
+                "description": "List all the vanity roles being managed by the bot"
+            }
+        ]
+    },
+    {
+        "title": "ROLES",
+        "description": "Moderator commands pertaining to vanity roles; under their own command because Discord sucks donkey balls. These commands require you to have the manage roles permission on the server",
+        "commands": [
+            {
+                "name": "roles create <name> [hex]",
+                "description": "Create a new Discord role with the given settings and add it to the database"
+            },
+            {
+                "name": "roles delete <name>",
+                "description": "Delete a role from the server and database."
+            },
+            {
+                "name": "roles rename <new-name>",
+                "description": "Rename a role. Kind of self-explanatory"
+            },
+            {
+                "name": "roles setcolor <role> <color>",
+                "description": "Update a role's color"
+            },
+            {
+                "name": "roles import <one> [two] [three] [four] [five]",
+                "description": "Import up to 5 existing roles into the database"
+            },
+            {
+                "name": "roles relinquish <one> [two] [three] [four] [five]",
+                "description": "Remove up to 5 roles from the database"
+            },
+            {
+                "name": "roles fix",
+                "description": "Add role names to existing roles in the database; only necessary for guilds using the bot prior to the website update. Exists due to an oversight. Oopsie"
+            }
+        ]
+    },
+    {
+        "title": "EGORAPTOR",
+        "description": "Moderator commands for configuring the unfortunate egoraptor functionality. **SCROTEGANG only**",
+        "commands": [
+            {
+                "name": "egoraptor toggle <toggled>",
+                "description": "Toggle timing users out when they mention egoraptor eating pussy. Requires manage guild permissions"
+            },
+            {
+                "name": "egoraptor settimeout <seconds>",
+                "description": "Sets the length of an egoraptor-related timeout. Requires manage guild permissions"
+            }
+        ]
+    }
+]

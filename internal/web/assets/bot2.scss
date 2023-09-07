@@ -1,0 +1,72 @@
+@charset "utf-8";
+
+$family-sans-serif: "Comic Sans MS", "Comic Sans", sans-serif;
+
+@import "node_modules/bulma/sass/utilities/initial-variables.sass";
+
+$scheme-main: $black;
+$scheme-main-bis: $black-bis;
+$scheme-main-ter: $black-ter;
+$scheme-invert: $white;
+$scheme-invert-bis: $white-bis;
+$scheme-invert-ter: $white-ter;
+
+$background: $black-ter;
+
+$border: $grey-darker;
+$border-hover: $grey-dark;
+$border-light: $black-ter;
+$border-light-hover: $grey-dark;
+
+$text: $white-bis;
+$text-light: $white-ter;
+$text-strong: $white;
+
+$link: $green;
+$link-visited: $blue;
+$link-hover: $grey-lighter;
+$link-hover-border: $grey-dark;
+$link-focus: $grey-lighter;
+$link-focus-border: $green;
+$link-active: $grey-lighter;
+$link-active-border: $grey-darker;
+
+$code: darken($yellow, 15%);
+
+$navbar-divider-background-color: $border;
+
+@import "node_modules/bulma/sass/utilities/_all.sass";
+@import "node_modules/bulma/sass/base/_all.sass";
+@import "node_modules/bulma/sass/helpers/_all.sass";
+
+@import "node_modules/bulma/sass/grid/_all.sass";
+
+@import "node_modules/bulma/sass/elements/container.sass";
+@import "node_modules/bulma/sass/elements/title.sass";
+@import "node_modules/bulma/sass/elements/box.sass";
+@import "node_modules/bulma/sass/elements/image.sass";
+@import "node_modules/bulma/sass/elements/table.sass";
+@import "node_modules/bulma/sass/elements/button.sass";
+@import "node_modules/bulma/sass/elements/other.sass";
+
+@import "node_modules/bulma/sass/layout/section.sass";
+
+@import "node_modules/bulma/sass/form/_all.sass";
+
+@import "node_modules/bulma/sass/components/pagination.sass";
+@import "node_modules/bulma/sass/components/dropdown.sass";
+@import "node_modules/bulma/sass/components/navbar.sass";
+@import "node_modules/bulma/sass/components/menu.sass";
+@import "node_modules/bulma/sass/components/panel.sass";
+
+#bot2-lance {
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    width: 288px;
+    height: 288px;
+}
+
+.bot2-break {
+    word-break: break-word;
+}

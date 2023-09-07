@@ -1,0 +1,19 @@
+{% code type ErrorPage struct {
+    BasePage
+    ErrorHead string
+    ErrorText string
+} %}
+
+{% func (p *ErrorPage) Title() %}Uh oh{% endfunc %}
+
+{% func (p *ErrorPage) Body() %}
+    <section class="section">
+        <div class="container has-text-centered">
+            <h1 class="title">{%s p.ErrorHead %}</h1>
+            {% if p.ErrorText != "" %}
+                <h2 class="subtitle">{%s p.ErrorText %}</h2>
+            {% endif %}
+            <a href="/" class="button is-success">Home</a>
+        </div>
+  </section>
+{% endfunc %}
