@@ -274,6 +274,11 @@ func (p *GuildQuotesPage) StreamScripts(qw422016 *qt422016.Writer) {
     `)
 	streamimportBootstrapTableJS(qw422016)
 	qw422016.N().S(`
+    <script>
+        $("#bot2-quotes-table").on("post-body.bs.table", function (e) {
+            $("#bot2-quotes-table").removeClass("is-hidden");
+        });
+    </script>
 `)
 }
 
@@ -313,13 +318,13 @@ func (p *GuildQuotesPage) StreamBody(qw422016 *qt422016.Writer) {
                 `)
 	} else {
 		qw422016.N().S(`
-                    <table data-toggle="table" data-pagination="true" data-search="true">
+                    <table id="bot2-quotes-table" class="table is-hidden" data-toggle="table" data-pagination="true" data-search="true">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Quote</th>
-                                <th>User</th>
-                                <th>Link</th>
+                                <th data-sortable="true">#</th>
+                                <th data-sortable="true" data-width="900">Quote</th>
+                                <th data-sortable="true">User</th>
+                                <th data-sortable="true">Link</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -330,7 +335,7 @@ func (p *GuildQuotesPage) StreamBody(qw422016 *qt422016.Writer) {
                                     <td>`)
 			qw422016.N().D(q.Num)
 			qw422016.N().S(`</td>
-                                    <td>`)
+                                    <td class="bot2-break">`)
 			qw422016.E().S(q.Quote)
 			qw422016.N().S(`</td>
                                     <td>`)
@@ -425,6 +430,11 @@ func (p *GuildRolesPage) StreamScripts(qw422016 *qt422016.Writer) {
     `)
 	streamimportBootstrapTableJS(qw422016)
 	qw422016.N().S(`
+    <script>
+        $("#bot2-roles-table").on("post-body.bs.table", function (e) {
+            $("#bot2-roles-table").removeClass("is-hidden");
+        });
+    </script>
 `)
 }
 
@@ -464,10 +474,10 @@ func (p *GuildRolesPage) StreamBody(qw422016 *qt422016.Writer) {
                 `)
 	} else {
 		qw422016.N().S(`
-                    <table data-toggle="table" data-pagination="true" data-search="true">
+                    <table id="bot2-roles-table" data-toggle="table" data-pagination="true" data-search="true">
                         <thead>
                             <tr>
-                               <th>Name</th>
+                               <th data-sortable="true">Name</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -86,6 +86,11 @@
 {% func (p *GuildQuotesPage) Scripts() %}
     {%= importJquery() %}
     {%= importBootstrapTableJS() %}
+    <script>
+        $("#bot2-quotes-table").on("post-body.bs.table", function (e) {
+            $("#bot2-quotes-table").removeClass("is-hidden");
+        });
+    </script>
 {% endfunc %}
 
 {% func (p *GuildQuotesPage) Body() %}
@@ -99,20 +104,20 @@
                 {% if len(p.Quotes) == 0 %}
                     <h1 class="title">No quotes!!!</h1>
                 {% else %}
-                    <table data-toggle="table" data-pagination="true" data-search="true">
+                    <table id="bot2-quotes-table" class="table is-hidden" data-toggle="table" data-pagination="true" data-search="true">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Quote</th>
-                                <th>User</th>
-                                <th>Link</th>
+                                <th data-sortable="true">#</th>
+                                <th data-sortable="true" data-width="900">Quote</th>
+                                <th data-sortable="true">User</th>
+                                <th data-sortable="true">Link</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for _, q := range p.Quotes %}
                                 <tr>
                                     <td>{%d q.Num %}</td>
-                                    <td>{%s q.Quote %}</td>
+                                    <td class="bot2-break">{%s q.Quote %}</td>
                                     <td>{%s q.QuotedUsername %}</td>
                                     <td><a class="button is-success" href="{%= quoteLink(q) %}">Link</a></td>
                                 </tr>
@@ -141,6 +146,11 @@
 {% func (p *GuildRolesPage) Scripts() %}
     {%= importJquery() %}
     {%= importBootstrapTableJS() %}
+    <script>
+        $("#bot2-roles-table").on("post-body.bs.table", function (e) {
+            $("#bot2-roles-table").removeClass("is-hidden");
+        });
+    </script>
 {% endfunc %}
 
 {% func (p *GuildRolesPage) Body() %}
@@ -154,10 +164,10 @@
                 {% if len(p.Roles) == 0 %}
                     <h1 class="title">No roles!!!</h1>
                 {% else %}
-                    <table data-toggle="table" data-pagination="true" data-search="true">
+                    <table id="bot2-roles-table" data-toggle="table" data-pagination="true" data-search="true">
                         <thead>
                             <tr>
-                               <th>Name</th>
+                               <th data-sortable="true">Name</th>
                             </tr>
                         </thead>
                         <tbody>
