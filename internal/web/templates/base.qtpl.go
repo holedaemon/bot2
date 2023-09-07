@@ -44,6 +44,21 @@ func StreamPageTemplate(qw422016 *qt422016.Writer, p Page) {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel="stylesheet" href="/static/bot2.css">
 
+      <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png?v=1234">
+      <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png?v=1234">
+      <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png?v=1234">
+      <link rel="manifest" href="/static/site.webmanifest?v=1234">
+      <link rel="mask-icon" href="/static/safari-pinned-tab.svg?v=1234" color="#5bbad5">
+      <link rel="shortcut icon" href="/static/favicon.ico?v=1234">
+      <meta name="msapplication-TileColor" content="#00aba9">
+      <meta name="msapplication-config" content="/static/browserconfig.xml?v=1234">
+      <meta name="theme-color" content="#ffffff">
+
+      <meta property="og:title" content="DILF">
+      <meta property="og:type" content="website">
+      <meta property="og:image" content="https://bot.holedaemon.net/static/lance.png">
+      <meta property="og:url" content="https://bot.holedaemon.net">
+
       `)
 	p.StreamMeta(qw422016)
 	qw422016.N().S(`
