@@ -13,6 +13,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/holedaemon/bot2/internal/db/models"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/zikaeroh/ctxlog"
@@ -100,7 +101,7 @@ func (b *Bot) cmdRoleCreate(ctx context.Context, data cmdroute.CommandData) *api
 	}
 
 	role := models.Role{
-		RoleName: name,
+		RoleName: null.StringFrom(name),
 		GuildID:  data.Event.GuildID.String(),
 		RoleID:   r.ID.String(),
 	}
@@ -340,7 +341,7 @@ func (b *Bot) cmdRoleRename(ctx context.Context, data cmdroute.CommandData) *api
 		return dbError
 	}
 
-	role.RoleName = newName
+	role.RoleName = null.StringFrom(newName)
 
 	if err := role.Update(ctx, b.DB, boil.Infer()); err != nil {
 		ctxlog.Error(ctx, "error updating role", zap.Error(err))
@@ -432,7 +433,7 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 		}
 
 		role := models.Role{
-			RoleName: discordRole.Name,
+			RoleName: null.StringFrom(discordRole.Name),
 			RoleID:   sf.String(),
 			GuildID:  data.Event.GuildID.String(),
 		}
@@ -536,7 +537,7 @@ func (b *Bot) cmdRoleFix(ctx context.Context, data cmdroute.CommandData) *api.In
 	count := 0
 
 	for _, role := range roles {
-		if role.RoleName != "" {
+		if !role.RoleName.IsZero() && role.RoleName.String != "" {
 			continue
 		}
 
@@ -552,7 +553,7 @@ func (b *Bot) cmdRoleFix(ctx context.Context, data cmdroute.CommandData) *api.In
 			return respond("Error fetching role from Discord xD")
 		}
 
-		role.RoleName = discordRole.Name
+		role.RoleName = null.StringFrom(discordRole.Name)
 
 		if err := role.Update(ctx, tx, boil.Infer()); err != nil {
 			ctxlog.Error(ctx, "error updating role in database", zap.Error(err))

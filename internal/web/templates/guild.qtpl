@@ -173,10 +173,10 @@
                         <tbody>
                             {% for _, r := range p.Roles %}
                                 <tr>
-                                    {% if r.RoleName == "" %}
+                                    {% if r.RoleName.IsZero() || r.RoleName.String == "" %}
                                         <td>N/A</td>
                                     {% else %}
-                                        <td>{%s r.RoleName %}</td>
+                                        <td>{%s r.RoleName.String %}</td>
                                     {% endif %}
                                 </tr>
                             {% endfor %}

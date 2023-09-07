@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -23,12 +24,12 @@ import (
 
 // Role is an object representing the database table.
 type Role struct {
-	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	RoleID    string    `boil:"role_id" json:"role_id" toml:"role_id" yaml:"role_id"`
-	GuildID   string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
-	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	RoleName  string    `boil:"role_name" json:"role_name" toml:"role_name" yaml:"role_name"`
+	ID        int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	RoleID    string      `boil:"role_id" json:"role_id" toml:"role_id" yaml:"role_id"`
+	GuildID   string      `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
+	CreatedAt time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	RoleName  null.String `boil:"role_name" json:"role_name,omitempty" toml:"role_name" yaml:"role_name,omitempty"`
 
 	R *roleR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L roleL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -74,14 +75,14 @@ var RoleWhere = struct {
 	GuildID   whereHelperstring
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
-	RoleName  whereHelperstring
+	RoleName  whereHelpernull_String
 }{
 	ID:        whereHelperint64{field: "\"roles\".\"id\""},
 	RoleID:    whereHelperstring{field: "\"roles\".\"role_id\""},
 	GuildID:   whereHelperstring{field: "\"roles\".\"guild_id\""},
 	CreatedAt: whereHelpertime_Time{field: "\"roles\".\"created_at\""},
 	UpdatedAt: whereHelpertime_Time{field: "\"roles\".\"updated_at\""},
-	RoleName:  whereHelperstring{field: "\"roles\".\"role_name\""},
+	RoleName:  whereHelpernull_String{field: "\"roles\".\"role_name\""},
 }
 
 // RoleRels is where relationship names are stored.
@@ -102,8 +103,8 @@ type roleL struct{}
 
 var (
 	roleAllColumns            = []string{"id", "role_id", "guild_id", "created_at", "updated_at", "role_name"}
-	roleColumnsWithoutDefault = []string{"role_id", "guild_id", "role_name"}
-	roleColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
+	roleColumnsWithoutDefault = []string{"role_id", "guild_id"}
+	roleColumnsWithDefault    = []string{"id", "created_at", "updated_at", "role_name"}
 	rolePrimaryKeyColumns     = []string{"id"}
 	roleGeneratedColumns      = []string{}
 )
