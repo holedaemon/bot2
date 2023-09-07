@@ -78,7 +78,7 @@ Page {
           {% else %}
             <div class="navbar-item has-dropdown is-hoverable">
               <a class="navbar-link">
-                Sup, holedaemon?
+                Sup, {%s p.Username %}?
               </a>
 
               <div class="navbar-dropdown">

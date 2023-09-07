@@ -197,7 +197,9 @@ func (p *BasePage) StreamNavbar(qw422016 *qt422016.Writer) {
 		qw422016.N().S(`
             <div class="navbar-item has-dropdown is-hoverable">
               <a class="navbar-link">
-                Sup, holedaemon?
+                Sup, `)
+		qw422016.E().S(p.Username)
+		qw422016.N().S(`?
               </a>
 
               <div class="navbar-dropdown">
