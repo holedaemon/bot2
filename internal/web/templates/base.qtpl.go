@@ -56,7 +56,7 @@ func StreamPageTemplate(qw422016 *qt422016.Writer, p Page) {
 
       <meta property="og:title" content="DILF">
       <meta property="og:type" content="website">
-      <meta property="og:image" content="https://bot.holedaemon.net/static/lance.png">
+      <meta property="og:image" content="https://bot.holedaemon.net/static/dilf.jpg">
       <meta property="og:url" content="https://bot.holedaemon.net">
 
       `)
