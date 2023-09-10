@@ -9,8 +9,8 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/holedaemon/bot2/internal/db/models"
 	"github.com/holedaemon/bot2/internal/db/modelsx"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
@@ -27,19 +27,34 @@ func (b *Bot) onGuildCreate(g *gateway.GuildCreateEvent) {
 	ctx := context.Background()
 	log := b.Logger.With(zap.String("guild_id", g.ID.String()))
 
-	exists, err := models.Guilds(qm.Where("guild_id = ?", g.ID.String())).Exists(ctx, b.DB)
+	guild, err := modelsx.FetchGuild(ctx, b.DB, g.ID.String())
 	if err != nil {
-		log.Error("error querying guild", zap.Error(err))
+		if !errors.Is(err, sql.ErrNoRows) {
+			log.Error("error querying guild", zap.Error(err))
+		}
+	}
+
+	if guild != nil {
+		if !guild.QuotesRequiredReactions.Valid {
+			guild.QuotesRequiredReactions = null.IntFrom(1)
+		}
+
+		if err := guild.Update(ctx, b.DB, boil.Whitelist(
+			models.GuildColumns.UpdatedAt,
+			models.GuildColumns.QuotesRequiredReactions,
+		)); err != nil {
+			log.Error("error fixing guild", zap.Error(err))
+			return
+		}
+
+		log.Info("fixed null records for guild")
 		return
 	}
 
-	if exists {
-		return
-	}
-
-	guild := &models.Guild{
-		GuildID:   g.ID.String(),
-		GuildName: g.Name,
+	guild = &models.Guild{
+		GuildID:                 g.ID.String(),
+		GuildName:               g.Name,
+		QuotesRequiredReactions: null.IntFrom(1),
 	}
 
 	if err := guild.Insert(ctx, b.DB, boil.Infer()); err != nil {
