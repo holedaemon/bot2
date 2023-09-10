@@ -65,6 +65,12 @@
                 <h1 class="title">{%s p.Guild.GuildName %}</h1>
                 <hr>
                 <p class="subtitle">Quotes: {%v p.Guild.DoQuotes %}</p>
+
+                {% if !p.Guild.QuotesRequiredReactions.Valid %}
+                    <p class="subtitle">Minimum Reactions to Quote: 1</p>
+                {% else %}
+                    <p class="subtitle">Minimum Reactions to Quote: {%v p.Guild.QuotesRequiredReactions.Int %}</p>
+                {% endif %}
             </div>
         </div>
     </div>

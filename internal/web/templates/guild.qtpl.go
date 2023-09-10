@@ -197,6 +197,20 @@ func (p *GuildPage) StreamBody(qw422016 *qt422016.Writer) {
                 <p class="subtitle">Quotes: `)
 	qw422016.E().V(p.Guild.DoQuotes)
 	qw422016.N().S(`</p>
+
+                `)
+	if !p.Guild.QuotesRequiredReactions.Valid {
+		qw422016.N().S(`
+                    <p class="subtitle">Minimum Reactions to Quote: 1</p>
+                `)
+	} else {
+		qw422016.N().S(`
+                    <p class="subtitle">Minimum Reactions to Quote: `)
+		qw422016.E().V(p.Guild.QuotesRequiredReactions.Int)
+		qw422016.N().S(`</p>
+                `)
+	}
+	qw422016.N().S(`
             </div>
         </div>
     </div>
