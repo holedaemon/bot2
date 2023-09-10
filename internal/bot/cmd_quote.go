@@ -74,6 +74,30 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 		return
 	}
 
+	userReactions, err := b.State.Reactions(ev.ChannelID, ev.MessageID, ev.Emoji.APIString(), 0)
+	if err != nil {
+		log.Error("error fetching user reactions", zap.Error(err))
+		return
+	}
+
+	var count int
+	for _, u := range userReactions {
+		if u.Bot {
+			continue
+		}
+
+		count++
+	}
+
+	needed := guild.QuotesRequiredReactions.Int
+	if needed == 0 {
+		needed = 1
+	}
+
+	if count < needed {
+		return
+	}
+
 	var row struct {
 		MaxNum null.Int
 	}

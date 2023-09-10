@@ -251,13 +251,26 @@ var commands = commandList{
 			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageGuild),
 			NoDMPermission:           true,
 			Options: discord.CommandOptions{
-				discord.NewSubcommandOption(
+				discord.NewSubcommandGroupOption(
 					"quotes",
-					"Toggle use of quotes in the guild",
-					discord.NewBooleanOption(
-						"toggled",
-						"Toggle quotes on or off",
-						true,
+					"Configure quote settings for the guild",
+					discord.NewSubcommandOption(
+						"toggle",
+						"Toggle the use of quotes in the guild",
+						discord.NewBooleanOption(
+							"toggled",
+							"Toggle quotes on or off",
+							true,
+						),
+					),
+					discord.NewSubcommandOption(
+						"set-min-required",
+						"Sets the minimum amount of reactions required to quote",
+						discord.NewIntegerOption(
+							"minimum",
+							"The minimum required to quote a message",
+							true,
+						),
 					),
 				),
 			},

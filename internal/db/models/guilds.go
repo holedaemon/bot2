@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -23,65 +24,110 @@ import (
 
 // Guild is an object representing the database table.
 type Guild struct {
-	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	GuildID   string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
-	GuildName string    `boil:"guild_name" json:"guild_name" toml:"guild_name" yaml:"guild_name"`
-	DoQuotes  bool      `boil:"do_quotes" json:"do_quotes" toml:"do_quotes" yaml:"do_quotes"`
-	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	ID                      int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	GuildID                 string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
+	GuildName               string    `boil:"guild_name" json:"guild_name" toml:"guild_name" yaml:"guild_name"`
+	DoQuotes                bool      `boil:"do_quotes" json:"do_quotes" toml:"do_quotes" yaml:"do_quotes"`
+	CreatedAt               time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt               time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	QuotesRequiredReactions null.Int  `boil:"quotes_required_reactions" json:"quotes_required_reactions,omitempty" toml:"quotes_required_reactions" yaml:"quotes_required_reactions,omitempty"`
 
 	R *guildR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L guildL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var GuildColumns = struct {
-	ID        string
-	GuildID   string
-	GuildName string
-	DoQuotes  string
-	CreatedAt string
-	UpdatedAt string
+	ID                      string
+	GuildID                 string
+	GuildName               string
+	DoQuotes                string
+	CreatedAt               string
+	UpdatedAt               string
+	QuotesRequiredReactions string
 }{
-	ID:        "id",
-	GuildID:   "guild_id",
-	GuildName: "guild_name",
-	DoQuotes:  "do_quotes",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
+	ID:                      "id",
+	GuildID:                 "guild_id",
+	GuildName:               "guild_name",
+	DoQuotes:                "do_quotes",
+	CreatedAt:               "created_at",
+	UpdatedAt:               "updated_at",
+	QuotesRequiredReactions: "quotes_required_reactions",
 }
 
 var GuildTableColumns = struct {
-	ID        string
-	GuildID   string
-	GuildName string
-	DoQuotes  string
-	CreatedAt string
-	UpdatedAt string
+	ID                      string
+	GuildID                 string
+	GuildName               string
+	DoQuotes                string
+	CreatedAt               string
+	UpdatedAt               string
+	QuotesRequiredReactions string
 }{
-	ID:        "guilds.id",
-	GuildID:   "guilds.guild_id",
-	GuildName: "guilds.guild_name",
-	DoQuotes:  "guilds.do_quotes",
-	CreatedAt: "guilds.created_at",
-	UpdatedAt: "guilds.updated_at",
+	ID:                      "guilds.id",
+	GuildID:                 "guilds.guild_id",
+	GuildName:               "guilds.guild_name",
+	DoQuotes:                "guilds.do_quotes",
+	CreatedAt:               "guilds.created_at",
+	UpdatedAt:               "guilds.updated_at",
+	QuotesRequiredReactions: "guilds.quotes_required_reactions",
 }
 
 // Generated where
 
+type whereHelpernull_Int struct{ field string }
+
+func (w whereHelpernull_Int) EQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Int) NEQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Int) LT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Int) LTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Int) GT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Int) GTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+func (w whereHelpernull_Int) IN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelpernull_Int) NIN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
+func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 var GuildWhere = struct {
-	ID        whereHelperint64
-	GuildID   whereHelperstring
-	GuildName whereHelperstring
-	DoQuotes  whereHelperbool
-	CreatedAt whereHelpertime_Time
-	UpdatedAt whereHelpertime_Time
+	ID                      whereHelperint64
+	GuildID                 whereHelperstring
+	GuildName               whereHelperstring
+	DoQuotes                whereHelperbool
+	CreatedAt               whereHelpertime_Time
+	UpdatedAt               whereHelpertime_Time
+	QuotesRequiredReactions whereHelpernull_Int
 }{
-	ID:        whereHelperint64{field: "\"guilds\".\"id\""},
-	GuildID:   whereHelperstring{field: "\"guilds\".\"guild_id\""},
-	GuildName: whereHelperstring{field: "\"guilds\".\"guild_name\""},
-	DoQuotes:  whereHelperbool{field: "\"guilds\".\"do_quotes\""},
-	CreatedAt: whereHelpertime_Time{field: "\"guilds\".\"created_at\""},
-	UpdatedAt: whereHelpertime_Time{field: "\"guilds\".\"updated_at\""},
+	ID:                      whereHelperint64{field: "\"guilds\".\"id\""},
+	GuildID:                 whereHelperstring{field: "\"guilds\".\"guild_id\""},
+	GuildName:               whereHelperstring{field: "\"guilds\".\"guild_name\""},
+	DoQuotes:                whereHelperbool{field: "\"guilds\".\"do_quotes\""},
+	CreatedAt:               whereHelpertime_Time{field: "\"guilds\".\"created_at\""},
+	UpdatedAt:               whereHelpertime_Time{field: "\"guilds\".\"updated_at\""},
+	QuotesRequiredReactions: whereHelpernull_Int{field: "\"guilds\".\"quotes_required_reactions\""},
 }
 
 // GuildRels is where relationship names are stored.
@@ -101,9 +147,9 @@ func (*guildR) NewStruct() *guildR {
 type guildL struct{}
 
 var (
-	guildAllColumns            = []string{"id", "guild_id", "guild_name", "do_quotes", "created_at", "updated_at"}
+	guildAllColumns            = []string{"id", "guild_id", "guild_name", "do_quotes", "created_at", "updated_at", "quotes_required_reactions"}
 	guildColumnsWithoutDefault = []string{"guild_id", "guild_name"}
-	guildColumnsWithDefault    = []string{"id", "do_quotes", "created_at", "updated_at"}
+	guildColumnsWithDefault    = []string{"id", "do_quotes", "created_at", "updated_at", "quotes_required_reactions"}
 	guildPrimaryKeyColumns     = []string{"id"}
 	guildGeneratedColumns      = []string{}
 )

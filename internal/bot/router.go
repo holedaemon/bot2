@@ -71,7 +71,10 @@ func (b *Bot) router() *cmdroute.Router {
 	})
 
 	r.Sub("settings", func(r *cmdroute.Router) {
-		r.AddFunc("quotes", b.cmdSettingsQuotes)
+		r.Sub("quotes", func(r *cmdroute.Router) {
+			r.AddFunc("toggle", b.cmdSettingsQuotesToggle)
+			r.AddFunc("set-min-required", b.cmdSettingsQuotesSetMinRequired)
+		})
 	})
 
 	r.AddFunc("q", b.cmdQ)

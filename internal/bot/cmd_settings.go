@@ -7,13 +7,15 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
+	"github.com/holedaemon/bot2/internal/db/models"
 	"github.com/holedaemon/bot2/internal/db/modelsx"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
 
-func (b *Bot) cmdSettingsQuotes(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+func (b *Bot) cmdSettingsQuotesToggle(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	val, err := data.Options.Find("toggled").BoolValue()
 	if err != nil {
 		ctxlog.Error(ctx, "error parsing bool value", zap.Error(err))
@@ -42,4 +44,36 @@ func (b *Bot) cmdSettingsQuotes(ctx context.Context, data cmdroute.CommandData) 
 	}
 
 	return respond("Quotes have been disabled")
+}
+
+func (b *Bot) cmdSettingsQuotesSetMinRequired(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	val, err := data.Options.Find("minimum").IntValue()
+	if err != nil {
+		ctxlog.Error(ctx, "error parsing int value", zap.Error(err))
+		return respondError("Error parsing the given value into an int!!!!")
+	}
+
+	if val <= 0 {
+		return respondError("Your value must be a number greater than 0")
+	}
+
+	if val > 10 {
+		return respondError("Your value must be less than or equal to 10")
+	}
+
+	guild, err := modelsx.FetchGuild(ctx, b.DB, data.Event.GuildID.String())
+	if err != nil {
+		ctxlog.Error(ctx, "error fetching guild from database", zap.Error(err))
+		return dbError
+	}
+
+	newVal := int(val)
+
+	guild.QuotesRequiredReactions = null.IntFrom(newVal)
+	if err := guild.Update(ctx, b.DB, boil.Whitelist(models.GuildColumns.UpdatedAt, models.GuildColumns.QuotesRequiredReactions)); err != nil {
+		ctxlog.Error(ctx, "error updating guild record in database", zap.Error(err))
+		return dbError
+	}
+
+	return respondf("The required number of reactions to add a quote has been set to %d", newVal)
 }
