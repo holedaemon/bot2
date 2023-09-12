@@ -96,6 +96,20 @@
         ]
     },
     {
+        "title": "SETTINGS",
+        "description": "Moderator commands for configuring guild settings",
+        "commands": [
+            {
+                "name": "settings quotes set-min-required <minimum>",
+                "description": "Set the minimum number of reactions needed to quote a message"
+            },
+            {
+                "name": "settings quotes toggle <toggled>",
+                "description": "Toggle use of quote functionality"
+            }
+        ]
+    },
+    {
         "title": "EGORAPTOR",
         "description": "Moderator commands for configuring the unfortunate egoraptor functionality. **SCROTEGANG only**",
         "commands": [
