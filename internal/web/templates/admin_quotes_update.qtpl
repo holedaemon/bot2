@@ -1,23 +1,23 @@
-{% code type AdminQuotesPage struct {
+{% code type AdminQuotesUpdatePage struct {
     BasePage
 }
 %}
 
-{% func (p *AdminQuotesPage) Title() %}Import Quotes{% endfunc %}
+{% func (p *AdminQuotesUpdatePage) Title() %}Update Quotes{% endfunc %}
 
-{% func (p *AdminQuotesPage) Body() %}
+{% func (p *AdminQuotesUpdatePage) Body() %}
     <section class="section">
         <div class="container">
             <h1 class="title has-text-centered">
-                Import quotes
+                Update quotes
             </h1>
 
             <div class="columns is-centered">
                 <div class="column is-one-third has-text-centered">
-                    <form id="bot2-quote-import-form" method="POST" action="/admin/quotes" autocomplete="off">
+                    <form id="bot2-quote-update-form" method="POST" action="/admin/quotes/update" autocomplete="off">
                         <div class="field">
                             <div class="control">
-                                <div id="bot2-quote-import-file" class="file has-name is-centered">
+                                <div id="bot2-quote-update-file" class="file has-name is-centered">
                                     <label class="file-label">
                                         <input class="file-input" type="file" name="quotes">
                                         <span class="file-cta">
@@ -50,16 +50,16 @@
     {%= importJquery() %}
     <script>
         $(document).ready(function () {
-            const fileInputs = $("#bot2-quote-import-file input[type=file]");
+            const fileInputs = $("#bot2-quote-update-file input[type=file]");
             const fileInput = fileInputs[0];
             fileInput.onchange = () => {
                 if (fileInput.files.length > 0) {
-                    const fileNames = $("#bot2-quote-import-file .file-name");
+                    const fileNames = $("#bot2-quote-update-file .file-name");
                     fileNames[0].textContent = fileInput.files[0].name;
                 }
             }
 
-            $("#bot2-quote-import-form").submit(function(event) {
+            $("#bot2-quote-update-form").submit(function(event) {
                 event.preventDefault();
 
                 const formData = new FormData();
@@ -72,7 +72,7 @@
 
                 $.ajax({
                     method: "POST",
-                    url: "/admin/quotes",
+                    url: "/admin/quotes/update",
                     data: formData,
                     contentType: false,
                     processData: false,
@@ -84,10 +84,10 @@
     </script>
 {% endfunc %}
 
-{% func (p *AdminQuotesPage) Meta() %}
+{% func (p *AdminQuotesUpdatePage) Meta() %}
     {%= importFontAwesome() %}
 {% endfunc %}
 
-{% func (p *AdminQuotesPage) Scripts() %}
+{% func (p *AdminQuotesUpdatePage) Scripts() %}
     {%= importJquery() %}
 {% endfunc %}

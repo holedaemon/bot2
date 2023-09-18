@@ -23,3 +23,13 @@ func UpsertGuild(ctx context.Context, exec boil.ContextExecutor, g *models.Guild
 func FetchGuild(ctx context.Context, exec boil.ContextExecutor, id string) (*models.Guild, error) {
 	return models.Guilds(qm.Where("guild_id = ?", id)).One(ctx, exec)
 }
+
+func ToggleGuildQuotes(ctx context.Context, exec boil.ContextExecutor, guild *models.Guild, toggle bool) error {
+	guild.DoQuotes = toggle
+
+	if err := guild.Update(ctx, exec, boil.Whitelist(models.GuildColumns.DoQuotes, models.GuildColumns.UpdatedAt)); err != nil {
+		return err
+	}
+
+	return nil
+}
