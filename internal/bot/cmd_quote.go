@@ -160,7 +160,7 @@ func (b *Bot) onMessageEdit(e *gateway.MessageUpdateEvent) {
 	}
 
 	quote.Quote = e.Content
-	if err := quote.Update(ctx, b.DB, boil.Infer()); err != nil {
+	if err := quote.Update(ctx, b.DB, boil.Whitelist(models.QuoteColumns.Quote, models.QuoteColumns.UpdatedAt)); err != nil {
 		log.Error("error updating quote", zap.Error(err))
 	}
 }
