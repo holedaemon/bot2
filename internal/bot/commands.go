@@ -283,7 +283,7 @@ var commands = commandList{
 			Description: "Generate a 3x3 Topster chart with Last.fm data",
 			Options: discord.CommandOptions{
 				discord.NewStringOption("lastfm-user", "Your Last.fm username", true),
-				discord.NewStringOption("period", "The period of time to use for data", false),
+				discord.NewStringOption("period", "The period of time to use for data. Valid options are overall, 7day, 1month, 3month, 6month, 12month", false),
 				discord.NewStringOption("background-color", "A background color as a hex code", false),
 				discord.NewStringOption("text-color", "A text color as a hex code", false),
 				discord.NewStringOption("title", "Your chart's title", false),
