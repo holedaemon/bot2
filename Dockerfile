@@ -10,6 +10,6 @@ COPY ./ ./
 ARG version
 RUN go build -ldflags="-X github.com/holedaemon/bot2/internal/version.version=${version}" -o bot2
 
-FROM gcr.io/distroless/base:nonroot
+FROM gcr.io/distroless/base-debian12:nonroot
 COPY --from=builder /app/bot2 /bot2
 ENTRYPOINT [ "/bot2" ]
