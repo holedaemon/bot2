@@ -35,9 +35,11 @@ func (b *Bot) onGuildCreate(g *gateway.GuildCreateEvent) {
 	}
 
 	if guild != nil {
-		if !guild.QuotesRequiredReactions.Valid {
-			guild.QuotesRequiredReactions = null.IntFrom(1)
+		if guild.QuotesRequiredReactions.Valid {
+			return
 		}
+
+		guild.QuotesRequiredReactions = null.IntFrom(1)
 
 		if err := guild.Update(ctx, b.DB, boil.Whitelist(
 			models.GuildColumns.UpdatedAt,
