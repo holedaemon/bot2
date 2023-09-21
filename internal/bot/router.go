@@ -39,6 +39,7 @@ func (b *Bot) router() *cmdroute.Router {
 	r := cmdroute.NewRouter()
 	r.Use(b.useRouter())
 	r.Use(recoverer())
+	r.Use(cmdroute.Deferrable(b.State, cmdroute.DeferOpts{}))
 
 	r.AddFunc("info", b.cmdInfo)
 	r.AddFunc("help", b.cmdInfo)
@@ -46,6 +47,7 @@ func (b *Bot) router() *cmdroute.Router {
 	r.AddFunc("is-admin", b.cmdIsAdmin)
 	r.AddFunc("game", b.cmdGame)
 	r.AddFunc("panic", b.cmdPanic)
+	r.AddFunc("topster", b.cmdTopster)
 
 	r.Sub("jerkcity", func(r *cmdroute.Router) {
 		r.AddFunc("latest", b.cmdJerkcityLatest)

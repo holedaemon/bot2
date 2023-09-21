@@ -24,6 +24,7 @@ type BotOptions struct {
 	Admins            string        `env:"BOT2_ADMINS"`
 	Token             string        `env:"BOT2_TOKEN"`
 	DSN               string        `env:"BOT2_DSN"`
+	TopsterAddr       string        `env:"BOT2_TOPSTER_ADDR"`
 	DBMaxAttempts     int           `env:"BOT2_DB_MAX_ATTEMPTS" envDefault:"10"`
 	DBTimeoutDuration time.Duration `env:"BOT2_DB_TIMEOUT_DURATION" envDefault:"20s"`
 }
@@ -121,6 +122,7 @@ func runBot() {
 		bot.WithAdminMap(admins),
 		bot.WithDB(db),
 		bot.WithDebug(opts.Debug),
+		bot.WithTopsterAddr(opts.TopsterAddr),
 	)
 	if err != nil {
 		logger.Fatal("error creating bot", zap.Error(err))

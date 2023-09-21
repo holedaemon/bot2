@@ -37,3 +37,10 @@ func WithDB(db *sql.DB) Option {
 		b.DB = db
 	}
 }
+
+// WithTopsterAddr sets the Bot's address for a Topster microservice.
+func WithTopsterAddr(t string) Option {
+	return func(b *Bot) {
+		b.TopsterAddr = t
+	}
+}

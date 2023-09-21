@@ -276,4 +276,20 @@ var commands = commandList{
 			},
 		},
 	},
+	{
+		Scoped: testGuildID,
+		Data: api.CreateCommandData{
+			Name:        "topster",
+			Description: "Generate a 3x3 Topster chart with Last.fm data",
+			Options: discord.CommandOptions{
+				discord.NewStringOption("lastfm-user", "Your Last.fm username", true),
+				discord.NewStringOption("period", "The period of time to use for data", false),
+				discord.NewStringOption("background-color", "A background color as a hex code", false),
+				discord.NewStringOption("text-color", "A text color as a hex code", false),
+				discord.NewStringOption("title", "Your chart's title", false),
+				discord.NewBooleanOption("show-titles", "Show titles on the chart?", false),
+				discord.NewBooleanOption("show-numbers", "Show numbers on the chart?", false),
+			},
+		},
+	},
 }

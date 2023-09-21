@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/http"
 	"path"
 	"time"
 
@@ -13,6 +14,8 @@ import (
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/utils/sendpart"
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
+	"github.com/holedaemon/bot2/internal/pkg/httpx"
+	"github.com/holedaemon/lastfm"
 	"go.uber.org/zap"
 )
 
@@ -20,9 +23,13 @@ import (
 type Bot struct {
 	Debug bool
 
+	TopsterAddr string
+
 	State  *state.State
 	Logger *zap.Logger
+	HTTP   *http.Client
 
+	Lastfm   *lastfm.Client
 	Jerkcity *jerkcity.Client
 	DB       *sql.DB
 
@@ -34,7 +41,9 @@ type Bot struct {
 
 // New creates a new Bot.
 func New(token string, opts ...Option) (*Bot, error) {
-	b := &Bot{}
+	b := &Bot{
+		HTTP: httpx.DefaultClient,
+	}
 
 	for _, o := range opts {
 		o(b)
@@ -53,7 +62,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 		b.Admins = make(map[discord.UserID]struct{})
 	}
 
-	b.Jerkcity = jerkcity.New()
+	b.Jerkcity = jerkcity.New(jerkcity.WithHTTPClient(b.HTTP))
 	b.imageCache = NewImageCache()
 
 	b.State = state.New("Bot " + token)

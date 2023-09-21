@@ -2,12 +2,14 @@ package bot
 
 import (
 	"fmt"
+	"io"
 	"strings"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"github.com/diamondburned/arikawa/v3/utils/sendpart"
 )
 
 var (
@@ -70,6 +72,22 @@ func respondEmbeds(embeds ...discord.Embed) *api.InteractionResponseData {
 
 	return &api.InteractionResponseData{
 		Embeds: &embeds,
+	}
+}
+
+func respondImage(name string, image io.Reader) *api.InteractionResponseData {
+	if image == nil {
+		panic("bot: nil reader given to respondImage")
+	}
+
+	files := make([]sendpart.File, 0)
+	files = append(files, sendpart.File{
+		Name:   name,
+		Reader: image,
+	})
+
+	return &api.InteractionResponseData{
+		Files: files,
 	}
 }
 
