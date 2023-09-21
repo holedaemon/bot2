@@ -83,16 +83,10 @@ func (b *Bot) cmdTopster(ctx context.Context, data cmdroute.CommandData) *api.In
 		return respondError("Error encoding Topster options as JSON. How embarrassing...")
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, b.TopsterAddr, &input)
+	res, err := http.Post(b.TopsterAddr, "application/json", &input)
 	if err != nil {
-		ctxlog.Error(ctx, "error creating http request", zap.Error(err))
-		return respondError("Error creating HTTP request... Oops :3")
-	}
-
-	res, err := b.HTTP.Do(req)
-	if err != nil {
-		ctxlog.Error(ctx, "error performing http request", zap.Error(err))
-		return respondError("Error performing HTTP request... xD")
+		ctxlog.Error(ctx, "error POSTing to topster addr", zap.Error(err))
+		return respondError("Error sending request to Topster!!")
 	}
 
 	defer res.Body.Close()
