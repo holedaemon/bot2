@@ -277,7 +277,7 @@ var commands = commandList{
 		},
 	},
 	{
-		Scoped: testGuildID,
+		Scoped: holeGuildID,
 		Data: api.CreateCommandData{
 			Name:        "topster",
 			Description: "Generate a 3x3 Topster chart with Last.fm data",
