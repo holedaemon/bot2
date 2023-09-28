@@ -186,6 +186,10 @@ func runWeb() {
 		connected = true
 	}
 
+	if !connected {
+		logger.Fatal("max database attempts reached", zap.Int("attempts", opts.DBMaxAttempts))
+	}
+
 	s, err := web.New(
 		web.WithDebug(opts.Debug),
 		web.WithAddr(opts.Addr),
