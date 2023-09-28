@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
+	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
@@ -15,6 +16,7 @@ import (
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
 	"github.com/holedaemon/lastfm"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // Bot is a Discord bot account.
@@ -23,8 +25,9 @@ type Bot struct {
 
 	TopsterAddr string
 
-	State  *state.State
-	Logger *zap.Logger
+	State   *state.State
+	Webhook *webhook.Client
+	Logger  *zap.Logger
 
 	Lastfm   *lastfm.Client
 	Jerkcity *jerkcity.Client
@@ -51,6 +54,12 @@ func New(token string, opts ...Option) (*Bot, error) {
 		}
 
 		b.Logger = l
+	}
+
+	if b.Webhook != nil {
+		b.Logger = b.Logger.WithOptions(
+			zap.Hooks(b.webhookHook),
+		)
 	}
 
 	if b.Admins == nil {
@@ -127,6 +136,24 @@ func (b *Bot) IsAdmin(sf discord.UserID) bool {
 // Start opens a connection to Discord.
 func (b *Bot) Start(ctx context.Context) error {
 	return b.State.Connect(ctx)
+}
+
+func (b *Bot) webhookHook(entry zapcore.Entry) error {
+	if b.Webhook == nil {
+		return nil
+	}
+
+	if entry.Level < zapcore.ErrorLevel {
+		return nil
+	}
+
+	data := webhook.ExecuteData{
+		Username:  "BOT/2 Logs",
+		AvatarURL: "https://holedaemon.net/images/yousuck.jpg",
+		Content:   entry.Message,
+	}
+
+	return b.Webhook.Execute(data)
 }
 
 func (b *Bot) Reply(m discord.Message, content string) error {

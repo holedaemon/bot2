@@ -98,5 +98,6 @@ func (b *Bot) cmdPanic(ctx context.Context, data cmdroute.CommandData) *api.Inte
 		return respondError("I don't think so, weather man")
 	}
 
-	panic("boo lol!")
+	ctxlog.Error(ctx, "why should we panic when we can just log?")
+	return respond("Nothing to see here!!")
 }

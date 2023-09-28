@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/caarlos0/env/v7"
+	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/holedaemon/bot2/internal/bot"
 	"github.com/holedaemon/bot2/internal/db/dbx"
@@ -23,6 +24,7 @@ type BotOptions struct {
 	Debug             bool          `env:"BOT2_DEBUG" envDefault:"false"`
 	Admins            string        `env:"BOT2_ADMINS"`
 	Token             string        `env:"BOT2_TOKEN"`
+	WebhookURL        string        `env:"BOT2_WEBHOOK_URL"`
 	DSN               string        `env:"BOT2_DSN"`
 	TopsterAddr       string        `env:"BOT2_TOPSTER_ADDR"`
 	DBMaxAttempts     int           `env:"BOT2_DB_MAX_ATTEMPTS" envDefault:"10"`
@@ -117,10 +119,16 @@ func runBot() {
 		logger.Fatal("max database attempts reached", zap.Int("attempts", opts.DBMaxAttempts))
 	}
 
+	hook, err := webhook.NewFromURL(opts.WebhookURL)
+	if err != nil {
+		logger.Fatal("error creating webhook", zap.Error(err))
+	}
+
 	b, err := bot.New(
 		opts.Token,
 		bot.WithAdminMap(admins),
 		bot.WithDB(db),
+		bot.WithWebhook(hook),
 		bot.WithDebug(opts.Debug),
 		bot.WithTopsterAddr(opts.TopsterAddr),
 	)

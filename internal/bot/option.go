@@ -3,6 +3,7 @@ package bot
 import (
 	"database/sql"
 
+	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"go.uber.org/zap"
 )
@@ -42,5 +43,12 @@ func WithDB(db *sql.DB) Option {
 func WithTopsterAddr(t string) Option {
 	return func(b *Bot) {
 		b.TopsterAddr = t
+	}
+}
+
+// WithWebhook sets the Bot's error log webhook.
+func WithWebhook(hook *webhook.Client) Option {
+	return func(b *Bot) {
+		b.Webhook = hook
 	}
 }

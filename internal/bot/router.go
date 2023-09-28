@@ -20,25 +20,9 @@ func (b *Bot) useRouter() cmdroute.Middleware {
 	}
 }
 
-func recoverer() cmdroute.Middleware {
-	return func(next cmdroute.InteractionHandler) cmdroute.InteractionHandler {
-		return cmdroute.InteractionHandlerFunc(func(ctx context.Context, ie *discord.InteractionEvent) *api.InteractionResponse {
-			defer func() {
-				if rvr := recover(); rvr != nil {
-					ctx := ctxlog.WithOptions(ctx, zap.AddStacktrace(zap.ErrorLevel))
-					ctxlog.Error(ctx, "PANIC", zap.Any("recover", rvr))
-				}
-			}()
-
-			return next.HandleInteraction(ctx, ie)
-		})
-	}
-}
-
 func (b *Bot) router() *cmdroute.Router {
 	r := cmdroute.NewRouter()
 	r.Use(b.useRouter())
-	r.Use(recoverer())
 	r.Use(cmdroute.Deferrable(b.State, cmdroute.DeferOpts{}))
 
 	r.AddFunc("info", b.cmdInfo)
