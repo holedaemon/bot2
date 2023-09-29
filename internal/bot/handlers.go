@@ -35,21 +35,29 @@ func (b *Bot) onGuildCreate(g *gateway.GuildCreateEvent) {
 	}
 
 	if guild != nil {
-		if guild.QuotesRequiredReactions.Valid {
-			return
+		whitelist := make([]string, 0)
+
+		if !guild.QuotesRequiredReactions.Valid {
+			guild.QuotesRequiredReactions = null.IntFrom(1)
+			whitelist = append(whitelist, models.GuildColumns.QuotesRequiredReactions)
 		}
 
-		guild.QuotesRequiredReactions = null.IntFrom(1)
-
-		if err := guild.Update(ctx, b.DB, boil.Whitelist(
-			models.GuildColumns.UpdatedAt,
-			models.GuildColumns.QuotesRequiredReactions,
-		)); err != nil {
-			log.Error("error fixing guild", zap.Error(err))
-			return
+		if !strings.EqualFold(guild.GuildName, g.Name) {
+			guild.GuildName = g.Name
+			whitelist = append(whitelist, models.GuildColumns.GuildName)
 		}
 
-		log.Info("fixed null records for guild")
+		if len(whitelist) > 0 {
+			whitelist = append(whitelist, models.GuildColumns.UpdatedAt)
+
+			if err := guild.Update(ctx, b.DB, boil.Whitelist(whitelist...)); err != nil {
+				log.Error("error fixing guild", zap.Error(err))
+				return
+			}
+
+			log.Info("updated record for guild")
+		}
+
 		return
 	}
 
@@ -76,13 +84,12 @@ func (b *Bot) onGuildUpdate(g *gateway.GuildUpdateEvent) {
 	guild, err := modelsx.FetchGuild(ctx, b.DB, g.ID.String())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			guild = &models.Guild{
-				GuildID: g.ID.String(),
-			}
-		} else {
-			log.Error("error fetching guild", zap.Error(err))
+			ctxlog.Error(ctx, "received update for guild we aren't tracking...")
 			return
 		}
+
+		log.Error("error fetching guild", zap.Error(err))
+		return
 	}
 
 	if strings.EqualFold(g.Name, guild.GuildName) {
@@ -90,9 +97,9 @@ func (b *Bot) onGuildUpdate(g *gateway.GuildUpdateEvent) {
 	}
 
 	guild.GuildName = g.Name
-
-	if err := modelsx.UpsertGuild(ctx, b.DB, guild); err != nil {
-		log.Error("error upserting guild record", zap.Error(err))
+	if err := guild.Update(ctx, b.DB, boil.Whitelist(models.GuildColumns.GuildName, models.GuildColumns.UpdatedAt)); err != nil {
+		ctxlog.Error(ctx, "error updating guild", zap.Error(err))
+		return
 	}
 }
 

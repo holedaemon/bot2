@@ -34,7 +34,7 @@ func (b *Bot) cmdSettingsQuotesToggle(ctx context.Context, data cmdroute.Command
 	}
 
 	guild.DoQuotes = val
-	if err := guild.Update(ctx, b.DB, boil.Infer()); err != nil {
+	if err := guild.Update(ctx, b.DB, boil.Whitelist(models.GuildColumns.DoQuotes, models.GuildColumns.UpdatedAt)); err != nil {
 		ctxlog.Error(ctx, "error updating guild record", zap.Error(err))
 		return dbError
 	}
