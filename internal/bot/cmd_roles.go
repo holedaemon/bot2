@@ -20,6 +20,15 @@ import (
 	"go.uber.org/zap"
 )
 
+var (
+	roleRename = boil.Whitelist(models.RoleColumns.RoleName, models.RoleColumns.UpdatedAt)
+)
+
+func renameRole(ctx context.Context, exec boil.ContextExecutor, role *models.Role, newName string) error {
+	role.RoleName = null.StringFrom(newName)
+	return role.Update(ctx, exec, roleRename)
+}
+
 func (b *Bot) onGuildRoleDelete(e *gateway.GuildRoleDeleteEvent) {
 	ctx := context.Background()
 	log := b.Logger.With(zap.String("guild_id", e.GuildID.String()))
@@ -257,14 +266,14 @@ func (b *Bot) cmdRoleRename(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("You gotta give me a new name to use!")
 	}
 
-	exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).Exists(ctx, b.DB)
+	role, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).One(ctx, b.DB)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return respondError("I'm not tracking a role by that ID!")
+		}
+
 		ctxlog.Error(ctx, "error checking for role", zap.Error(err))
 		return dbError
-	}
-
-	if !exists {
-		return respondError("I'm not tracking a role by that ID!")
 	}
 
 	if _, err := b.State.ModifyRole(data.Event.GuildID, discord.RoleID(sf), api.ModifyRoleData{
@@ -274,19 +283,7 @@ func (b *Bot) cmdRoleRename(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("The API got mad at me when I tried updating the role")
 	}
 
-	role, err := models.Roles(qm.Where("role_id = ? AND guild_id = ?", sf.String(), data.Event.GuildID.String())).One(ctx, b.DB)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return respondError("Uh oh! Role doesn't exist in database... This shouldn't happen. Lol")
-		}
-
-		ctxlog.Error(ctx, "error fetching role from database", zap.Error(err))
-		return dbError
-	}
-
-	role.RoleName = null.StringFrom(newName)
-
-	if err := role.Update(ctx, b.DB, boil.Infer()); err != nil {
+	if err := renameRole(ctx, b.DB, role, newName); err != nil {
 		ctxlog.Error(ctx, "error updating role", zap.Error(err))
 		return dbError
 	}
@@ -490,9 +487,7 @@ func (b *Bot) cmdRoleFix(ctx context.Context, data cmdroute.CommandData) *api.In
 			return respond("Error fetching role from Discord xD")
 		}
 
-		role.RoleName = null.StringFrom(discordRole.Name)
-
-		if err := role.Update(ctx, tx, boil.Infer()); err != nil {
+		if err := renameRole(ctx, tx, role, discordRole.Name); err != nil {
 			ctxlog.Error(ctx, "error updating role in database", zap.Error(err))
 			return dbError
 		}
