@@ -24,20 +24,7 @@ func (b *Bot) onGuildRoleDelete(e *gateway.GuildRoleDeleteEvent) {
 	ctx := context.Background()
 	log := b.Logger.With(zap.String("guild_id", e.GuildID.String()))
 
-	tx, err := b.DB.BeginTx(ctx, nil)
-	if err != nil {
-		log.Error("error creating transaction", zap.Error(err))
-		return
-	}
-
-	defer func() {
-		if err := tx.Commit(); err != nil {
-			log.Error("error committing transaction", zap.Error(err))
-			return
-		}
-	}()
-
-	exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", e.GuildID.String(), e.RoleID.String())).Exists(ctx, tx)
+	exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", e.GuildID.String(), e.RoleID.String())).Exists(ctx, b.DB)
 	if err != nil {
 		log.Error("error checking for role", zap.Error(err))
 		return
@@ -49,11 +36,8 @@ func (b *Bot) onGuildRoleDelete(e *gateway.GuildRoleDeleteEvent) {
 
 	log.Info("tracked role has been deleted on Discord, deleting from database...", zap.String("role_id", e.RoleID.String()))
 
-	if err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", e.GuildID.String(), e.RoleID.String())).DeleteAll(ctx, tx); err != nil {
+	if err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", e.GuildID.String(), e.RoleID.String())).DeleteAll(ctx, b.DB); err != nil {
 		log.Error("error deleting role", zap.Error(err))
-		if err := tx.Rollback(); err != nil {
-			ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
-		}
 		return
 	}
 }
@@ -83,12 +67,6 @@ func (b *Bot) cmdRoleCreate(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("Unable to parse argument as a boolean")
 	}
 
-	tx, err := b.DB.BeginTx(ctx, nil)
-	if err != nil {
-		ctxlog.Error(ctx, "error creating transaction", zap.Error(err))
-		return respondError("Error creating database transaction")
-	}
-
 	r, err := b.State.CreateRole(data.Event.GuildID, api.CreateRoleData{
 		Name:        name,
 		Hoist:       hoisted,
@@ -106,20 +84,11 @@ func (b *Bot) cmdRoleCreate(ctx context.Context, data cmdroute.CommandData) *api
 		RoleID:   r.ID.String(),
 	}
 
-	if err := role.Insert(ctx, tx, boil.Infer()); err != nil {
-		if err := tx.Rollback(); err != nil {
-			ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
-		}
-
+	if err := role.Insert(ctx, b.DB, boil.Infer()); err != nil {
 		if err := b.State.DeleteRole(data.Event.GuildID, r.ID, "rolling back"); err != nil {
 			ctxlog.Error(ctx, "error deleting role from Discord", zap.Error(err))
 		}
 
-		return dbError
-	}
-
-	if err := tx.Commit(); err != nil {
-		ctxlog.Error(ctx, "error committing transaction", zap.Error(err))
 		return dbError
 	}
 
@@ -132,13 +101,7 @@ func (b *Bot) cmdRoleDelete(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("Unable to convert the given argument into a snowflake")
 	}
 
-	tx, err := b.DB.BeginTx(ctx, nil)
-	if err != nil {
-		ctxlog.Error(ctx, "error beginning tx", zap.Error(err))
-		return dbError
-	}
-
-	role, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).One(ctx, tx)
+	role, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).One(ctx, b.DB)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return respondError("I'm not tracking a role with that ID")
@@ -148,28 +111,14 @@ func (b *Bot) cmdRoleDelete(ctx context.Context, data cmdroute.CommandData) *api
 		return dbError
 	}
 
-	if err := role.Delete(ctx, tx); err != nil {
-		if err := tx.Rollback(); err != nil {
-			ctxlog.Error(ctx, "error rolling back transaction", zap.Error(err))
-		}
-
+	if err := role.Delete(ctx, b.DB); err != nil {
 		ctxlog.Error(ctx, "error deleting role", zap.Error(err))
 		return dbError
 	}
 
 	if err := b.State.DeleteRole(data.Event.GuildID, discord.RoleID(sf), "Deletion requested"); err != nil {
 		ctxlog.Error(ctx, "error deleting role", zap.Error(err))
-		if err := tx.Rollback(); err != nil {
-			ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
-		}
 		return respondError("The API got mad at me when I tried to delete the role")
-	}
-
-	if err := tx.Commit(); err != nil {
-		if !errors.Is(err, sql.ErrTxDone) {
-			ctxlog.Error(ctx, "error committing transaction", zap.Error(err))
-			return dbError
-		}
 	}
 
 	return respond("Role has been deleted")
@@ -184,6 +133,8 @@ func (b *Bot) cmdRoleRelinquish(ctx context.Context, data cmdroute.CommandData) 
 		ctxlog.Error(ctx, "error beginning transaction", zap.Error(err))
 		return dbError
 	}
+
+	defer tx.Rollback()
 
 	for _, opt := range data.Options {
 		sf, err := opt.SnowflakeValue()
@@ -207,16 +158,10 @@ func (b *Bot) cmdRoleRelinquish(ctx context.Context, data cmdroute.CommandData) 
 			}
 
 			ctxlog.Error(ctx, "error querying for role", zap.Error(err))
-			if err := tx.Rollback(); err != nil {
-				ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
-			}
 			return dbError
 		}
 
 		if err := role.Delete(ctx, tx); err != nil {
-			if err := tx.Rollback(); err != nil {
-				ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
-			}
 			ctxlog.Error(ctx, "error deleting role", zap.Error(err))
 			return respondErrorf("There was an issue deleting <@&%s> from the database", sf.String())
 		}
@@ -226,10 +171,8 @@ func (b *Bot) cmdRoleRelinquish(ctx context.Context, data cmdroute.CommandData) 
 	}
 
 	if err := tx.Commit(); err != nil {
-		if !errors.Is(err, sql.ErrTxDone) {
-			ctxlog.Error(ctx, "error committing transaction", zap.Error(err))
-			return dbError
-		}
+		ctxlog.Error(ctx, "error committing transaction", zap.Error(err))
+		return dbError
 	}
 
 	var sb strings.Builder
@@ -398,6 +341,8 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 		return dbError
 	}
 
+	defer tx.Rollback()
+
 	for _, opt := range data.Options {
 		sf, err := opt.SnowflakeValue()
 		if err != nil {
@@ -416,9 +361,6 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 		exists, err := models.Roles(qm.Where("role_id = ? AND guild_id = ?", sf.String(), data.Event.GuildID.String())).Exists(ctx, tx)
 		if err != nil {
 			ctxlog.Error(ctx, "error checking for role in database", zap.Error(err))
-			if err := tx.Rollback(); err != nil {
-				ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
-			}
 			return dbError
 		}
 
@@ -440,9 +382,6 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 
 		if err := role.Insert(ctx, tx, boil.Infer()); err != nil {
 			ctxlog.Error(ctx, "error inserting role", zap.Error(err))
-			if err := tx.Rollback(); err != nil {
-				ctxlog.Error(ctx, "error rolling back tx", zap.Error(err))
-			}
 			return respondErrorf("There was an issue inserting <@&%s> into the database", sf.String())
 		}
 
@@ -451,10 +390,8 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 	}
 
 	if err := tx.Commit(); err != nil {
-		if !errors.Is(err, sql.ErrTxDone) {
-			ctxlog.Error(ctx, "error committing transaction", zap.Error(err))
-			return dbError
-		}
+		ctxlog.Error(ctx, "error committing transaction", zap.Error(err))
+		return dbError
 	}
 
 	var sb strings.Builder
