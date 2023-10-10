@@ -32,6 +32,7 @@ func (b *Bot) router() *cmdroute.Router {
 	r.AddFunc("game", b.cmdGame)
 	r.AddFunc("panic", b.cmdPanic)
 	r.AddFunc("topster", b.cmdTopster)
+	r.AddFunc("tag", b.cmdTag)
 
 	r.Sub("jerkcity", func(r *cmdroute.Router) {
 		r.AddFunc("latest", b.cmdJerkcityLatest)
@@ -54,6 +55,13 @@ func (b *Bot) router() *cmdroute.Router {
 		r.AddFunc("import", b.cmdRoleImport)
 		r.AddFunc("relinquish", b.cmdRoleRelinquish)
 		r.AddFunc("fix", b.cmdRoleFix)
+	})
+
+	r.Sub("tags", func(r *cmdroute.Router) {
+		r.AddFunc("create", b.cmdTagCreate)
+		r.AddFunc("update", b.cmdTagUpdate)
+		r.AddFunc("rename", b.cmdTagRename)
+		r.AddFunc("delete", b.cmdTagDelete)
 	})
 
 	r.Sub("settings", func(r *cmdroute.Router) {
