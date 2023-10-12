@@ -58,10 +58,10 @@ func (b *Bot) router() *cmdroute.Router {
 	})
 
 	r.Sub("tags", func(r *cmdroute.Router) {
-		r.AddFunc("create", b.cmdTagCreate)
-		r.AddFunc("update", b.cmdTagUpdate)
-		r.AddFunc("rename", b.cmdTagRename)
-		r.AddFunc("delete", b.cmdTagDelete)
+		r.AddFunc("create", b.cmdTagsCreate)
+		r.AddFunc("update", b.cmdTagsUpdate)
+		r.AddFunc("rename", b.cmdTagsRename)
+		r.AddFunc("delete", b.cmdTagsDelete)
 		r.AddFunc("list", b.cmdTagsList)
 	})
 

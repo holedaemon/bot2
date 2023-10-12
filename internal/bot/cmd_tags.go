@@ -42,7 +42,7 @@ func (b *Bot) cmdTag(ctx context.Context, data cmdroute.CommandData) *api.Intera
 	return respond(tag.Content)
 }
 
-func (b *Bot) cmdTagCreate(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+func (b *Bot) cmdTagsCreate(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	name := data.Options.Find("name").String()
 	content := data.Options.Find("content").String()
 
@@ -88,7 +88,7 @@ func (b *Bot) cmdTagCreate(ctx context.Context, data cmdroute.CommandData) *api.
 	return respondf("Tag `%s` has been created", name)
 }
 
-func (b *Bot) cmdTagUpdate(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+func (b *Bot) cmdTagsUpdate(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	name := data.Options.Find("name").String()
 	content := data.Options.Find("content").String()
 
@@ -127,7 +127,7 @@ func (b *Bot) cmdTagUpdate(ctx context.Context, data cmdroute.CommandData) *api.
 	return respondf("Tag `%s` has had its content updated", name)
 }
 
-func (b *Bot) cmdTagRename(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+func (b *Bot) cmdTagsRename(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	name := data.Options.Find("name").String()
 	newName := data.Options.Find("new-name").String()
 
@@ -181,7 +181,7 @@ func (b *Bot) cmdTagRename(ctx context.Context, data cmdroute.CommandData) *api.
 	return respondf("Tag `%s` is henceforth known as `%s`", name, newName)
 }
 
-func (b *Bot) cmdTagDelete(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+func (b *Bot) cmdTagsDelete(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	name := data.Options.Find("name").String()
 	if name == "" {
 		return respondError("Name cannot be blank!!")
