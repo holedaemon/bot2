@@ -322,6 +322,10 @@ var commands = commandList{
 					"Delete a tag",
 					discord.NewStringOption("name", "Name of the tag", true),
 				),
+				discord.NewSubcommandOption(
+					"list",
+					"Get a link to a list of tags for the guild",
+				),
 			},
 		},
 	},

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/diamondburned/arikawa/v3/api"
@@ -214,4 +215,16 @@ func (b *Bot) cmdTagDelete(ctx context.Context, data cmdroute.CommandData) *api.
 	}
 
 	return respondf("Tag `%s` has been deleted", name)
+}
+
+func (b *Bot) cmdTagsList(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	addr := fmt.Sprintf("%s/guild/%s/tags", b.siteAddress, data.Event.GuildID.String())
+
+	guild, err := b.State.Guild(data.Event.GuildID)
+	if err != nil {
+		ctxlog.Error(ctx, "error fetching guild", zap.Error(err), zap.String("guild_id", data.Event.GuildID.String()))
+		return respondError("There was an error fetching the guild :(")
+	}
+
+	return respondf("Tags for %s can be found at <%s>", guild.Name, addr)
 }

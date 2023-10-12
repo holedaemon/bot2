@@ -62,6 +62,7 @@ func (b *Bot) router() *cmdroute.Router {
 		r.AddFunc("update", b.cmdTagUpdate)
 		r.AddFunc("rename", b.cmdTagRename)
 		r.AddFunc("delete", b.cmdTagDelete)
+		r.AddFunc("list", b.cmdTagsList)
 	})
 
 	r.Sub("settings", func(r *cmdroute.Router) {
