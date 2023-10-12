@@ -5,6 +5,7 @@ CREATE TABLE tags (
 
     guild_id text NOT NULL,
     creator_id text NOT NULL,
+    editor text NOT NULL,
 
     trigger text NOT NULL,
     content text NOT NULL,

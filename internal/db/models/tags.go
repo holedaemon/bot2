@@ -26,6 +26,7 @@ type Tag struct {
 	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
 	GuildID   string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
 	CreatorID string    `boil:"creator_id" json:"creator_id" toml:"creator_id" yaml:"creator_id"`
+	Editor    string    `boil:"editor" json:"editor" toml:"editor" yaml:"editor"`
 	Trigger   string    `boil:"trigger" json:"trigger" toml:"trigger" yaml:"trigger"`
 	Content   string    `boil:"content" json:"content" toml:"content" yaml:"content"`
 	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
@@ -39,6 +40,7 @@ var TagColumns = struct {
 	ID        string
 	GuildID   string
 	CreatorID string
+	Editor    string
 	Trigger   string
 	Content   string
 	CreatedAt string
@@ -47,6 +49,7 @@ var TagColumns = struct {
 	ID:        "id",
 	GuildID:   "guild_id",
 	CreatorID: "creator_id",
+	Editor:    "editor",
 	Trigger:   "trigger",
 	Content:   "content",
 	CreatedAt: "created_at",
@@ -57,6 +60,7 @@ var TagTableColumns = struct {
 	ID        string
 	GuildID   string
 	CreatorID string
+	Editor    string
 	Trigger   string
 	Content   string
 	CreatedAt string
@@ -65,6 +69,7 @@ var TagTableColumns = struct {
 	ID:        "tags.id",
 	GuildID:   "tags.guild_id",
 	CreatorID: "tags.creator_id",
+	Editor:    "tags.editor",
 	Trigger:   "tags.trigger",
 	Content:   "tags.content",
 	CreatedAt: "tags.created_at",
@@ -77,6 +82,7 @@ var TagWhere = struct {
 	ID        whereHelperint64
 	GuildID   whereHelperstring
 	CreatorID whereHelperstring
+	Editor    whereHelperstring
 	Trigger   whereHelperstring
 	Content   whereHelperstring
 	CreatedAt whereHelpertime_Time
@@ -85,6 +91,7 @@ var TagWhere = struct {
 	ID:        whereHelperint64{field: "\"tags\".\"id\""},
 	GuildID:   whereHelperstring{field: "\"tags\".\"guild_id\""},
 	CreatorID: whereHelperstring{field: "\"tags\".\"creator_id\""},
+	Editor:    whereHelperstring{field: "\"tags\".\"editor\""},
 	Trigger:   whereHelperstring{field: "\"tags\".\"trigger\""},
 	Content:   whereHelperstring{field: "\"tags\".\"content\""},
 	CreatedAt: whereHelpertime_Time{field: "\"tags\".\"created_at\""},
@@ -108,8 +115,8 @@ func (*tagR) NewStruct() *tagR {
 type tagL struct{}
 
 var (
-	tagAllColumns            = []string{"id", "guild_id", "creator_id", "trigger", "content", "created_at", "updated_at"}
-	tagColumnsWithoutDefault = []string{"guild_id", "creator_id", "trigger", "content"}
+	tagAllColumns            = []string{"id", "guild_id", "creator_id", "editor", "trigger", "content", "created_at", "updated_at"}
+	tagColumnsWithoutDefault = []string{"guild_id", "creator_id", "editor", "trigger", "content"}
 	tagColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	tagPrimaryKeyColumns     = []string{"id"}
 	tagGeneratedColumns      = []string{}

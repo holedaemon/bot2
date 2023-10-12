@@ -8,7 +8,7 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
-var tagUpdate = boil.Whitelist(models.TagColumns.Trigger, models.TagColumns.Content, models.TagColumns.UpdatedAt)
+var tagUpdate = boil.Whitelist(models.TagColumns.Trigger, models.TagColumns.Content, models.TagColumns.Editor, models.TagColumns.UpdatedAt)
 
 // FetchTag retrieves a tag from the database.
 func FetchTag(ctx context.Context, exec boil.ContextExecutor, guild, name string) (*models.Tag, error) {
@@ -16,13 +16,15 @@ func FetchTag(ctx context.Context, exec boil.ContextExecutor, guild, name string
 }
 
 // UpdateTagContent updates a tag's content in the database.
-func UpdateTagContent(ctx context.Context, exec boil.ContextExecutor, tag *models.Tag, content string) error {
+func UpdateTagContent(ctx context.Context, exec boil.ContextExecutor, tag *models.Tag, content, editor string) error {
 	tag.Content = content
+	tag.Editor = editor
 	return tag.Update(ctx, exec, tagUpdate)
 }
 
 // RenameTag renames a tag in the database.
-func RenameTag(ctx context.Context, exec boil.ContextExecutor, tag *models.Tag, newName string) error {
+func RenameTag(ctx context.Context, exec boil.ContextExecutor, tag *models.Tag, newName, editor string) error {
 	tag.Trigger = newName
+	tag.Editor = editor
 	return tag.Update(ctx, exec, tagUpdate)
 }

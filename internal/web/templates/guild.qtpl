@@ -49,6 +49,7 @@
                 <li><a href="/guild/{%s p.Guild.GuildID %}" class='{%= isActive(item, "general") %}'>General</a></li>
                 <li><a href="/guild/{%s p.Guild.GuildID %}/roles" class='{%= isActive(item, "roles") %}'>Roles</a></li>
                 <li><a href="/guild/{%s p.Guild.GuildID %}/quotes" class='{%= isActive(item, "quotes") %}'>Quotes</a></li>
+                <li><a href="/guild/{%s p.Guild.GuildID %}/tags" class='{%= isActive(item, "tags") %}'>Tags</a></li>
             </ul>
         </aside>
     </div>
@@ -184,6 +185,64 @@
                                     {% else %}
                                         <td>{%s r.RoleName.String %}</td>
                                     {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endfunc %}
+
+{% code type GuildTagsPage struct {
+    GuildPage
+    Tags models.TagSlice
+}
+%}
+
+{% func (p *GuildTagsPage) Title() %}Tags &mdash; {%s p.Guild.GuildName %}{% endfunc %}
+
+{% func (p *GuildTagsPage) Meta() %}
+    {%= importBootstrapTableBulmaCSS() %}
+    {%= importFontAwesome() %}
+{% endfunc %}
+
+{% func (p *GuildTagsPage) Scripts() %}
+    {%= importJquery() %}
+    {%= importBootstrapTableJS() %}
+    <script>
+        $("#bot2-tags-table").on("post-body.bs.table", function (e) {
+            $("#bot2-tags-table").removeClass("is-hidden");
+        });
+    </script>
+{% endfunc %}
+
+{% func (p *GuildTagsPage) Body() %}
+    {%= p.Navigation() %}
+    <div class="container mt-6">
+        <div class="columns is-variable is-8">
+            {%= p.Sidebar("tags") %}
+            <div class="column mx-6">
+                <h1 class="title">Tags &mdash; {%s p.Guild.GuildName %}</h1>
+                <hr>
+                {% if len(p.Tags) == 0 %}
+                    <h1 class="title">No tags!!!</h1>
+                {% else %}
+                    <table id="bot2-tags-table" data-toggle="table" data-pagination="true" data-search="true">
+                        <thead>
+                            <tr>
+                               <th data-sortable="true">Name</th>
+                               <th data-sortable="true">Content</th>
+                               <th data-sortable="true">Editor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for _, t := range p.Tags %}
+                                <tr>
+                                    <td>{%s t.Trigger %}</td>
+                                    <td>{%s t.Content %}</td>
+                                    <td>{%s t.Editor %}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

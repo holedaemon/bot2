@@ -74,6 +74,7 @@ func (b *Bot) cmdTagCreate(ctx context.Context, data cmdroute.CommandData) *api.
 	tag := &models.Tag{
 		GuildID:   data.Event.GuildID.String(),
 		CreatorID: data.Event.Member.User.ID.String(),
+		Editor:    data.Event.Member.User.Tag(),
 		Trigger:   name,
 		Content:   content,
 	}
@@ -117,7 +118,7 @@ func (b *Bot) cmdTagUpdate(ctx context.Context, data cmdroute.CommandData) *api.
 		return respondError("You lack permission to update this tag!!")
 	}
 
-	if err := modelsx.UpdateTagContent(ctx, b.DB, tag, content); err != nil {
+	if err := modelsx.UpdateTagContent(ctx, b.DB, tag, content, data.Event.Member.User.Tag()); err != nil {
 		ctxlog.Error(ctx, "error updating tag content", zap.Error(err))
 		return respondError("Error updating tag's content!!!")
 	}
@@ -171,7 +172,7 @@ func (b *Bot) cmdTagRename(ctx context.Context, data cmdroute.CommandData) *api.
 		return respondErrorf("There is already a tag called `%s`", newName)
 	}
 
-	if err := modelsx.RenameTag(ctx, b.DB, tag, newName); err != nil {
+	if err := modelsx.RenameTag(ctx, b.DB, tag, newName, data.Event.Member.User.Tag()); err != nil {
 		ctxlog.Error(ctx, "error updating tag name", zap.Error(err))
 		return respondError("Error updating tag's name!!!")
 	}

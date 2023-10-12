@@ -141,6 +141,11 @@ func (p *GuildPage) StreamSidebar(qw422016 *qt422016.Writer, item string) {
 	qw422016.N().S(`/quotes" class='`)
 	streamisActive(qw422016, item, "quotes")
 	qw422016.N().S(`'>Quotes</a></li>
+                <li><a href="/guild/`)
+	qw422016.E().S(p.Guild.GuildID)
+	qw422016.N().S(`/tags" class='`)
+	streamisActive(qw422016, item, "tags")
+	qw422016.N().S(`'>Tags</a></li>
             </ul>
         </aside>
     </div>
@@ -534,6 +539,158 @@ func (p *GuildRolesPage) WriteBody(qq422016 qtio422016.Writer) {
 }
 
 func (p *GuildRolesPage) Body() string {
+	qb422016 := qt422016.AcquireByteBuffer()
+	p.WriteBody(qb422016)
+	qs422016 := string(qb422016.B)
+	qt422016.ReleaseByteBuffer(qb422016)
+	return qs422016
+}
+
+type GuildTagsPage struct {
+	GuildPage
+	Tags models.TagSlice
+}
+
+func (p *GuildTagsPage) StreamTitle(qw422016 *qt422016.Writer) {
+	qw422016.N().S(`Tags &mdash; `)
+	qw422016.E().S(p.Guild.GuildName)
+}
+
+func (p *GuildTagsPage) WriteTitle(qq422016 qtio422016.Writer) {
+	qw422016 := qt422016.AcquireWriter(qq422016)
+	p.StreamTitle(qw422016)
+	qt422016.ReleaseWriter(qw422016)
+}
+
+func (p *GuildTagsPage) Title() string {
+	qb422016 := qt422016.AcquireByteBuffer()
+	p.WriteTitle(qb422016)
+	qs422016 := string(qb422016.B)
+	qt422016.ReleaseByteBuffer(qb422016)
+	return qs422016
+}
+
+func (p *GuildTagsPage) StreamMeta(qw422016 *qt422016.Writer) {
+	qw422016.N().S(`
+    `)
+	streamimportBootstrapTableBulmaCSS(qw422016)
+	qw422016.N().S(`
+    `)
+	streamimportFontAwesome(qw422016)
+	qw422016.N().S(`
+`)
+}
+
+func (p *GuildTagsPage) WriteMeta(qq422016 qtio422016.Writer) {
+	qw422016 := qt422016.AcquireWriter(qq422016)
+	p.StreamMeta(qw422016)
+	qt422016.ReleaseWriter(qw422016)
+}
+
+func (p *GuildTagsPage) Meta() string {
+	qb422016 := qt422016.AcquireByteBuffer()
+	p.WriteMeta(qb422016)
+	qs422016 := string(qb422016.B)
+	qt422016.ReleaseByteBuffer(qb422016)
+	return qs422016
+}
+
+func (p *GuildTagsPage) StreamScripts(qw422016 *qt422016.Writer) {
+	qw422016.N().S(`
+    `)
+	streamimportJquery(qw422016)
+	qw422016.N().S(`
+    `)
+	streamimportBootstrapTableJS(qw422016)
+	qw422016.N().S(`
+    <script>
+        $("#bot2-tags-table").on("post-body.bs.table", function (e) {
+            $("#bot2-tags-table").removeClass("is-hidden");
+        });
+    </script>
+`)
+}
+
+func (p *GuildTagsPage) WriteScripts(qq422016 qtio422016.Writer) {
+	qw422016 := qt422016.AcquireWriter(qq422016)
+	p.StreamScripts(qw422016)
+	qt422016.ReleaseWriter(qw422016)
+}
+
+func (p *GuildTagsPage) Scripts() string {
+	qb422016 := qt422016.AcquireByteBuffer()
+	p.WriteScripts(qb422016)
+	qs422016 := string(qb422016.B)
+	qt422016.ReleaseByteBuffer(qb422016)
+	return qs422016
+}
+
+func (p *GuildTagsPage) StreamBody(qw422016 *qt422016.Writer) {
+	qw422016.N().S(`
+    `)
+	p.StreamNavigation(qw422016)
+	qw422016.N().S(`
+    <div class="container mt-6">
+        <div class="columns is-variable is-8">
+            `)
+	p.StreamSidebar(qw422016, "tags")
+	qw422016.N().S(`
+            <div class="column mx-6">
+                <h1 class="title">Tags &mdash; `)
+	qw422016.E().S(p.Guild.GuildName)
+	qw422016.N().S(`</h1>
+                <hr>
+                `)
+	if len(p.Tags) == 0 {
+		qw422016.N().S(`
+                    <h1 class="title">No tags!!!</h1>
+                `)
+	} else {
+		qw422016.N().S(`
+                    <table id="bot2-tags-table" data-toggle="table" data-pagination="true" data-search="true">
+                        <thead>
+                            <tr>
+                               <th data-sortable="true">Name</th>
+                               <th data-sortable="true">Content</th>
+                               <th data-sortable="true">Editor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            `)
+		for _, t := range p.Tags {
+			qw422016.N().S(`
+                                <tr>
+                                    <td>`)
+			qw422016.E().S(t.Trigger)
+			qw422016.N().S(`</td>
+                                    <td>`)
+			qw422016.E().S(t.Content)
+			qw422016.N().S(`</td>
+                                    <td>`)
+			qw422016.E().S(t.Editor)
+			qw422016.N().S(`</td>
+                                </tr>
+                            `)
+		}
+		qw422016.N().S(`
+                        </tbody>
+                    </table>
+                `)
+	}
+	qw422016.N().S(`
+            </div>
+        </div>
+    </div>
+`)
+}
+
+func (p *GuildTagsPage) WriteBody(qq422016 qtio422016.Writer) {
+	qw422016 := qt422016.AcquireWriter(qq422016)
+	p.StreamBody(qw422016)
+	qt422016.ReleaseWriter(qw422016)
+}
+
+func (p *GuildTagsPage) Body() string {
 	qb422016 := qt422016.AcquireByteBuffer()
 	p.WriteBody(qb422016)
 	qs422016 := string(qb422016.B)

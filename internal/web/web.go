@@ -112,6 +112,7 @@ func (s *Server) Run(ctx context.Context) error {
 		r.Get("/", s.guild)
 		r.Get("/quotes", s.guildQuotes)
 		r.Get("/roles", s.guildRoles)
+		r.Get("/tags", s.guildTags)
 	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
@@ -301,7 +302,7 @@ func (s *Server) guildRoles(w http.ResponseWriter, r *http.Request) {
 	roles, err := models.Roles(qm.Where("guild_id = ?", id)).All(ctx, s.DB)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			ctxlog.Error(ctx, "error fetching quotes", zap.Error(err))
+			ctxlog.Error(ctx, "error fetching roles", zap.Error(err))
 			s.errorPage(w, r, http.StatusInternalServerError, "")
 			return
 		}
@@ -310,5 +311,35 @@ func (s *Server) guildRoles(w http.ResponseWriter, r *http.Request) {
 	templates.WritePageTemplate(w, &templates.GuildRolesPage{
 		GuildPage: s.guildPage(r, guild),
 		Roles:     roles,
+	})
+}
+
+func (s *Server) guildTags(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	id := chi.URLParam(r, "id")
+
+	guild, err := modelsx.FetchGuild(ctx, s.DB, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			s.errorPage(w, r, http.StatusNotFound, "")
+		} else {
+			ctxlog.Error(ctx, "error fetching guild", zap.String("guild_id", id), zap.Error(err))
+			s.errorPage(w, r, http.StatusInternalServerError, "")
+		}
+		return
+	}
+
+	tags, err := models.Tags(qm.Where("guild_id = ?", id)).All(ctx, s.DB)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			ctxlog.Error(ctx, "error fetching tags", zap.Error(err))
+			s.errorPage(w, r, http.StatusInternalServerError, "")
+			return
+		}
+	}
+
+	templates.WritePageTemplate(w, &templates.GuildTagsPage{
+		GuildPage: s.guildPage(r, guild),
+		Tags:      tags,
 	})
 }
