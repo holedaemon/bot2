@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
@@ -24,6 +25,7 @@ type Bot struct {
 	Debug bool
 
 	TopsterAddr string
+	siteAddress string
 
 	State   *state.State
 	Webhook *webhook.Client
@@ -64,6 +66,18 @@ func New(token string, opts ...Option) (*Bot, error) {
 
 	if b.Admins == nil {
 		b.Admins = make(map[discord.UserID]struct{})
+	}
+
+	if b.siteAddress == "" {
+		return nil, fmt.Errorf("bot: site address is blank")
+	} else {
+		if !strings.HasPrefix(b.siteAddress, "http") {
+			b.siteAddress = "https://" + b.siteAddress
+		}
+
+		if !strings.HasSuffix(b.siteAddress, "/") {
+			b.siteAddress = strings.TrimSuffix(b.siteAddress, "/")
+		}
 	}
 
 	b.Jerkcity = jerkcity.New()

@@ -27,6 +27,7 @@ type BotOptions struct {
 	WebhookURL        string        `env:"BOT2_WEBHOOK_URL"`
 	DSN               string        `env:"BOT2_DSN"`
 	TopsterAddr       string        `env:"BOT2_TOPSTER_ADDR"`
+	SiteAddr          string        `env:"BOT2_SITE_ADDR"`
 	DBMaxAttempts     int           `env:"BOT2_DB_MAX_ATTEMPTS" envDefault:"10"`
 	DBTimeoutDuration time.Duration `env:"BOT2_DB_TIMEOUT_DURATION" envDefault:"20s"`
 }
@@ -131,6 +132,7 @@ func runBot() {
 		bot.WithWebhook(hook),
 		bot.WithDebug(opts.Debug),
 		bot.WithTopsterAddr(opts.TopsterAddr),
+		bot.WithSiteAddr(opts.SiteAddr),
 	)
 	if err != nil {
 		logger.Fatal("error creating bot", zap.Error(err))

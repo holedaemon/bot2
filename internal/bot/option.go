@@ -52,3 +52,10 @@ func WithWebhook(hook *webhook.Client) Option {
 		b.Webhook = hook
 	}
 }
+
+// WithSiteAddr sets a Bot's site address.
+func WithSiteAddr(site string) Option {
+	return func(b *Bot) {
+		b.siteAddress = site
+	}
+}

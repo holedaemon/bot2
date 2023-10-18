@@ -292,4 +292,52 @@ var commands = commandList{
 			},
 		},
 	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:           "tags",
+			Description:    "Commands for managing user-generated tags; think custom commands!",
+			NoDMPermission: true,
+			Options: discord.CommandOptions{
+				discord.NewSubcommandOption(
+					"create",
+					"Create a tag",
+					discord.NewStringOption("name", "Name of the tag", true),
+					discord.NewStringOption("content", "Content of the tag", true),
+				),
+				discord.NewSubcommandOption(
+					"update",
+					"Update a tag's content",
+					discord.NewStringOption("name", "Name of the tag", true),
+					discord.NewStringOption("content", "New content of the tag", true),
+				),
+				discord.NewSubcommandOption(
+					"rename",
+					"Rename a tag",
+					discord.NewStringOption("name", "Current name of the tag", true),
+					discord.NewStringOption("new-name", "New name of the tag", true),
+				),
+				discord.NewSubcommandOption(
+					"delete",
+					"Delete a tag",
+					discord.NewStringOption("name", "Name of the tag", true),
+				),
+				discord.NewSubcommandOption(
+					"list",
+					"Get a link to a list of tags for the guild",
+				),
+			},
+		},
+	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:           "tag",
+			Description:    "Query a tag",
+			NoDMPermission: true,
+			Options: discord.CommandOptions{
+				discord.NewStringOption("name", "Name of the tag", true),
+			},
+		},
+	},
 }
