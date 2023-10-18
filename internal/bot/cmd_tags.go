@@ -27,6 +27,10 @@ func (b *Bot) cmdTag(ctx context.Context, data cmdroute.CommandData) *api.Intera
 		return respondError("Name cannot be blank!!")
 	}
 
+	if len(name) > tagNameMaxLength {
+		return respondErrorf("Tag name cannot exceed %d characters in length", tagNameMaxLength)
+	}
+
 	name = strings.ToLower(name)
 
 	tag, err := modelsx.FetchTag(ctx, b.DB, data.Event.GuildID.String(), name)
