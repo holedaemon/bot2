@@ -18,6 +18,10 @@
             {
                 "name": "game <new-game>",
                 "description": "Set's DILF's playing status. Only allowed once per hour."
+            },
+            {
+                "name": "topster",
+                "description": "Create a 3x3 Topster chart using Last.fm data"
             }
         ]
     },
@@ -45,7 +49,7 @@
     },
     {
         "title": "ROLE",
-        "description": "User commands pertaining to vanity roles, AKA self-assignable roles. These replace the pronoun commands found in previous iterations of the bot. Roles must be created or imported by a server administrator before being assignable",
+        "description": "User commands pertaining to vanity roles, AKA self-assignable roles. These replace the pronoun commands found in previous iterations of the bot. Roles must be created or imported by a guild administrator before being assignable",
         "commands": [
             {
                 "name": "role add <role>",
@@ -63,7 +67,7 @@
     },
     {
         "title": "ROLES",
-        "description": "Moderator commands pertaining to vanity roles; under their own command because Discord sucks donkey balls. These commands require you to have the manage roles permission on the server",
+        "description": "Moderator commands pertaining to vanity roles; under their own command because Discord sucks donkey balls. These commands require you to have the manage roles permission on the guild",
         "commands": [
             {
                 "name": "roles create <name> [hex]",
@@ -71,7 +75,7 @@
             },
             {
                 "name": "roles delete <name>",
-                "description": "Delete a role from the server and database."
+                "description": "Delete a role from the guild and database."
             },
             {
                 "name": "roles rename <new-name>",
