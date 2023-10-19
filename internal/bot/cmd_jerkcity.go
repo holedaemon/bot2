@@ -38,7 +38,7 @@ func (b *Bot) cmdJerkcityEpisode(ctx context.Context, data cmdroute.CommandData)
 		return respondError("Something about the episode number you gave is wrong. Fix it.")
 	}
 
-	episode, err := b.Jerkcity.FetchEpisode(ctx, int(number))
+	episode, err := b.jerkcity.FetchEpisode(ctx, int(number))
 	if err != nil {
 		ctxlog.Error(ctx, "error fetching episode", zap.Error(err), zap.Int64("number", number))
 		return respondError("Sorry, something went wrong and I couldn't get that episode")
@@ -48,13 +48,13 @@ func (b *Bot) cmdJerkcityEpisode(ctx context.Context, data cmdroute.CommandData)
 }
 
 func (b *Bot) cmdJerkcityLatest(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	high, err := b.Jerkcity.FetchMeta(ctx)
+	high, err := b.jerkcity.FetchMeta(ctx)
 	if err != nil {
 		ctxlog.Error(ctx, "error fetching meta payload", zap.Error(err))
 		return respondError("Couldn't get the latest episode number. Sorry?")
 	}
 
-	episode, err := b.Jerkcity.FetchEpisode(ctx, high)
+	episode, err := b.jerkcity.FetchEpisode(ctx, high)
 	if err != nil {
 		ctxlog.Error(ctx, "error fetching latest episode", zap.Error(err))
 		return respondError("Couldn't get the latest episode. Sorry I guess")
@@ -64,7 +64,7 @@ func (b *Bot) cmdJerkcityLatest(ctx context.Context, data cmdroute.CommandData) 
 }
 
 func (b *Bot) cmdJerkcityRandom(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	episode, err := b.Jerkcity.FetchQuote(ctx)
+	episode, err := b.jerkcity.FetchQuote(ctx)
 	if err != nil {
 		ctxlog.Error(ctx, "error fetching episode", zap.Error(err))
 		return respondError("Sorry, something went wrong and I wasn't able to get an episode")
@@ -83,7 +83,7 @@ func (b *Bot) cmdJerkcitySearch(ctx context.Context, data cmdroute.CommandData) 
 	so := data.Options.Find("query")
 	search := so.String()
 
-	results, err := b.Jerkcity.FetchSearch(ctx, search)
+	results, err := b.jerkcity.FetchSearch(ctx, search)
 	if err != nil {
 		ctxlog.Error(ctx, "error searching jerkcity API", zap.Error(err))
 		return respondError("Something happened and I wasn't able to perform the search")

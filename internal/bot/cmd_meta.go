@@ -15,7 +15,7 @@ import (
 )
 
 func (b *Bot) cmdInfo(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	user, err := b.State.Me()
+	user, err := b.state.Me()
 	if err != nil {
 		ctxlog.Error(ctx, "error getting user", zap.Error(err))
 		return respondError("Sorry, I'm having an identity crisis")
@@ -56,7 +56,7 @@ func (b *Bot) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.Inter
 }
 
 func (b *Bot) cmdIsAdmin(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	if b.IsAdmin(data.Event.SenderID()) {
+	if b.isAdmin(data.Event.SenderID()) {
 		return respond("You are an admin")
 	}
 
@@ -64,7 +64,7 @@ func (b *Bot) cmdIsAdmin(ctx context.Context, data cmdroute.CommandData) *api.In
 }
 
 func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	if b.lastGameChange.Add(time.Hour).After(time.Now()) && !b.IsAdmin(data.Event.SenderID()) {
+	if b.lastGameChange.Add(time.Hour).After(time.Now()) && !b.isAdmin(data.Event.SenderID()) {
 		return respond("The game can only be changed once an hour")
 	}
 
@@ -77,7 +77,7 @@ func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.Inter
 		return respondError("Game can only be 128 characters in length")
 	}
 
-	if err := b.State.Gateway().Send(ctx, &gateway.UpdatePresenceCommand{
+	if err := b.state.Gateway().Send(ctx, &gateway.UpdatePresenceCommand{
 		Activities: []discord.Activity{{
 			Name: newGame,
 			Type: discord.GameActivity,
@@ -94,7 +94,7 @@ func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.Inter
 }
 
 func (b *Bot) cmdPanic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	if !b.IsAdmin(data.Event.SenderID()) {
+	if !b.isAdmin(data.Event.SenderID()) {
 		return respondError("I don't think so, weather man")
 	}
 

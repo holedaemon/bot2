@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"path"
 	"strings"
 	"time"
 
@@ -13,61 +12,58 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
-	"github.com/diamondburned/arikawa/v3/utils/sendpart"
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
-	"github.com/holedaemon/lastfm"
+	"github.com/holedaemon/bot2/internal/api/topster"
+	"github.com/holedaemon/bot2/internal/pkg/imagecache"
+	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 // Bot is a Discord bot account.
 type Bot struct {
-	Debug bool
+	debug bool
 
-	TopsterAddr string
+	topsterAddr string
 	siteAddress string
 
-	State   *state.State
-	Webhook *webhook.Client
-	Logger  *zap.Logger
+	state   *state.State
+	webhook *webhook.Client
+	logger  *zap.Logger
 
-	Lastfm   *lastfm.Client
-	Jerkcity *jerkcity.Client
-	DB       *sql.DB
+	jerkcity *jerkcity.Client
+	topster  *topster.Client
+	db       *sql.DB
 
-	Admins map[discord.UserID]struct{}
+	admins map[discord.UserID]struct{}
 
-	imageCache     *ImageCache
+	imageCache     *imagecache.Cache
 	lastGameChange time.Time
 }
 
 // New creates a new Bot.
 func New(token string, opts ...Option) (*Bot, error) {
-	b := &Bot{}
+	if token == "" {
+		return nil, fmt.Errorf("bot: token is blank")
+	}
+
+	b := &Bot{
+		jerkcity:   jerkcity.New(),
+		imageCache: imagecache.New(),
+		admins:     make(map[discord.UserID]struct{}),
+		state:      state.New("Bot " + token),
+	}
 
 	for _, o := range opts {
 		o(b)
 	}
 
-	if b.Logger == nil {
-		l, err := zap.NewProduction()
-		if err != nil {
-			return nil, fmt.Errorf("bot: creating logger: %w", err)
-		}
-
-		b.Logger = l
+	if b.logger == nil {
+		l := ctxlog.New(b.debug)
+		b.logger = l
 	}
 
-	if b.Webhook != nil {
-		b.Logger = b.Logger.WithOptions(
-			zap.Hooks(b.webhookHook),
-		)
-	}
-
-	if b.Admins == nil {
-		b.Admins = make(map[discord.UserID]struct{})
-	}
-
+	// required options
 	if b.siteAddress == "" {
 		return nil, fmt.Errorf("bot: site address is blank")
 	} else {
@@ -80,24 +76,53 @@ func New(token string, opts ...Option) (*Bot, error) {
 		}
 	}
 
-	b.Jerkcity = jerkcity.New()
-	b.imageCache = NewImageCache()
+	if b.db == nil {
+		return nil, fmt.Errorf("bot: db is nil")
+	}
 
-	b.State = state.New("Bot " + token)
-	b.State.AddHandler(b.onReady)
-	b.State.AddHandler(b.onGuildCreate)
-	b.State.AddHandler(b.onGuildUpdate)
-	b.State.AddHandler(b.onGuildRoleDelete)
-	b.State.AddHandler(b.onMessage)
-	b.State.AddHandler(b.onReconnect)
-	b.State.AddHandler(b.onMessageReactionAdd)
-	b.State.AddHandler(b.onMessageEdit)
+	// optional options
+	if b.webhook == nil {
+		b.logger.Warn("webhook logs have been disabled")
+	} else {
+		b.logger = b.logger.WithOptions(
+			zap.Hooks(b.webhookHook),
+		)
+	}
+
+	if len(b.admins) == 0 {
+		b.logger.Warn("no admins have been configured; admin-only commands are unusable")
+	}
+
+	if b.topsterAddr == "" {
+		b.logger.Warn("topster address has not been set; topster command is unusable")
+	} else {
+		if !strings.HasPrefix(b.topsterAddr, "http") {
+			b.topsterAddr = "https://" + b.topsterAddr
+		}
+
+		tp, err := topster.New(b.topsterAddr)
+		if err != nil {
+			return nil, fmt.Errorf("%w: creating topster client", err)
+		}
+
+		b.topster = tp
+	}
+
+	b.state = state.New("Bot " + token)
+	b.state.AddHandler(b.onReady)
+	b.state.AddHandler(b.onGuildCreate)
+	b.state.AddHandler(b.onGuildUpdate)
+	b.state.AddHandler(b.onGuildRoleDelete)
+	b.state.AddHandler(b.onMessage)
+	b.state.AddHandler(b.onReconnect)
+	b.state.AddHandler(b.onMessageReactionAdd)
+	b.state.AddHandler(b.onMessageEdit)
 
 	r := b.router()
-	b.State.AddInteractionHandler(r)
-	b.State.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages | gateway.IntentGuildMessageReactions)
+	b.state.AddInteractionHandler(r)
+	b.state.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages | gateway.IntentGuildMessageReactions)
 
-	if b.Debug {
+	if b.debug {
 		commands = commands.Scoped(testGuildID)
 	}
 
@@ -118,18 +143,18 @@ func New(token string, opts ...Option) (*Bot, error) {
 		}
 	}
 
-	app, err := b.State.CurrentApplication()
+	app, err := b.state.CurrentApplication()
 	if err != nil {
 		return nil, fmt.Errorf("bot: getting current application: %w", err)
 	}
 
 	for scope, cmd := range cmds {
 		if scope == 0 {
-			if _, err := b.State.BulkOverwriteCommands(app.ID, cmd); err != nil {
+			if _, err := b.state.BulkOverwriteCommands(app.ID, cmd); err != nil {
 				return nil, fmt.Errorf("bot: overwriting global commands: %w", err)
 			}
 		} else {
-			if _, err := b.State.BulkOverwriteGuildCommands(app.ID, scope, cmd); err != nil {
+			if _, err := b.state.BulkOverwriteGuildCommands(app.ID, scope, cmd); err != nil {
 				return nil, fmt.Errorf("bot: overwriting guild commands (%d): %w", scope, err)
 			}
 		}
@@ -138,22 +163,24 @@ func New(token string, opts ...Option) (*Bot, error) {
 	return b, nil
 }
 
-// IsAdmin checks if the given UserID is a bot admin.
-func (b *Bot) IsAdmin(sf discord.UserID) bool {
-	if _, ok := b.Admins[sf]; ok {
+// Start opens a connection to Discord and enables
+// the internal image cache's automatic deletion.
+func (b *Bot) Start(ctx context.Context) error {
+	go b.imageCache.Start()
+	defer b.imageCache.Stop()
+	return b.state.Connect(ctx)
+}
+
+func (b *Bot) isAdmin(sf discord.UserID) bool {
+	if _, ok := b.admins[sf]; ok {
 		return true
 	}
 
 	return false
 }
 
-// Start opens a connection to Discord.
-func (b *Bot) Start(ctx context.Context) error {
-	return b.State.Connect(ctx)
-}
-
 func (b *Bot) webhookHook(entry zapcore.Entry) error {
-	if b.Webhook == nil {
+	if b.webhook == nil {
 		return nil
 	}
 
@@ -167,52 +194,5 @@ func (b *Bot) webhookHook(entry zapcore.Entry) error {
 		Content:   entry.Message,
 	}
 
-	return b.Webhook.Execute(data)
-}
-
-func (b *Bot) Reply(m discord.Message, content string) error {
-	if content == "" {
-		panic("bot: blank content given to Reply")
-	}
-
-	_, err := b.State.SendMessageReply(m.ChannelID, content, m.ID)
-	return err
-}
-
-func (b *Bot) Replyf(m discord.Message, content string, args ...interface{}) error {
-	msg := fmt.Sprintf(content, args...)
-	return b.Reply(m, msg)
-}
-
-func (b *Bot) SendImage(chID discord.ChannelID, content string, image string) error {
-	cachedImage := b.imageCache.Get(image)
-	if cachedImage == nil {
-		err := b.imageCache.Download(image)
-		if err != nil {
-			return err
-		}
-
-		cachedImage = b.imageCache.Get(image)
-	}
-
-	rawName := path.Base(image)
-
-	files := make([]sendpart.File, 0)
-	files = append(files, sendpart.File{
-		Name:   rawName,
-		Reader: cachedImage,
-	})
-
-	_, err := b.State.SendMessageComplex(
-		chID,
-		api.SendMessageData{
-			Content: content,
-			Files:   files,
-		},
-	)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return b.webhook.Execute(data)
 }

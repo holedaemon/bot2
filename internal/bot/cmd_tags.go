@@ -33,7 +33,7 @@ func (b *Bot) cmdTag(ctx context.Context, data cmdroute.CommandData) *api.Intera
 
 	name = strings.ToLower(name)
 
-	tag, err := modelsx.FetchTag(ctx, b.DB, data.Event.GuildID.String(), name)
+	tag, err := modelsx.FetchTag(ctx, b.db, data.Event.GuildID.String(), name)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return respondError("There is no tag by that name in this guild!!")
@@ -66,7 +66,7 @@ func (b *Bot) cmdTagsCreate(ctx context.Context, data cmdroute.CommandData) *api
 			data.Event.GuildID.String(),
 			name,
 		),
-	).Exists(ctx, b.DB)
+	).Exists(ctx, b.db)
 	if err != nil {
 		ctxlog.Error(ctx, "error checking if tag exists", zap.Error(err))
 		return respondError("Uh uh uh, error checking if tag already exists!!")
@@ -84,7 +84,7 @@ func (b *Bot) cmdTagsCreate(ctx context.Context, data cmdroute.CommandData) *api
 		Content:   content,
 	}
 
-	if err := tag.Insert(ctx, b.DB, boil.Infer()); err != nil {
+	if err := tag.Insert(ctx, b.db, boil.Infer()); err != nil {
 		ctxlog.Error(ctx, "error inserting tag into database", zap.Error(err))
 		return respondError("Error inserting tag into database!!!")
 	}
@@ -103,7 +103,7 @@ func (b *Bot) cmdTagsUpdate(ctx context.Context, data cmdroute.CommandData) *api
 	name = strings.ToLower(name)
 	ctx = ctxlog.With(ctx, zap.String("trigger", name))
 
-	tag, err := modelsx.FetchTag(ctx, b.DB, data.Event.GuildID.String(), name)
+	tag, err := modelsx.FetchTag(ctx, b.db, data.Event.GuildID.String(), name)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return respondError("No tag by that name exists within this guild!!")
@@ -113,7 +113,7 @@ func (b *Bot) cmdTagsUpdate(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("Error getting tag from database!!!")
 	}
 
-	perms, err := b.State.Permissions(data.Event.ChannelID, data.Event.Member.User.ID)
+	perms, err := b.state.Permissions(data.Event.ChannelID, data.Event.Member.User.ID)
 	if err != nil {
 		ctxlog.Error(ctx, "error checking permissions for user", zap.String("user_id", data.Event.Member.User.ID.String()))
 		return respondError("Error reading your permissions...!")
@@ -123,7 +123,7 @@ func (b *Bot) cmdTagsUpdate(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("You lack permission to update this tag!!")
 	}
 
-	if err := modelsx.UpdateTagContent(ctx, b.DB, tag, content, data.Event.Member.User.Tag()); err != nil {
+	if err := modelsx.UpdateTagContent(ctx, b.db, tag, content, data.Event.Member.User.Tag()); err != nil {
 		ctxlog.Error(ctx, "error updating tag content", zap.Error(err))
 		return respondError("Error updating tag's content!!!")
 	}
@@ -147,7 +147,7 @@ func (b *Bot) cmdTagsRename(ctx context.Context, data cmdroute.CommandData) *api
 	newName = strings.ToLower(newName)
 	ctx = ctxlog.With(ctx, zap.String("trigger", name))
 
-	tag, err := modelsx.FetchTag(ctx, b.DB, data.Event.GuildID.String(), name)
+	tag, err := modelsx.FetchTag(ctx, b.db, data.Event.GuildID.String(), name)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return respondError("No tag by that name exists within this guild!!")
@@ -157,7 +157,7 @@ func (b *Bot) cmdTagsRename(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("Error getting tag from database!!!")
 	}
 
-	perms, err := b.State.Permissions(data.Event.ChannelID, data.Event.Member.User.ID)
+	perms, err := b.state.Permissions(data.Event.ChannelID, data.Event.Member.User.ID)
 	if err != nil {
 		ctxlog.Error(ctx, "error checking permissions for user", zap.String("user_id", data.Event.Member.User.ID.String()))
 		return respondError("Error reading your permissions...!")
@@ -167,7 +167,7 @@ func (b *Bot) cmdTagsRename(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("You lack permission to update this tag!!")
 	}
 
-	exists, err := models.Tags(qm.Where("guild_id = ? AND trigger = ?", data.Event.GuildID.String(), newName)).Exists(ctx, b.DB)
+	exists, err := models.Tags(qm.Where("guild_id = ? AND trigger = ?", data.Event.GuildID.String(), newName)).Exists(ctx, b.db)
 	if err != nil {
 		ctxlog.Error(ctx, "error checking if tag exists", zap.Error(err))
 		return respondError("Uh uh uh, error checking if tag already exists!!")
@@ -177,7 +177,7 @@ func (b *Bot) cmdTagsRename(ctx context.Context, data cmdroute.CommandData) *api
 		return respondErrorf("There is already a tag called `%s`", newName)
 	}
 
-	if err := modelsx.RenameTag(ctx, b.DB, tag, newName, data.Event.Member.User.Tag()); err != nil {
+	if err := modelsx.RenameTag(ctx, b.db, tag, newName, data.Event.Member.User.Tag()); err != nil {
 		ctxlog.Error(ctx, "error updating tag name", zap.Error(err))
 		return respondError("Error updating tag's name!!!")
 	}
@@ -194,7 +194,7 @@ func (b *Bot) cmdTagsDelete(ctx context.Context, data cmdroute.CommandData) *api
 	name = strings.ToLower(name)
 	ctx = ctxlog.With(ctx, zap.String("trigger", name))
 
-	tag, err := modelsx.FetchTag(ctx, b.DB, data.Event.GuildID.String(), name)
+	tag, err := modelsx.FetchTag(ctx, b.db, data.Event.GuildID.String(), name)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return respondError("A tag by that name doesn't exist in this guild!!")
@@ -203,7 +203,7 @@ func (b *Bot) cmdTagsDelete(ctx context.Context, data cmdroute.CommandData) *api
 		ctxlog.Error(ctx, "error fetching tag", zap.Error(err))
 	}
 
-	perms, err := b.State.Permissions(data.Event.ChannelID, data.Event.Member.User.ID)
+	perms, err := b.state.Permissions(data.Event.ChannelID, data.Event.Member.User.ID)
 	if err != nil {
 		ctxlog.Error(ctx, "error checking permissions for user", zap.String("user_id", data.Event.Member.User.ID.String()))
 		return respondError("Error reading your permissions...!")
@@ -213,7 +213,7 @@ func (b *Bot) cmdTagsDelete(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("You lack permission to update this tag!!")
 	}
 
-	if err := tag.Delete(ctx, b.DB); err != nil {
+	if err := tag.Delete(ctx, b.db); err != nil {
 		ctxlog.Error(ctx, "error deleting tag", zap.Error(err))
 		return respondError("Error deleting tag!!")
 	}
@@ -224,7 +224,7 @@ func (b *Bot) cmdTagsDelete(ctx context.Context, data cmdroute.CommandData) *api
 func (b *Bot) cmdTagsList(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	addr := fmt.Sprintf("%s/guild/%s/tags", b.siteAddress, data.Event.GuildID.String())
 
-	guild, err := b.State.Guild(data.Event.GuildID)
+	guild, err := b.state.Guild(data.Event.GuildID)
 	if err != nil {
 		ctxlog.Error(ctx, "error fetching guild", zap.Error(err), zap.String("guild_id", data.Event.GuildID.String()))
 		return respondError("There was an error fetching the guild :(")

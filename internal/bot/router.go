@@ -13,7 +13,7 @@ import (
 func (b *Bot) useRouter() cmdroute.Middleware {
 	return func(next cmdroute.InteractionHandler) cmdroute.InteractionHandler {
 		return cmdroute.InteractionHandlerFunc(func(ctx context.Context, ie *discord.InteractionEvent) *api.InteractionResponse {
-			ctx = ctxlog.WithLogger(ctx, b.Logger)
+			ctx = ctxlog.WithLogger(ctx, b.logger)
 			ctx = ctxlog.With(ctx, zap.String("guild_id", ie.GuildID.String()))
 			return next.HandleInteraction(ctx, ie)
 		})
@@ -23,7 +23,7 @@ func (b *Bot) useRouter() cmdroute.Middleware {
 func (b *Bot) router() *cmdroute.Router {
 	r := cmdroute.NewRouter()
 	r.Use(b.useRouter())
-	r.Use(cmdroute.Deferrable(b.State, cmdroute.DeferOpts{}))
+	r.Use(cmdroute.Deferrable(b.state, cmdroute.DeferOpts{}))
 
 	r.AddFunc("info", b.cmdInfo)
 	r.AddFunc("help", b.cmdInfo)

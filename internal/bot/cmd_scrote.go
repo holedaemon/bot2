@@ -19,7 +19,7 @@ func (b *Bot) cmdEgoraptorToggle(ctx context.Context, data cmdroute.CommandData)
 		return respondError("Error converting argument to boolean")
 	}
 
-	ego, err := modelsx.FetchMention(ctx, b.DB, data.Event.GuildID)
+	ego, err := modelsx.FetchMention(ctx, b.db, data.Event.GuildID)
 	if err != nil {
 		ctxlog.Error(ctx, "error querying for egoraptor mention", zap.Error(err))
 		return dbError
@@ -27,7 +27,7 @@ func (b *Bot) cmdEgoraptorToggle(ctx context.Context, data cmdroute.CommandData)
 
 	ego.TimeoutOnMention = toggled
 
-	if err := modelsx.UpsertMention(ctx, b.DB, ego); err != nil {
+	if err := modelsx.UpsertMention(ctx, b.db, ego); err != nil {
 		ctxlog.Error(ctx, "error upserting egoraptor mention", zap.Error(err))
 		return dbError
 	}
@@ -54,7 +54,7 @@ func (b *Bot) cmdEgoraptorSetTimeout(ctx context.Context, data cmdroute.CommandD
 		return respondError("The number of seconds cannot exceed a week")
 	}
 
-	ego, err := modelsx.FetchMention(ctx, b.DB, data.Event.GuildID)
+	ego, err := modelsx.FetchMention(ctx, b.db, data.Event.GuildID)
 	if err != nil {
 		ctxlog.Error(ctx, "error querying for egoraptor mention", zap.Error(err))
 		return dbError
@@ -62,7 +62,7 @@ func (b *Bot) cmdEgoraptorSetTimeout(ctx context.Context, data cmdroute.CommandD
 
 	ego.TimeoutLength = int(seconds)
 
-	if err := modelsx.UpsertMention(ctx, b.DB, ego); err != nil {
+	if err := modelsx.UpsertMention(ctx, b.db, ego); err != nil {
 		ctxlog.Error(ctx, "error upserting egoraptor mention", zap.Error(err))
 		return dbError
 	}

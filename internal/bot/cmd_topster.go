@@ -4,37 +4,18 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"encoding/json"
-	"net/http"
+	"errors"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
+	"github.com/holedaemon/bot2/internal/api/topster"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 )
 
-type topsterBody struct {
-	User            string  `json:"user"`
-	Period          string  `json:"period"`
-	Title           string  `json:"title"`
-	BackgroundColor string  `json:"background_color"`
-	TextColor       string  `json:"text_color"`
-	Gap             float64 `json:"gap"`
-	ShowNumbers     bool    `json:"show_numbers"`
-	ShowTitles      bool    `json:"show_titles"`
-}
-
-type topsterResponse struct {
-	Image string `json:"image"`
-}
-
-type topsterError struct {
-	Message string `json:"message"`
-}
-
 func (b *Bot) cmdTopster(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	if b.TopsterAddr == "" {
-		return respondError("The Topster command isn't configured correctly! Contact your administrator or something")
+	if b.topster == nil {
+		return respondError("The Topster command has been disabled! Contact your administrator if you feel this is a mistake.")
 	}
 
 	lastUser := data.Options.Find("lastfm-user").String()
@@ -59,55 +40,39 @@ func (b *Bot) cmdTopster(ctx context.Context, data cmdroute.CommandData) *api.In
 		return respondError("You must provide a last.fm user!!")
 	}
 
-	switch period {
-	case "overall", "7day", "1month", "3month", "6month", "12month":
-	case "":
-		period = "overall"
-	default:
-		return respondError("Period should be one of the following: overall, 7day, 1month, 3month, 6month, 12month")
+	opts := []topster.ChartOption{
+		topster.BackgroundColor(backgroundColor),
+		topster.TextColor(textColor),
+		topster.Title(title),
+		topster.Period(period),
+		topster.Gap(20),
 	}
 
-	opts := &topsterBody{
-		User:            lastUser,
-		Period:          period,
-		Title:           title,
-		BackgroundColor: backgroundColor,
-		TextColor:       textColor,
-		Gap:             20,
-		ShowNumbers:     showNumbers,
-		ShowTitles:      showTitles,
+	if showTitles {
+		opts = append(opts, topster.ShowTitles())
 	}
 
-	var input bytes.Buffer
-	if err := json.NewEncoder(&input).Encode(&opts); err != nil {
-		return respondError("Error encoding Topster options as JSON. How embarrassing...")
+	if showNumbers {
+		opts = append(opts, topster.ShowNumbers())
 	}
 
-	res, err := http.Post(b.TopsterAddr, "application/json", &input)
+	chart, err := b.topster.CreateChart(ctx, lastUser, opts...)
 	if err != nil {
-		ctxlog.Error(ctx, "error POSTing to topster addr", zap.Error(err))
-		return respondError("Error sending request to Topster!!")
-	}
-
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		var te *topsterError
-		if err := json.NewDecoder(res.Body).Decode(&te); err != nil {
-			ctxlog.Error(ctx, "error decoding json body", zap.Error(err))
-			return respondError("Oops! Something went wrong. Unable to decode Topster error into something readable...")
+		if errors.Is(err, topster.ErrChartOption) {
+			return respondErrorf("Your chart options are wrong: %s", err.Error())
 		}
 
-		return respondErrorf("Something went wrong, Topster says: %s", te.Message)
+		ctxlog.Error(ctx, "error creating topster chart", zap.Error(err))
+
+		switch err.(type) {
+		case *topster.Error:
+			return respondErrorf("Rut roh, something went wrong. Topster says: %s", err.Error())
+		default:
+			return respondError("Oops, an unknown error has occurred. Try again later.")
+		}
 	}
 
-	var tr *topsterResponse
-	if err := json.NewDecoder(res.Body).Decode(&tr); err != nil {
-		ctxlog.Error(ctx, "error decoding topster response", zap.Error(err))
-		return respondError("Error decoding the image sent by Topster...")
-	}
-
-	raw, err := base64.StdEncoding.DecodeString(tr.Image)
+	raw, err := base64.StdEncoding.DecodeString(chart)
 	if err != nil {
 		ctxlog.Error(ctx, "error decoding base64 into image", zap.Error(err))
 		return respondError("Error decoding Topster image from base64...")

@@ -1,6 +1,8 @@
 @charset "utf-8";
 
-$family-sans-serif: "Comic Sans MS", "Comic Sans", sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
+
+$family-sans-serif: "Comic Sans MS", "Comic Sans", "Comic Neue", sans-serif;
 
 @import "node_modules/bulma/sass/utilities/initial-variables.sass";
 

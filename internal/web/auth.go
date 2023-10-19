@@ -23,7 +23,7 @@ func (s *Server) authDiscord(w http.ResponseWriter, r *http.Request) {
 	state := uuid.Must(uuid.NewV4()).String()
 
 	s.stateCache.Set(state, true, ttlcache.DefaultTTL)
-	url := s.OAuth2.AuthCodeURL(state)
+	url := s.oauth2.AuthCodeURL(state)
 	http.Redirect(w, r, url, http.StatusSeeOther)
 }
 
@@ -41,7 +41,7 @@ func (s *Server) authDiscordCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tok, err := s.OAuth2.Exchange(ctx, r.FormValue("code"))
+	tok, err := s.oauth2.Exchange(ctx, r.FormValue("code"))
 	if err != nil {
 		ctxlog.Error(ctx, "error exchanging code", zap.Error(err))
 		s.errorPage(w, r, http.StatusBadRequest, "")
@@ -64,7 +64,7 @@ func (s *Server) authDiscordCallback(w http.ResponseWriter, r *http.Request) {
 		TokenType:    tok.TokenType,
 	}
 
-	if err := modelsx.UpsertDiscordToken(ctx, s.DB, dt); err != nil {
+	if err := modelsx.UpsertDiscordToken(ctx, s.db, dt); err != nil {
 		ctxlog.Error(ctx, "error upserting token", zap.Error(err))
 		s.errorPage(w, r, http.StatusInternalServerError, "")
 		return
