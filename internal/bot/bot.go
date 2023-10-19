@@ -93,6 +93,21 @@ func New(token string, opts ...Option) (*Bot, error) {
 		b.logger.Warn("no admins have been configured; admin-only commands are unusable")
 	}
 
+	if b.topsterAddr == "" {
+		b.logger.Warn("topster address has not been set; topster command is unusable")
+	} else {
+		if !strings.HasPrefix(b.topsterAddr, "http") {
+			b.topsterAddr = "https://" + b.topsterAddr
+		}
+
+		tp, err := topster.New(b.topsterAddr)
+		if err != nil {
+			return nil, fmt.Errorf("%w: creating topster client", err)
+		}
+
+		b.topster = tp
+	}
+
 	b.state = state.New("Bot " + token)
 	b.state.AddHandler(b.onReady)
 	b.state.AddHandler(b.onGuildCreate)
