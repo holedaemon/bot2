@@ -32,14 +32,14 @@ func (s *Server) notAuthorized(w http.ResponseWriter, r *http.Request, header bo
 
 // fetchToken retrieves a Discord token from the database, and refreshes it if necessary.
 func (s *Server) fetchToken(ctx context.Context, id string) (*models.DiscordToken, error) {
-	dt, err := modelsx.FetchToken(ctx, s.DB, id)
+	dt, err := modelsx.FetchToken(ctx, s.db, id)
 	if err != nil {
 		return nil, err
 	}
 
 	if dt.Expiry.Before(time.Now()) {
 		tok := modelsx.ModelToToken(dt)
-		src := s.OAuth2.TokenSource(ctx, tok)
+		src := s.oauth2.TokenSource(ctx, tok)
 		newTok, err := src.Token()
 		if err != nil {
 			return nil, err
@@ -51,7 +51,7 @@ func (s *Server) fetchToken(ctx context.Context, id string) (*models.DiscordToke
 			dt.TokenType = newTok.TokenType
 			dt.RefreshToken = newTok.RefreshToken
 
-			err = modelsx.UpsertDiscordToken(ctx, s.DB, dt)
+			err = modelsx.UpsertDiscordToken(ctx, s.db, dt)
 			if err != nil {
 				return nil, err
 			}

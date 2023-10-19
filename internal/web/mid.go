@@ -55,7 +55,7 @@ func (s *Server) guildCheck(next http.Handler) http.Handler {
 			return
 		}
 
-		exists, err := models.Guilds(qm.Where("guild_id = ?", gid)).Exists(ctx, s.DB)
+		exists, err := models.Guilds(qm.Where("guild_id = ?", gid)).Exists(ctx, s.db)
 		if err != nil {
 			ctxlog.Error(ctx, "error checking if guild exists", zap.Error(err))
 			s.errorPage(w, r, http.StatusInternalServerError, "")

@@ -37,7 +37,7 @@ func (t *quoteTime) UnmarshalJSON(b []byte) error {
 
 func (s *Server) adminAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if len(s.Admins) == 0 {
+		if len(s.admins) == 0 {
 			s.notAuthorized(w, r, false)
 			return
 		}
@@ -48,7 +48,7 @@ func (s *Server) adminAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		expected := s.Admins[user]
+		expected := s.admins[user]
 		if expected == "" || pass != expected {
 			s.notAuthorized(w, r, true)
 			return
@@ -139,7 +139,7 @@ func (s *Server) postAdminImportQuotes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	guild, err := modelsx.FetchGuild(ctx, s.DB, f.GuildID)
+	guild, err := modelsx.FetchGuild(ctx, s.db, f.GuildID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			respondf(w, "That guild isn't in the database!!! ")
@@ -156,7 +156,7 @@ func (s *Server) postAdminImportQuotes(w http.ResponseWriter, r *http.Request) {
 		reenable = true
 	}
 
-	if err := modelsx.ToggleGuildQuotes(ctx, s.DB, guild, false); err != nil {
+	if err := modelsx.ToggleGuildQuotes(ctx, s.db, guild, false); err != nil {
 		ctxlog.Error(ctx, "error updating guild record", zap.Error(err))
 		respondf(w, "error toggling quotes off on guild")
 		return
@@ -164,7 +164,7 @@ func (s *Server) postAdminImportQuotes(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
 		if reenable {
-			if err := modelsx.ToggleGuildQuotes(ctx, s.DB, guild, true); err != nil {
+			if err := modelsx.ToggleGuildQuotes(ctx, s.db, guild, true); err != nil {
 				ctxlog.Error(ctx, "error updating guild record", zap.Error(err))
 				respondf(w, "error toggling quotes off on guild")
 				return
@@ -179,7 +179,7 @@ func (s *Server) postAdminImportQuotes(w http.ResponseWriter, r *http.Request) {
 	err = models.Quotes(
 		qm.Where("guild_id = ?", f.GuildID),
 		qm.Select("max("+models.QuoteColumns.Num+") as max_num"),
-	).Bind(ctx, s.DB, &row)
+	).Bind(ctx, s.db, &row)
 	if err != nil {
 		ctxlog.Error(ctx, "error getting latest quote number from database", zap.Error(err))
 		respondf(w, "error getting latest quote number from database")
@@ -188,7 +188,7 @@ func (s *Server) postAdminImportQuotes(w http.ResponseWriter, r *http.Request) {
 
 	nextNum := row.MaxNum.Int + 1
 
-	tx, err := s.DB.BeginTx(ctx, nil)
+	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		ctxlog.Error(ctx, "error starting transaction", zap.Error(err))
 		respondf(w, "error starting transaction")
@@ -263,7 +263,7 @@ func (s *Server) postAdminUpdateQuotes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	guild, err := modelsx.FetchGuild(ctx, s.DB, f.GuildID)
+	guild, err := modelsx.FetchGuild(ctx, s.db, f.GuildID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			respondf(w, "That guild isn't in the database!!! ")
@@ -280,7 +280,7 @@ func (s *Server) postAdminUpdateQuotes(w http.ResponseWriter, r *http.Request) {
 		reenable = true
 	}
 
-	if err := modelsx.ToggleGuildQuotes(ctx, s.DB, guild, false); err != nil {
+	if err := modelsx.ToggleGuildQuotes(ctx, s.db, guild, false); err != nil {
 		ctxlog.Error(ctx, "error updating guild record", zap.Error(err))
 		respondf(w, "error toggling quotes off on guild")
 		return
@@ -288,7 +288,7 @@ func (s *Server) postAdminUpdateQuotes(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
 		if reenable {
-			if err := modelsx.ToggleGuildQuotes(ctx, s.DB, guild, true); err != nil {
+			if err := modelsx.ToggleGuildQuotes(ctx, s.db, guild, true); err != nil {
 				ctxlog.Error(ctx, "error updating guild record", zap.Error(err))
 				respondf(w, "error toggling quotes off on guild")
 				return
@@ -296,7 +296,7 @@ func (s *Server) postAdminUpdateQuotes(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	tx, err := s.DB.BeginTx(ctx, nil)
+	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		ctxlog.Error(ctx, "error starting transaction", zap.Error(err))
 		respondf(w, "error starting transaction")
@@ -373,7 +373,7 @@ func (s *Server) postAdminDeleteQuotes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	guild, err := modelsx.FetchGuild(ctx, s.DB, f.GuildID)
+	guild, err := modelsx.FetchGuild(ctx, s.db, f.GuildID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			respondf(w, "That guild isn't in the database!!! ")
@@ -390,7 +390,7 @@ func (s *Server) postAdminDeleteQuotes(w http.ResponseWriter, r *http.Request) {
 		reenable = true
 	}
 
-	if err := modelsx.ToggleGuildQuotes(ctx, s.DB, guild, false); err != nil {
+	if err := modelsx.ToggleGuildQuotes(ctx, s.db, guild, false); err != nil {
 		ctxlog.Error(ctx, "error updating guild record", zap.Error(err))
 		respondf(w, "error toggling quotes off on guild")
 		return
@@ -398,7 +398,7 @@ func (s *Server) postAdminDeleteQuotes(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
 		if reenable {
-			if err := modelsx.ToggleGuildQuotes(ctx, s.DB, guild, true); err != nil {
+			if err := modelsx.ToggleGuildQuotes(ctx, s.db, guild, true); err != nil {
 				ctxlog.Error(ctx, "error updating guild record", zap.Error(err))
 				respondf(w, "error toggling quotes off on guild")
 				return
@@ -406,7 +406,7 @@ func (s *Server) postAdminDeleteQuotes(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	tx, err := s.DB.BeginTx(ctx, nil)
+	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		ctxlog.Error(ctx, "error starting transaction", zap.Error(err))
 		respondf(w, "error starting transaction")

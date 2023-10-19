@@ -41,11 +41,11 @@ func init() {
 
 // Server is the HTTP server responsible for serving BOT/2's website.
 type Server struct {
-	Debug  bool
-	Addr   string
-	DB     *sql.DB
-	OAuth2 *oauth2.Config
-	Admins map[string]string
+	debug  bool
+	addr   string
+	db     *sql.DB
+	oauth2 *oauth2.Config
+	admins map[string]string
 
 	sessionManager *scs.SessionManager
 
@@ -60,27 +60,24 @@ func New(opts ...Option) (*Server, error) {
 		userCache: ttlcache.New[string, []string](
 			ttlcache.WithTTL[string, []string](5 * time.Minute),
 		),
+		admins: make(map[string]string),
 	}
 
 	for _, o := range opts {
 		o(srv)
 	}
 
-	if srv.DB == nil {
+	if srv.db == nil {
 		return nil, fmt.Errorf("web: missing db")
 	}
 
-	if srv.OAuth2 == nil {
+	if srv.oauth2 == nil {
 		return nil, fmt.Errorf("web: missing oauth2 config")
-	}
-
-	if srv.Admins == nil {
-		srv.Admins = make(map[string]string)
 	}
 
 	sm := scs.New()
 	sm.Cookie.Name = sessionName
-	sm.Cookie.Secure = !srv.Debug
+	sm.Cookie.Secure = !srv.debug
 	srv.sessionManager = sm
 
 	return srv, nil
@@ -125,12 +122,12 @@ func (s *Server) Run(ctx context.Context) error {
 	go s.stateCache.Start()
 	defer s.stateCache.Stop()
 
-	store := pgstore.New(s.DB)
+	store := pgstore.New(s.db)
 	store.Start(ctx)
 	s.sessionManager.Store = store
 
 	srv := &http.Server{
-		Addr:        s.Addr,
+		Addr:        s.addr,
 		Handler:     s.sessionManager.LoadAndSave(r),
 		BaseContext: func(l net.Listener) context.Context { return ctx },
 	}
@@ -191,7 +188,7 @@ func (s *Server) guilds(w http.ResponseWriter, r *http.Request) {
 
 	var guilds []*models.Guild
 
-	dbGuilds, err := models.Guilds().All(ctx, s.DB)
+	dbGuilds, err := models.Guilds().All(ctx, s.db)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			ctxlog.Error(ctx, "error fetching guilds", zap.Error(err))
@@ -237,7 +234,7 @@ func (s *Server) guild(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := chi.URLParam(r, "id")
 
-	guild, err := modelsx.FetchGuild(ctx, s.DB, id)
+	guild, err := modelsx.FetchGuild(ctx, s.db, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			s.errorPage(w, r, http.StatusNotFound, "")
@@ -258,7 +255,7 @@ func (s *Server) guildQuotes(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := chi.URLParam(r, "id")
 
-	guild, err := modelsx.FetchGuild(ctx, s.DB, id)
+	guild, err := modelsx.FetchGuild(ctx, s.db, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			s.errorPage(w, r, http.StatusNotFound, "")
@@ -269,7 +266,7 @@ func (s *Server) guildQuotes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	quotes, err := models.Quotes(qm.Where("guild_id = ?", id), qm.OrderBy("num")).All(ctx, s.DB)
+	quotes, err := models.Quotes(qm.Where("guild_id = ?", id), qm.OrderBy("num")).All(ctx, s.db)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			ctxlog.Error(ctx, "error fetching quotes", zap.Error(err))
@@ -288,7 +285,7 @@ func (s *Server) guildRoles(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := chi.URLParam(r, "id")
 
-	guild, err := modelsx.FetchGuild(ctx, s.DB, id)
+	guild, err := modelsx.FetchGuild(ctx, s.db, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			s.errorPage(w, r, http.StatusNotFound, "")
@@ -299,7 +296,7 @@ func (s *Server) guildRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roles, err := models.Roles(qm.Where("guild_id = ?", id)).All(ctx, s.DB)
+	roles, err := models.Roles(qm.Where("guild_id = ?", id)).All(ctx, s.db)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			ctxlog.Error(ctx, "error fetching roles", zap.Error(err))
@@ -318,7 +315,7 @@ func (s *Server) guildTags(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := chi.URLParam(r, "id")
 
-	guild, err := modelsx.FetchGuild(ctx, s.DB, id)
+	guild, err := modelsx.FetchGuild(ctx, s.db, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			s.errorPage(w, r, http.StatusNotFound, "")
@@ -329,7 +326,7 @@ func (s *Server) guildTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tags, err := models.Tags(qm.Where("guild_id = ?", id)).All(ctx, s.DB)
+	tags, err := models.Tags(qm.Where("guild_id = ?", id)).All(ctx, s.db)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			ctxlog.Error(ctx, "error fetching tags", zap.Error(err))
