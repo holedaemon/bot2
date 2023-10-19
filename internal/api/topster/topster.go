@@ -7,20 +7,20 @@ import (
 	"github.com/holedaemon/bot2/internal/pkg/httpx"
 )
 
-// Topster is an API client that interacts with a companion
+// Client is an API client that interacts with a companion
 // microgopster instance.
-type Topster struct {
+type Client struct {
 	addr   string
 	client *http.Client
 }
 
 // New creates a new Topster client.
-func New(addr string, opts ...Option) (*Topster, error) {
+func New(addr string, opts ...Option) (*Client, error) {
 	if addr == "" {
 		return nil, fmt.Errorf("topster: address is blank")
 	}
 
-	t := &Topster{
+	t := &Client{
 		addr: addr,
 	}
 

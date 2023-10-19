@@ -20,7 +20,7 @@ var ErrChartOption = errors.New("topster: invalid chart option")
 
 // CreateChart creates a chart using the configured microgopster instance
 // and returns it as a Base64 encoded string.
-func (t *Topster) CreateChart(ctx context.Context, user string, opts ...ChartOption) (string, error) {
+func (t *Client) CreateChart(ctx context.Context, user string, opts ...ChartOption) (string, error) {
 	if user == "" {
 		return "", fmt.Errorf("%w: user is blank", ErrChartOption)
 	}

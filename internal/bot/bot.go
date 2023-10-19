@@ -13,6 +13,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
+	"github.com/holedaemon/bot2/internal/api/topster"
 	"github.com/holedaemon/bot2/internal/pkg/imagecache"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
@@ -31,6 +32,7 @@ type Bot struct {
 	logger  *zap.Logger
 
 	jerkcity *jerkcity.Client
+	topster  *topster.Client
 	db       *sql.DB
 
 	admins map[discord.UserID]struct{}
