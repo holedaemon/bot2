@@ -59,9 +59,16 @@ func New(opts ...Option) *Cache {
 	return c
 }
 
-// Start begins deleting expired items from the cache.
+// Start enables the automatic deletion of expired items.
+// This method is blocking.
 func (c *Cache) Start() {
 	c.cache.Start()
+}
+
+// Stop disables the automatic deletion of expired items.
+// This method is blocking.
+func (c *Cache) Stop() {
+	c.cache.Stop()
 }
 
 func (c *Cache) download(ctx context.Context, url string) error {

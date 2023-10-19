@@ -13,6 +13,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
+	"github.com/holedaemon/bot2/internal/pkg/imagecache"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -34,7 +35,7 @@ type Bot struct {
 
 	admins map[discord.UserID]struct{}
 
-	imageCache     *ImageCache
+	imageCache     *imagecache.Cache
 	lastGameChange time.Time
 }
 
@@ -46,7 +47,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 
 	b := &Bot{
 		jerkcity:   jerkcity.New(),
-		imageCache: NewImageCache(),
+		imageCache: imagecache.New(),
 		admins:     make(map[discord.UserID]struct{}),
 		state:      state.New("Bot " + token),
 	}
@@ -145,8 +146,14 @@ func New(token string, opts ...Option) (*Bot, error) {
 	return b, nil
 }
 
-// Start opens a connection to Discord.
+// Start opens a connection to Discord and enables
+// the internal image cache's automatic deletion.
 func (b *Bot) Start(ctx context.Context) error {
+	go b.imageCache.Start()
+	go func() {
+		<-ctx.Done()
+		b.imageCache.Stop()
+	}()
 	return b.state.Connect(ctx)
 }
 

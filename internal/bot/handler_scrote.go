@@ -50,7 +50,7 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 		}
 
 		image := fakePNG("egopussy")
-		err = b.sendImage(m.ChannelID, content, image)
+		err = b.sendImage(ctx, m.ChannelID, content, image)
 		if err != nil {
 			ctxlog.Error(ctx, "error sending image", zap.Error(err))
 			return

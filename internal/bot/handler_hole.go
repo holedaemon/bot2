@@ -23,7 +23,7 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 		str := strconv.FormatInt(int64(idx), 10)
 		image := fakeGif("fortnite-" + str)
 
-		if err := b.sendImage(m.ChannelID, "", image); err != nil {
+		if err := b.sendImage(ctx, m.ChannelID, "", image); err != nil {
 			ctxlog.Error(ctx, "error sending image to channel", zap.Error(err))
 		}
 
@@ -40,7 +40,7 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 		}
 
 		if cache.Author.ID == m.Author.ID {
-			if err := b.sendImage(m.ChannelID, "", fakeJPG("snipes")); err != nil {
+			if err := b.sendImage(ctx, m.ChannelID, "", fakeJPG("snipes")); err != nil {
 				ctxlog.Error(ctx, "error sending image", zap.Error(err))
 			}
 			return
