@@ -20,7 +20,7 @@
                 "description": "Set's DILF's playing status. Only allowed once per hour."
             },
             {
-                "name": "topster",
+                "name": "topster <lastfm-user> [background-color] [text-color] [title] [period] [show-titles] [show-numbers]",
                 "description": "Create a 3x3 Topster chart using Last.fm data"
             }
         ]
@@ -44,6 +44,42 @@
             {
                 "name": "jerkcity search <query>",
                 "description": "Searches the Jerkcity API for the given query"
+            }
+        ]
+    },
+    {
+        "title": "TAG",
+        "description": "User command for querying tags",
+        "commands": [
+            {
+                "name": "tag <name>",
+                "description": "Query a tag"
+            }
+        ]
+    },
+    {
+        "title": "TAGS",
+        "description": "User commands pertaining to tags, AKA custom commands. These are not global, rather being specific to the current guild.",
+        "commands": [
+            {
+                "name": "tags create <name> <content>",
+                "description": "Create a tag"
+            },
+            {
+                "name": "tags update <name> <content>",
+                "description": "Update a tag"
+            },
+            {
+                "name": "tags rename <name> <new-name>",
+                "description": "Rename a tag"
+            },
+            {
+                "name": "tags delete <name>",
+                "description": "Delete a tag"
+            },
+            {
+                "name": "tags list",
+                "description": "Link to the guild tag list on the website"
             }
         ]
     },
