@@ -13,7 +13,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
-	"github.com/holedaemon/lastfm"
+	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -29,7 +29,6 @@ type Bot struct {
 	webhook *webhook.Client
 	logger  *zap.Logger
 
-	lastfm   *lastfm.Client
 	jerkcity *jerkcity.Client
 	db       *sql.DB
 
@@ -41,31 +40,27 @@ type Bot struct {
 
 // New creates a new Bot.
 func New(token string, opts ...Option) (*Bot, error) {
-	b := &Bot{}
+	if token == "" {
+		return nil, fmt.Errorf("bot: token is blank")
+	}
+
+	b := &Bot{
+		jerkcity:   jerkcity.New(),
+		imageCache: NewImageCache(),
+		admins:     make(map[discord.UserID]struct{}),
+		state:      state.New("Bot " + token),
+	}
 
 	for _, o := range opts {
 		o(b)
 	}
 
 	if b.logger == nil {
-		l, err := zap.NewProduction()
-		if err != nil {
-			return nil, fmt.Errorf("bot: creating logger: %w", err)
-		}
-
+		l := ctxlog.New(b.debug)
 		b.logger = l
 	}
 
-	if b.webhook != nil {
-		b.logger = b.logger.WithOptions(
-			zap.Hooks(b.webhookHook),
-		)
-	}
-
-	if b.admins == nil {
-		b.admins = make(map[discord.UserID]struct{})
-	}
-
+	// required options
 	if b.siteAddress == "" {
 		return nil, fmt.Errorf("bot: site address is blank")
 	} else {
@@ -78,8 +73,22 @@ func New(token string, opts ...Option) (*Bot, error) {
 		}
 	}
 
-	b.jerkcity = jerkcity.New()
-	b.imageCache = NewImageCache()
+	if b.db == nil {
+		return nil, fmt.Errorf("bot: db is nil")
+	}
+
+	// optional options
+	if b.webhook == nil {
+		b.logger.Warn("webhook logs have been disabled")
+	} else {
+		b.logger = b.logger.WithOptions(
+			zap.Hooks(b.webhookHook),
+		)
+	}
+
+	if len(b.admins) == 0 {
+		b.logger.Warn("no admins have been configured; admin-only commands are unusable")
+	}
 
 	b.state = state.New("Bot " + token)
 	b.state.AddHandler(b.onReady)

@@ -127,7 +127,6 @@ func runBot() {
 
 	b, err := bot.New(
 		opts.Token,
-		bot.WithAdminMap(admins),
 		bot.WithDB(db),
 		bot.WithWebhook(hook),
 		bot.WithDebug(opts.Debug),

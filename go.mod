@@ -12,7 +12,6 @@ require (
 	github.com/friendsofgo/errors v0.9.2
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/holedaemon/lastfm v0.0.0-20230919005730-e0aac0eef13c
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/jellydator/ttlcache/v3 v3.1.0
 	github.com/valyala/quicktemplate v1.7.0
@@ -27,7 +26,6 @@ require (
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

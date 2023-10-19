@@ -25,10 +25,14 @@ func WithLogger(l *zap.Logger) Option {
 	}
 }
 
-// WithAdminMap sets a Bot's admin map.
-func WithAdminMap(m map[discord.UserID]struct{}) Option {
+// WithAdmin adds an admin to the Bot.
+func WithAdmin(sf discord.UserID) Option {
 	return func(b *Bot) {
-		b.admins = m
+		if b.admins == nil {
+			b.admins = make(map[discord.UserID]struct{})
+		}
+
+		b.admins[sf] = struct{}{}
 	}
 }
 
