@@ -25,14 +25,16 @@ func WithLogger(l *zap.Logger) Option {
 	}
 }
 
-// WithAdmin adds an admin to the Bot.
-func WithAdmin(sf discord.UserID) Option {
+// WithAdmins adds one or more admins to the Bot.
+func WithAdmins(admins ...discord.UserID) Option {
 	return func(b *Bot) {
 		if b.admins == nil {
 			b.admins = make(map[discord.UserID]struct{})
 		}
 
-		b.admins[sf] = struct{}{}
+		for _, a := range admins {
+			b.admins[a] = struct{}{}
+		}
 	}
 }
 

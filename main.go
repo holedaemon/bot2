@@ -22,7 +22,7 @@ import (
 
 type BotOptions struct {
 	Debug             bool          `env:"BOT2_DEBUG" envDefault:"false"`
-	Admins            string        `env:"BOT2_ADMINS"`
+	Admins            []string      `env:"BOT2_ADMINS"`
 	Token             string        `env:"BOT2_TOKEN"`
 	WebhookURL        string        `env:"BOT2_WEBHOOK_URL"`
 	DSN               string        `env:"BOT2_DSN"`
@@ -78,19 +78,14 @@ func runBot() {
 	logger := ctxlog.New(opts.Debug)
 	ctx := ctxlog.WithLogger(context.Background(), logger)
 
-	rawAdmins := strings.Split(opts.Admins, ",")
-	admins := make(map[discord.UserID]struct{})
-	for _, a := range rawAdmins {
+	admins := make([]discord.UserID, 0)
+	for _, a := range opts.Admins {
 		sf, err := discord.ParseSnowflake(a)
 		if err != nil {
 			logger.Fatal("error parsing admin snowflake", zap.Error(err))
 		}
 
-		if _, ok := admins[discord.UserID(sf)]; ok {
-			continue
-		}
-
-		admins[discord.UserID(sf)] = struct{}{}
+		admins = append(admins, discord.UserID(sf))
 	}
 
 	var (
@@ -132,6 +127,7 @@ func runBot() {
 		bot.WithDebug(opts.Debug),
 		bot.WithTopsterAddr(opts.TopsterAddr),
 		bot.WithSiteAddr(opts.SiteAddr),
+		bot.WithAdmins(admins...),
 	)
 	if err != nil {
 		logger.Fatal("error creating bot", zap.Error(err))
