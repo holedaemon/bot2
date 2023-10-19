@@ -31,9 +31,9 @@ func renameRole(ctx context.Context, exec boil.ContextExecutor, role *models.Rol
 
 func (b *Bot) onGuildRoleDelete(e *gateway.GuildRoleDeleteEvent) {
 	ctx := context.Background()
-	log := b.Logger.With(zap.String("guild_id", e.GuildID.String()))
+	log := b.logger.With(zap.String("guild_id", e.GuildID.String()))
 
-	exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", e.GuildID.String(), e.RoleID.String())).Exists(ctx, b.DB)
+	exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", e.GuildID.String(), e.RoleID.String())).Exists(ctx, b.db)
 	if err != nil {
 		log.Error("error checking for role", zap.Error(err))
 		return
@@ -45,7 +45,7 @@ func (b *Bot) onGuildRoleDelete(e *gateway.GuildRoleDeleteEvent) {
 
 	log.Info("tracked role has been deleted on Discord, deleting from database...", zap.String("role_id", e.RoleID.String()))
 
-	if err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", e.GuildID.String(), e.RoleID.String())).DeleteAll(ctx, b.DB); err != nil {
+	if err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", e.GuildID.String(), e.RoleID.String())).DeleteAll(ctx, b.db); err != nil {
 		log.Error("error deleting role", zap.Error(err))
 		return
 	}
@@ -76,7 +76,7 @@ func (b *Bot) cmdRoleCreate(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("Unable to parse argument as a boolean")
 	}
 
-	r, err := b.State.CreateRole(data.Event.GuildID, api.CreateRoleData{
+	r, err := b.state.CreateRole(data.Event.GuildID, api.CreateRoleData{
 		Name:        name,
 		Hoist:       hoisted,
 		Mentionable: true,
@@ -93,8 +93,8 @@ func (b *Bot) cmdRoleCreate(ctx context.Context, data cmdroute.CommandData) *api
 		RoleID:   r.ID.String(),
 	}
 
-	if err := role.Insert(ctx, b.DB, boil.Infer()); err != nil {
-		if err := b.State.DeleteRole(data.Event.GuildID, r.ID, "rolling back"); err != nil {
+	if err := role.Insert(ctx, b.db, boil.Infer()); err != nil {
+		if err := b.state.DeleteRole(data.Event.GuildID, r.ID, "rolling back"); err != nil {
 			ctxlog.Error(ctx, "error deleting role from Discord", zap.Error(err))
 		}
 
@@ -110,7 +110,7 @@ func (b *Bot) cmdRoleDelete(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("Unable to convert the given argument into a snowflake")
 	}
 
-	role, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).One(ctx, b.DB)
+	role, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).One(ctx, b.db)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return respondError("I'm not tracking a role with that ID")
@@ -120,12 +120,12 @@ func (b *Bot) cmdRoleDelete(ctx context.Context, data cmdroute.CommandData) *api
 		return dbError
 	}
 
-	if err := role.Delete(ctx, b.DB); err != nil {
+	if err := role.Delete(ctx, b.db); err != nil {
 		ctxlog.Error(ctx, "error deleting role", zap.Error(err))
 		return dbError
 	}
 
-	if err := b.State.DeleteRole(data.Event.GuildID, discord.RoleID(sf), "Deletion requested"); err != nil {
+	if err := b.state.DeleteRole(data.Event.GuildID, discord.RoleID(sf), "Deletion requested"); err != nil {
 		ctxlog.Error(ctx, "error deleting role", zap.Error(err))
 		return respondError("The API got mad at me when I tried to delete the role")
 	}
@@ -137,7 +137,7 @@ func (b *Bot) cmdRoleRelinquish(ctx context.Context, data cmdroute.CommandData) 
 	roles := make([]string, 0)
 	removed := make(map[discord.Snowflake]struct{})
 
-	tx, err := b.DB.BeginTx(ctx, nil)
+	tx, err := b.db.BeginTx(ctx, nil)
 	if err != nil {
 		ctxlog.Error(ctx, "error beginning transaction", zap.Error(err))
 		return dbError
@@ -211,7 +211,7 @@ func (b *Bot) cmdRoleAdd(ctx context.Context, data cmdroute.CommandData) *api.In
 		return respondError("The role you gave me sucks")
 	}
 
-	exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).Exists(ctx, b.DB)
+	exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).Exists(ctx, b.db)
 	if err != nil {
 		ctxlog.Error(ctx, "error querying role", zap.Error(err))
 		return dbError
@@ -221,7 +221,7 @@ func (b *Bot) cmdRoleAdd(ctx context.Context, data cmdroute.CommandData) *api.In
 		return respondError("I'm not tracking that role")
 	}
 
-	if err := b.State.AddRole(data.Event.GuildID, data.Event.SenderID(), discord.RoleID(sf), api.AddRoleData{
+	if err := b.state.AddRole(data.Event.GuildID, data.Event.SenderID(), discord.RoleID(sf), api.AddRoleData{
 		AuditLogReason: "Vanity role requested",
 	}); err != nil {
 		ctxlog.Error(ctx, "error adding role to user", zap.Error(err))
@@ -237,7 +237,7 @@ func (b *Bot) cmdRoleRemove(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("The role you gave me sucks")
 	}
 
-	exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).Exists(ctx, b.DB)
+	exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).Exists(ctx, b.db)
 	if err != nil {
 		ctxlog.Error(ctx, "error querying role", zap.Error(err))
 		return dbError
@@ -247,7 +247,7 @@ func (b *Bot) cmdRoleRemove(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("I'm not tracking that role in my database")
 	}
 
-	if err := b.State.RemoveRole(data.Event.GuildID, data.Event.SenderID(), discord.RoleID(sf), "Requested vanity role removal"); err != nil {
+	if err := b.state.RemoveRole(data.Event.GuildID, data.Event.SenderID(), discord.RoleID(sf), "Requested vanity role removal"); err != nil {
 		ctxlog.Error(ctx, "error removing role from user", zap.Error(err))
 		return respondError("Something happened when I tried removing that role from you")
 	}
@@ -266,7 +266,7 @@ func (b *Bot) cmdRoleRename(ctx context.Context, data cmdroute.CommandData) *api
 		return respondError("You gotta give me a new name to use!")
 	}
 
-	role, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).One(ctx, b.DB)
+	role, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), sf.String())).One(ctx, b.db)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return respondError("I'm not tracking a role by that ID!")
@@ -276,14 +276,14 @@ func (b *Bot) cmdRoleRename(ctx context.Context, data cmdroute.CommandData) *api
 		return dbError
 	}
 
-	if _, err := b.State.ModifyRole(data.Event.GuildID, discord.RoleID(sf), api.ModifyRoleData{
+	if _, err := b.state.ModifyRole(data.Event.GuildID, discord.RoleID(sf), api.ModifyRoleData{
 		Name: option.NewNullableString(newName),
 	}); err != nil {
 		ctxlog.Error(ctx, "error updating role", zap.Error(err))
 		return respondError("The API got mad at me when I tried updating the role")
 	}
 
-	if err := renameRole(ctx, b.DB, role, newName); err != nil {
+	if err := renameRole(ctx, b.db, role, newName); err != nil {
 		ctxlog.Error(ctx, "error updating role", zap.Error(err))
 		return dbError
 	}
@@ -300,7 +300,7 @@ func (b *Bot) cmdRoleSetColor(ctx context.Context, data cmdroute.CommandData) *a
 
 	role := discord.RoleID(sf)
 
-	exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), role)).Exists(ctx, b.DB)
+	exists, err := models.Roles(qm.Where("guild_id = ? AND role_id = ?", data.Event.GuildID.String(), role)).Exists(ctx, b.db)
 	if err != nil {
 		ctxlog.Error(ctx, "error querying role", zap.Error(err))
 		return dbError
@@ -318,7 +318,7 @@ func (b *Bot) cmdRoleSetColor(ctx context.Context, data cmdroute.CommandData) *a
 		return respondError("The \"color\" you provided is invalid")
 	}
 
-	if _, err := b.State.ModifyRole(data.Event.GuildID, role, api.ModifyRoleData{
+	if _, err := b.state.ModifyRole(data.Event.GuildID, role, api.ModifyRoleData{
 		Color: discord.Color(int32(i)),
 	}); err != nil {
 		ctxlog.Error(ctx, "error modifying role", zap.Error(err))
@@ -332,7 +332,7 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 	roles := make([]string, 0)
 	added := make(map[discord.Snowflake]struct{})
 
-	tx, err := b.DB.BeginTx(ctx, nil)
+	tx, err := b.db.BeginTx(ctx, nil)
 	if err != nil {
 		ctxlog.Error(ctx, "error beginning transaction", zap.Error(err))
 		return dbError
@@ -365,7 +365,7 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 			continue
 		}
 
-		discordRole, err := b.State.Role(data.Event.GuildID, discord.RoleID(sf))
+		discordRole, err := b.state.Role(data.Event.GuildID, discord.RoleID(sf))
 		if err != nil {
 			ctxlog.Error(ctx, "error fetching role from Discord")
 			return respondError("Error fetching role from Discord!!!")
@@ -413,7 +413,7 @@ func (b *Bot) cmdRoleImport(ctx context.Context, data cmdroute.CommandData) *api
 }
 
 func (b *Bot) cmdRoleList(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	roles, err := models.Roles(qm.Where("guild_id = ?", data.Event.GuildID.String())).All(ctx, b.DB)
+	roles, err := models.Roles(qm.Where("guild_id = ?", data.Event.GuildID.String())).All(ctx, b.db)
 	if err != nil {
 		ctxlog.Error(ctx, "error querying roles", zap.Error(err))
 		return dbError
@@ -432,7 +432,7 @@ func (b *Bot) cmdRoleList(ctx context.Context, data cmdroute.CommandData) *api.I
 			return respondError("Unable to convert role ID into snowflake")
 		}
 
-		role, err := b.State.Role(data.Event.GuildID, discord.RoleID(sf))
+		role, err := b.state.Role(data.Event.GuildID, discord.RoleID(sf))
 		if err != nil {
 			ctxlog.Error(ctx, "error retrieving role from cabinet", zap.Error(err))
 			return respondError("Unable to retrieve role from internal cache")
@@ -450,7 +450,7 @@ func (b *Bot) cmdRoleList(ctx context.Context, data cmdroute.CommandData) *api.I
 }
 
 func (b *Bot) cmdRoleFix(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	tx, err := b.DB.BeginTx(ctx, nil)
+	tx, err := b.db.BeginTx(ctx, nil)
 	if err != nil {
 		ctxlog.Error(ctx, "error starting transaction", zap.Error(err))
 		return dbError
@@ -481,7 +481,7 @@ func (b *Bot) cmdRoleFix(ctx context.Context, data cmdroute.CommandData) *api.In
 			return respond("Error parsing snowflake from role_id???")
 		}
 
-		discordRole, err := b.State.Role(data.Event.GuildID, discord.RoleID(sf))
+		discordRole, err := b.state.Role(data.Event.GuildID, discord.RoleID(sf))
 		if err != nil {
 			ctxlog.Error(ctx, "error fetching role from Discord", zap.Error(err))
 			return respond("Error fetching role from Discord xD")

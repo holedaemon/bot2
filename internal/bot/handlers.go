@@ -16,18 +16,18 @@ import (
 )
 
 func (b *Bot) onReady(r *gateway.ReadyEvent) {
-	b.Logger.Info("connected to Discord gateway", zap.Any("user_id", r.User.ID))
+	b.logger.Info("connected to Discord gateway", zap.Any("user_id", r.User.ID))
 }
 
 func (b *Bot) onReconnect(r *gateway.ReconnectEvent) {
-	b.Logger.Info("reconnected to Discord gateway")
+	b.logger.Info("reconnected to Discord gateway")
 }
 
 func (b *Bot) onGuildCreate(g *gateway.GuildCreateEvent) {
 	ctx := context.Background()
-	log := b.Logger.With(zap.String("guild_id", g.ID.String()))
+	log := b.logger.With(zap.String("guild_id", g.ID.String()))
 
-	guild, err := modelsx.FetchGuild(ctx, b.DB, g.ID.String())
+	guild, err := modelsx.FetchGuild(ctx, b.db, g.ID.String())
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			log.Error("error querying guild", zap.Error(err))
@@ -50,7 +50,7 @@ func (b *Bot) onGuildCreate(g *gateway.GuildCreateEvent) {
 		if len(whitelist) > 0 {
 			whitelist = append(whitelist, models.GuildColumns.UpdatedAt)
 
-			if err := guild.Update(ctx, b.DB, boil.Whitelist(whitelist...)); err != nil {
+			if err := guild.Update(ctx, b.db, boil.Whitelist(whitelist...)); err != nil {
 				log.Error("error fixing guild", zap.Error(err))
 				return
 			}
@@ -67,7 +67,7 @@ func (b *Bot) onGuildCreate(g *gateway.GuildCreateEvent) {
 		QuotesRequiredReactions: null.IntFrom(1),
 	}
 
-	if err := guild.Insert(ctx, b.DB, boil.Infer()); err != nil {
+	if err := guild.Insert(ctx, b.db, boil.Infer()); err != nil {
 		log.Error("error inserting guild into database", zap.Error(err))
 		return
 	}
@@ -77,11 +77,11 @@ func (b *Bot) onGuildCreate(g *gateway.GuildCreateEvent) {
 
 func (b *Bot) onGuildUpdate(g *gateway.GuildUpdateEvent) {
 	ctx := context.Background()
-	log := b.Logger.With(zap.String("guild_id", g.ID.String()))
+	log := b.logger.With(zap.String("guild_id", g.ID.String()))
 
 	log.Info("guild settings have changed")
 
-	guild, err := modelsx.FetchGuild(ctx, b.DB, g.ID.String())
+	guild, err := modelsx.FetchGuild(ctx, b.db, g.ID.String())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			ctxlog.Error(ctx, "received update for guild we aren't tracking...")
@@ -97,7 +97,7 @@ func (b *Bot) onGuildUpdate(g *gateway.GuildUpdateEvent) {
 	}
 
 	guild.GuildName = g.Name
-	if err := guild.Update(ctx, b.DB, boil.Whitelist(models.GuildColumns.GuildName, models.GuildColumns.UpdatedAt)); err != nil {
+	if err := guild.Update(ctx, b.db, boil.Whitelist(models.GuildColumns.GuildName, models.GuildColumns.UpdatedAt)); err != nil {
 		ctxlog.Error(ctx, "error updating guild", zap.Error(err))
 		return
 	}
@@ -109,7 +109,7 @@ func (b *Bot) onMessage(m *gateway.MessageCreateEvent) {
 	}
 
 	ctx := context.Background()
-	ctx = ctxlog.WithLogger(ctx, b.Logger)
+	ctx = ctxlog.WithLogger(ctx, b.logger)
 	ctx = ctxlog.With(ctx, zap.String("guild_id", m.GuildID.String()))
 
 	if m.GuildID == holeGuildID {

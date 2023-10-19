@@ -15,7 +15,7 @@ import (
 )
 
 func (b *Bot) cmdInfo(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	user, err := b.State.Me()
+	user, err := b.state.Me()
 	if err != nil {
 		ctxlog.Error(ctx, "error getting user", zap.Error(err))
 		return respondError("Sorry, I'm having an identity crisis")
@@ -77,7 +77,7 @@ func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.Inter
 		return respondError("Game can only be 128 characters in length")
 	}
 
-	if err := b.State.Gateway().Send(ctx, &gateway.UpdatePresenceCommand{
+	if err := b.state.Gateway().Send(ctx, &gateway.UpdatePresenceCommand{
 		Activities: []discord.Activity{{
 			Name: newGame,
 			Type: discord.GameActivity,

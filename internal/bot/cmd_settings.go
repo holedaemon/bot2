@@ -22,7 +22,7 @@ func (b *Bot) cmdSettingsQuotesToggle(ctx context.Context, data cmdroute.Command
 		return respondError("Error parsing bool value, oops")
 	}
 
-	guild, err := modelsx.FetchGuild(ctx, b.DB, data.Event.GuildID.String())
+	guild, err := modelsx.FetchGuild(ctx, b.db, data.Event.GuildID.String())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			ctxlog.Warn(ctx, "guild does not have record present in database")
@@ -34,7 +34,7 @@ func (b *Bot) cmdSettingsQuotesToggle(ctx context.Context, data cmdroute.Command
 	}
 
 	guild.DoQuotes = val
-	if err := guild.Update(ctx, b.DB, boil.Whitelist(models.GuildColumns.DoQuotes, models.GuildColumns.UpdatedAt)); err != nil {
+	if err := guild.Update(ctx, b.db, boil.Whitelist(models.GuildColumns.DoQuotes, models.GuildColumns.UpdatedAt)); err != nil {
 		ctxlog.Error(ctx, "error updating guild record", zap.Error(err))
 		return dbError
 	}
@@ -61,7 +61,7 @@ func (b *Bot) cmdSettingsQuotesSetMinRequired(ctx context.Context, data cmdroute
 		return respondError("Your value must be less than or equal to 10")
 	}
 
-	guild, err := modelsx.FetchGuild(ctx, b.DB, data.Event.GuildID.String())
+	guild, err := modelsx.FetchGuild(ctx, b.db, data.Event.GuildID.String())
 	if err != nil {
 		ctxlog.Error(ctx, "error fetching guild from database", zap.Error(err))
 		return dbError
@@ -70,7 +70,7 @@ func (b *Bot) cmdSettingsQuotesSetMinRequired(ctx context.Context, data cmdroute
 	newVal := int(val)
 
 	guild.QuotesRequiredReactions = null.IntFrom(newVal)
-	if err := guild.Update(ctx, b.DB, boil.Whitelist(models.GuildColumns.UpdatedAt, models.GuildColumns.QuotesRequiredReactions)); err != nil {
+	if err := guild.Update(ctx, b.db, boil.Whitelist(models.GuildColumns.UpdatedAt, models.GuildColumns.QuotesRequiredReactions)); err != nil {
 		ctxlog.Error(ctx, "error updating guild record in database", zap.Error(err))
 		return dbError
 	}

@@ -38,9 +38,9 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 	}
 
 	ctx := context.Background()
-	log := b.Logger.With(zap.String("guild_id", ev.GuildID.String()))
+	log := b.logger.With(zap.String("guild_id", ev.GuildID.String()))
 
-	guild, err := modelsx.FetchGuild(ctx, b.DB, ev.GuildID.String())
+	guild, err := modelsx.FetchGuild(ctx, b.db, ev.GuildID.String())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			log.Warn("database record not found for guild")
@@ -54,7 +54,7 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 		return
 	}
 
-	exists, err := models.Quotes(qm.Where("message_id = ?", ev.MessageID.String())).Exists(ctx, b.DB)
+	exists, err := models.Quotes(qm.Where("message_id = ?", ev.MessageID.String())).Exists(ctx, b.db)
 	if err != nil {
 		log.Error("error checking if quote exists", zap.Error(err))
 		return
@@ -64,7 +64,7 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 		return
 	}
 
-	msg, err := b.State.Message(ev.ChannelID, ev.MessageID)
+	msg, err := b.state.Message(ev.ChannelID, ev.MessageID)
 	if err != nil {
 		log.Error("error retrieving quoted message", zap.Error(err))
 		return
@@ -74,7 +74,7 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 		return
 	}
 
-	userReactions, err := b.State.Reactions(ev.ChannelID, ev.MessageID, ev.Emoji.APIString(), 0)
+	userReactions, err := b.state.Reactions(ev.ChannelID, ev.MessageID, ev.Emoji.APIString(), 0)
 	if err != nil {
 		log.Error("error fetching user reactions", zap.Error(err))
 		return
@@ -105,7 +105,7 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 	err = models.Quotes(
 		qm.Where("guild_id = ?", ev.GuildID.String()),
 		qm.Select("max("+models.QuoteColumns.Num+") as max_num"),
-	).Bind(ctx, b.DB, &row)
+	).Bind(ctx, b.db, &row)
 	if err != nil {
 		log.Error("error getting latest quote number from database", zap.Error(err))
 		return
@@ -124,12 +124,12 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 		Num:            nextNum,
 	}
 
-	if err := quote.Insert(ctx, b.DB, boil.Infer()); err != nil {
+	if err := quote.Insert(ctx, b.db, boil.Infer()); err != nil {
 		log.Error("error inserting quote", zap.Error(err))
 		return
 	}
 
-	if err := b.State.React(msg.ChannelID, msg.ID, discord.APIEmoji("💬")); err != nil {
+	if err := b.state.React(msg.ChannelID, msg.ID, discord.APIEmoji("💬")); err != nil {
 		log.Error("error adding reaction", zap.Error(err))
 	}
 
@@ -140,16 +140,16 @@ func (b *Bot) onMessageReactionAdd(ev *gateway.MessageReactionAddEvent) {
 		jumpLink(ev.GuildID, ev.ChannelID, ev.MessageID),
 	)
 
-	if _, err := b.State.SendMessage(ev.ChannelID, response); err != nil {
+	if _, err := b.state.SendMessage(ev.ChannelID, response); err != nil {
 		log.Error("error sending quote message", zap.Error(err))
 	}
 }
 
 func (b *Bot) onMessageEdit(e *gateway.MessageUpdateEvent) {
 	ctx := context.Background()
-	log := b.Logger.With(zap.String("guild_id", e.GuildID.String()), zap.String("message_id", e.ID.String()))
+	log := b.logger.With(zap.String("guild_id", e.GuildID.String()), zap.String("message_id", e.ID.String()))
 
-	quote, err := models.Quotes(qm.Where("message_id = ?", e.ID.String())).One(ctx, b.DB)
+	quote, err := models.Quotes(qm.Where("message_id = ?", e.ID.String())).One(ctx, b.db)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return
@@ -160,7 +160,7 @@ func (b *Bot) onMessageEdit(e *gateway.MessageUpdateEvent) {
 	}
 
 	quote.Quote = e.Content
-	if err := quote.Update(ctx, b.DB, boil.Whitelist(models.QuoteColumns.Quote, models.QuoteColumns.UpdatedAt)); err != nil {
+	if err := quote.Update(ctx, b.db, boil.Whitelist(models.QuoteColumns.Quote, models.QuoteColumns.UpdatedAt)); err != nil {
 		log.Error("error updating quote", zap.Error(err))
 	}
 }
@@ -185,7 +185,7 @@ func (b *Bot) cmdQ(ctx context.Context, data cmdroute.CommandData) *api.Interact
 		return respondError("The index provided is malformed")
 	}
 
-	guild, err := modelsx.FetchGuild(ctx, b.DB, data.Event.GuildID.String())
+	guild, err := modelsx.FetchGuild(ctx, b.db, data.Event.GuildID.String())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			ctxlog.Warn(ctx, "database record does not exist for guild")
@@ -203,7 +203,7 @@ func (b *Bot) cmdQ(ctx context.Context, data cmdroute.CommandData) *api.Interact
 		quote, err := models.Quotes(
 			qm.Where("guild_id = ?", data.Event.GuildID.String()),
 			qm.Where("num = ?", idx),
-		).One(ctx, b.DB)
+		).One(ctx, b.db)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return respond("No quote at the requested index")
@@ -228,7 +228,7 @@ func (b *Bot) cmdQ(ctx context.Context, data cmdroute.CommandData) *api.Interact
 			qm.Where("guild_id = ?", data.Event.GuildID.String()),
 			qm.Where("quoted_id = ?", user.String()),
 			qm.OrderBy("random()"),
-		).One(ctx, b.DB)
+		).One(ctx, b.db)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return respond("There aren't any quotes by that user. They should try being funny")
@@ -245,7 +245,7 @@ func (b *Bot) cmdQ(ctx context.Context, data cmdroute.CommandData) *api.Interact
 	quote, err := models.Quotes(
 		qm.Where("guild_id = ?", data.Event.GuildID.String()),
 		qm.OrderBy("random()"),
-	).One(ctx, b.DB)
+	).One(ctx, b.db)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return respond("No quotes found. Sad")
@@ -269,7 +269,7 @@ func (b *Bot) cmdQuoteDelete(ctx context.Context, data cmdroute.CommandData) *ap
 	quote, err := models.Quotes(
 		qm.Where("num = ?", index),
 		qm.Where("guild_id = ?", data.Event.GuildID.String()),
-	).One(ctx, b.DB)
+	).One(ctx, b.db)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return respond("There isn't a quote at that index, doofus")
@@ -279,7 +279,7 @@ func (b *Bot) cmdQuoteDelete(ctx context.Context, data cmdroute.CommandData) *ap
 		return dbError
 	}
 
-	if err := quote.Delete(ctx, b.DB); err != nil {
+	if err := quote.Delete(ctx, b.db); err != nil {
 		ctxlog.Error(ctx, "error deleting quote", zap.Error(err))
 		return dbError
 	}

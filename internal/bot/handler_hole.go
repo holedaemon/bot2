@@ -51,7 +51,7 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 		dur := time.Now().Add(tilDur)
 		ts := discord.NewTimestamp(dur)
 
-		if err := b.State.ModifyMember(m.GuildID, cache.Author.ID, api.ModifyMemberData{
+		if err := b.state.ModifyMember(m.GuildID, cache.Author.ID, api.ModifyMemberData{
 			CommunicationDisabledUntil: &ts,
 		}); err != nil {
 			er := err.(*httputil.HTTPError)

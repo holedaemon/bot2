@@ -22,20 +22,20 @@ import (
 
 // Bot is a Discord bot account.
 type Bot struct {
-	Debug bool
+	debug bool
 
-	TopsterAddr string
+	topsterAddr string
 	siteAddress string
 
-	State   *state.State
-	Webhook *webhook.Client
-	Logger  *zap.Logger
+	state   *state.State
+	webhook *webhook.Client
+	logger  *zap.Logger
 
-	Lastfm   *lastfm.Client
-	Jerkcity *jerkcity.Client
-	DB       *sql.DB
+	lastfm   *lastfm.Client
+	jerkcity *jerkcity.Client
+	db       *sql.DB
 
-	Admins map[discord.UserID]struct{}
+	admins map[discord.UserID]struct{}
 
 	imageCache     *ImageCache
 	lastGameChange time.Time
@@ -49,23 +49,23 @@ func New(token string, opts ...Option) (*Bot, error) {
 		o(b)
 	}
 
-	if b.Logger == nil {
+	if b.logger == nil {
 		l, err := zap.NewProduction()
 		if err != nil {
 			return nil, fmt.Errorf("bot: creating logger: %w", err)
 		}
 
-		b.Logger = l
+		b.logger = l
 	}
 
-	if b.Webhook != nil {
-		b.Logger = b.Logger.WithOptions(
+	if b.webhook != nil {
+		b.logger = b.logger.WithOptions(
 			zap.Hooks(b.webhookHook),
 		)
 	}
 
-	if b.Admins == nil {
-		b.Admins = make(map[discord.UserID]struct{})
+	if b.admins == nil {
+		b.admins = make(map[discord.UserID]struct{})
 	}
 
 	if b.siteAddress == "" {
@@ -80,24 +80,24 @@ func New(token string, opts ...Option) (*Bot, error) {
 		}
 	}
 
-	b.Jerkcity = jerkcity.New()
+	b.jerkcity = jerkcity.New()
 	b.imageCache = NewImageCache()
 
-	b.State = state.New("Bot " + token)
-	b.State.AddHandler(b.onReady)
-	b.State.AddHandler(b.onGuildCreate)
-	b.State.AddHandler(b.onGuildUpdate)
-	b.State.AddHandler(b.onGuildRoleDelete)
-	b.State.AddHandler(b.onMessage)
-	b.State.AddHandler(b.onReconnect)
-	b.State.AddHandler(b.onMessageReactionAdd)
-	b.State.AddHandler(b.onMessageEdit)
+	b.state = state.New("Bot " + token)
+	b.state.AddHandler(b.onReady)
+	b.state.AddHandler(b.onGuildCreate)
+	b.state.AddHandler(b.onGuildUpdate)
+	b.state.AddHandler(b.onGuildRoleDelete)
+	b.state.AddHandler(b.onMessage)
+	b.state.AddHandler(b.onReconnect)
+	b.state.AddHandler(b.onMessageReactionAdd)
+	b.state.AddHandler(b.onMessageEdit)
 
 	r := b.router()
-	b.State.AddInteractionHandler(r)
-	b.State.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages | gateway.IntentGuildMessageReactions)
+	b.state.AddInteractionHandler(r)
+	b.state.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages | gateway.IntentGuildMessageReactions)
 
-	if b.Debug {
+	if b.debug {
 		commands = commands.Scoped(testGuildID)
 	}
 
@@ -118,18 +118,18 @@ func New(token string, opts ...Option) (*Bot, error) {
 		}
 	}
 
-	app, err := b.State.CurrentApplication()
+	app, err := b.state.CurrentApplication()
 	if err != nil {
 		return nil, fmt.Errorf("bot: getting current application: %w", err)
 	}
 
 	for scope, cmd := range cmds {
 		if scope == 0 {
-			if _, err := b.State.BulkOverwriteCommands(app.ID, cmd); err != nil {
+			if _, err := b.state.BulkOverwriteCommands(app.ID, cmd); err != nil {
 				return nil, fmt.Errorf("bot: overwriting global commands: %w", err)
 			}
 		} else {
-			if _, err := b.State.BulkOverwriteGuildCommands(app.ID, scope, cmd); err != nil {
+			if _, err := b.state.BulkOverwriteGuildCommands(app.ID, scope, cmd); err != nil {
 				return nil, fmt.Errorf("bot: overwriting guild commands (%d): %w", scope, err)
 			}
 		}
@@ -140,7 +140,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 
 // IsAdmin checks if the given UserID is a bot admin.
 func (b *Bot) IsAdmin(sf discord.UserID) bool {
-	if _, ok := b.Admins[sf]; ok {
+	if _, ok := b.admins[sf]; ok {
 		return true
 	}
 
@@ -149,11 +149,11 @@ func (b *Bot) IsAdmin(sf discord.UserID) bool {
 
 // Start opens a connection to Discord.
 func (b *Bot) Start(ctx context.Context) error {
-	return b.State.Connect(ctx)
+	return b.state.Connect(ctx)
 }
 
 func (b *Bot) webhookHook(entry zapcore.Entry) error {
-	if b.Webhook == nil {
+	if b.webhook == nil {
 		return nil
 	}
 
@@ -167,7 +167,7 @@ func (b *Bot) webhookHook(entry zapcore.Entry) error {
 		Content:   entry.Message,
 	}
 
-	return b.Webhook.Execute(data)
+	return b.webhook.Execute(data)
 }
 
 func (b *Bot) Reply(m discord.Message, content string) error {
@@ -175,7 +175,7 @@ func (b *Bot) Reply(m discord.Message, content string) error {
 		panic("bot: blank content given to Reply")
 	}
 
-	_, err := b.State.SendMessageReply(m.ChannelID, content, m.ID)
+	_, err := b.state.SendMessageReply(m.ChannelID, content, m.ID)
 	return err
 }
 
@@ -203,7 +203,7 @@ func (b *Bot) SendImage(chID discord.ChannelID, content string, image string) er
 		Reader: cachedImage,
 	})
 
-	_, err := b.State.SendMessageComplex(
+	_, err := b.state.SendMessageComplex(
 		chID,
 		api.SendMessageData{
 			Content: content,

@@ -32,7 +32,7 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 	thingsCheck := wordInContent(m.Content, egoraptorThings)
 
 	if namesCheck && thingsCheck {
-		data, err := modelsx.FetchMention(ctx, b.DB, m.GuildID)
+		data, err := modelsx.FetchMention(ctx, b.db, m.GuildID)
 		if err != nil {
 			ctxlog.Error(ctx, "error querying egoraptor mention", zap.Error(err))
 			return
@@ -62,7 +62,7 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 			t := time.Now().Add(duration)
 			ts := discord.NewTimestamp(t)
 
-			err = b.State.ModifyMember(m.GuildID, m.Author.ID, api.ModifyMemberData{
+			err = b.state.ModifyMember(m.GuildID, m.Author.ID, api.ModifyMemberData{
 				CommunicationDisabledUntil: &ts,
 			})
 			if err != nil {
@@ -74,7 +74,7 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 		data.LastTimestamp = time.Now().In(azLoc)
 		data.LastUser = m.Author.ID.String()
 
-		err = modelsx.UpsertMention(ctx, b.DB, data)
+		err = modelsx.UpsertMention(ctx, b.db, data)
 		if err != nil {
 			ctxlog.Error(ctx, "error upserting egoraptor mention", zap.Error(err))
 		}

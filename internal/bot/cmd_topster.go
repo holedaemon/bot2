@@ -33,7 +33,7 @@ type topsterError struct {
 }
 
 func (b *Bot) cmdTopster(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	if b.TopsterAddr == "" {
+	if b.topsterAddr == "" {
 		return respondError("The Topster command isn't configured correctly! Contact your administrator or something")
 	}
 
@@ -83,7 +83,7 @@ func (b *Bot) cmdTopster(ctx context.Context, data cmdroute.CommandData) *api.In
 		return respondError("Error encoding Topster options as JSON. How embarrassing...")
 	}
 
-	res, err := http.Post(b.TopsterAddr, "application/json", &input)
+	res, err := http.Post(b.topsterAddr, "application/json", &input)
 	if err != nil {
 		ctxlog.Error(ctx, "error POSTing to topster addr", zap.Error(err))
 		return respondError("Error sending request to Topster!!")
