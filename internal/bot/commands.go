@@ -5,18 +5,18 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 )
 
-type Command struct {
+type command struct {
 	Scoped discord.GuildID
 	Data   api.CreateCommandData
 }
 
-type commandList []Command
+type commandList []command
 
 func (cl commandList) Scoped(to discord.GuildID) commandList {
 	newCmds := make(commandList, 0)
 
 	for _, c := range cl {
-		newCmds = append(newCmds, Command{
+		newCmds = append(newCmds, command{
 			Data:   c.Data,
 			Scoped: to,
 		})
