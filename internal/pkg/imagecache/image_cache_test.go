@@ -66,6 +66,6 @@ func writeFile(image *bytes.Buffer, ext string) error {
 
 	defer file.Close()
 
-	file.Write(image.Bytes())
+	file.Write(image.Bytes()) //nolint:errcheck
 	return nil
 }

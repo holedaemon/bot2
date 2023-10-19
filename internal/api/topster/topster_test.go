@@ -33,5 +33,5 @@ func TestTopster(t *testing.T) {
 
 	defer file.Close()
 
-	file.Write(raw)
+	file.Write(raw) //nolint:errcheck
 }

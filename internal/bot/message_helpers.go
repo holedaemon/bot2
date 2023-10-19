@@ -2,7 +2,6 @@ package bot
 
 import (
 	"context"
-	"fmt"
 	"path"
 
 	"github.com/diamondburned/arikawa/v3/api"
@@ -17,11 +16,6 @@ func (b *Bot) reply(m discord.Message, content string) error {
 
 	_, err := b.state.SendMessageReply(m.ChannelID, content, m.ID)
 	return err
-}
-
-func (b *Bot) replyf(m discord.Message, content string, args ...interface{}) error {
-	msg := fmt.Sprintf(content, args...)
-	return b.reply(m, msg)
 }
 
 func (b *Bot) sendImage(ctx context.Context, chID discord.ChannelID, content string, image string) error {
