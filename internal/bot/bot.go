@@ -167,10 +167,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 // the internal image cache's automatic deletion.
 func (b *Bot) Start(ctx context.Context) error {
 	go b.imageCache.Start()
-	go func() {
-		<-ctx.Done()
-		b.imageCache.Stop()
-	}()
+	defer b.imageCache.Stop()
 	return b.state.Connect(ctx)
 }
 
