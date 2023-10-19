@@ -11,6 +11,7 @@ var TableNames = struct {
 	Roles             string
 	Sessions          string
 	Tags              string
+	UserProfiles      string
 }{
 	DiscordTokens:     "discord_tokens",
 	EgoraptorMentions: "egoraptor_mentions",
@@ -19,4 +20,5 @@ var TableNames = struct {
 	Roles:             "roles",
 	Sessions:          "sessions",
 	Tags:              "tags",
+	UserProfiles:      "user_profiles",
 }
