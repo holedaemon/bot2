@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"path"
 	"strings"
 	"time"
 
@@ -13,7 +12,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
-	"github.com/diamondburned/arikawa/v3/utils/sendpart"
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
 	"github.com/holedaemon/lastfm"
 	"go.uber.org/zap"
@@ -138,18 +136,17 @@ func New(token string, opts ...Option) (*Bot, error) {
 	return b, nil
 }
 
-// IsAdmin checks if the given UserID is a bot admin.
-func (b *Bot) IsAdmin(sf discord.UserID) bool {
+// Start opens a connection to Discord.
+func (b *Bot) Start(ctx context.Context) error {
+	return b.state.Connect(ctx)
+}
+
+func (b *Bot) isAdmin(sf discord.UserID) bool {
 	if _, ok := b.admins[sf]; ok {
 		return true
 	}
 
 	return false
-}
-
-// Start opens a connection to Discord.
-func (b *Bot) Start(ctx context.Context) error {
-	return b.state.Connect(ctx)
 }
 
 func (b *Bot) webhookHook(entry zapcore.Entry) error {
@@ -168,51 +165,4 @@ func (b *Bot) webhookHook(entry zapcore.Entry) error {
 	}
 
 	return b.webhook.Execute(data)
-}
-
-func (b *Bot) Reply(m discord.Message, content string) error {
-	if content == "" {
-		panic("bot: blank content given to Reply")
-	}
-
-	_, err := b.state.SendMessageReply(m.ChannelID, content, m.ID)
-	return err
-}
-
-func (b *Bot) Replyf(m discord.Message, content string, args ...interface{}) error {
-	msg := fmt.Sprintf(content, args...)
-	return b.Reply(m, msg)
-}
-
-func (b *Bot) SendImage(chID discord.ChannelID, content string, image string) error {
-	cachedImage := b.imageCache.Get(image)
-	if cachedImage == nil {
-		err := b.imageCache.Download(image)
-		if err != nil {
-			return err
-		}
-
-		cachedImage = b.imageCache.Get(image)
-	}
-
-	rawName := path.Base(image)
-
-	files := make([]sendpart.File, 0)
-	files = append(files, sendpart.File{
-		Name:   rawName,
-		Reader: cachedImage,
-	})
-
-	_, err := b.state.SendMessageComplex(
-		chID,
-		api.SendMessageData{
-			Content: content,
-			Files:   files,
-		},
-	)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

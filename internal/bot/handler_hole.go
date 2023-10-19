@@ -23,7 +23,7 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 		str := strconv.FormatInt(int64(idx), 10)
 		image := fakeGif("fortnite-" + str)
 
-		if err := b.SendImage(m.ChannelID, "", image); err != nil {
+		if err := b.sendImage(m.ChannelID, "", image); err != nil {
 			ctxlog.Error(ctx, "error sending image to channel", zap.Error(err))
 		}
 
@@ -33,14 +33,14 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 	if regexTimeout.MatchString(m.Content) {
 		cache := m.ReferencedMessage
 		if cache == nil {
-			if err := b.Reply(m.Message, "Who's am I's whackin' 'ere?"); err != nil {
+			if err := b.reply(m.Message, "Who's am I's whackin' 'ere?"); err != nil {
 				ctxlog.Error(ctx, "error sending reply", zap.Error(err))
 			}
 			return
 		}
 
 		if cache.Author.ID == m.Author.ID {
-			if err := b.SendImage(m.ChannelID, "", fakeJPG("snipes")); err != nil {
+			if err := b.sendImage(m.ChannelID, "", fakeJPG("snipes")); err != nil {
 				ctxlog.Error(ctx, "error sending image", zap.Error(err))
 			}
 			return
@@ -56,7 +56,7 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 		}); err != nil {
 			er := err.(*httputil.HTTPError)
 			if er.Code == 50013 {
-				if err := b.Reply(m.Message, "Sorry boss, I's forgots my gun"); err != nil {
+				if err := b.reply(m.Message, "Sorry boss, I's forgots my gun"); err != nil {
 					ctxlog.Error(ctx, "error sending message", zap.Error(err))
 				}
 				return
@@ -64,13 +64,13 @@ func (b *Bot) onHoleMessage(ctx context.Context, m *gateway.MessageCreateEvent) 
 
 			ctxlog.Error(ctx, "error timing out user", zap.Error(err))
 
-			if err := b.Reply(m.Message, "Sorry boss, da feds got in da way"); err != nil {
+			if err := b.reply(m.Message, "Sorry boss, da feds got in da way"); err != nil {
 				ctxlog.Error(ctx, "error sending message", zap.Error(err))
 			}
 			return
 		}
 
-		if err := b.Reply(m.Message, "Da jobs done, boss"); err != nil {
+		if err := b.reply(m.Message, "Da jobs done, boss"); err != nil {
 			ctxlog.Error(ctx, "error sending message", zap.Error(err))
 		}
 	}

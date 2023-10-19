@@ -56,7 +56,7 @@ func (b *Bot) cmdPing(ctx context.Context, data cmdroute.CommandData) *api.Inter
 }
 
 func (b *Bot) cmdIsAdmin(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	if b.IsAdmin(data.Event.SenderID()) {
+	if b.isAdmin(data.Event.SenderID()) {
 		return respond("You are an admin")
 	}
 
@@ -64,7 +64,7 @@ func (b *Bot) cmdIsAdmin(ctx context.Context, data cmdroute.CommandData) *api.In
 }
 
 func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	if b.lastGameChange.Add(time.Hour).After(time.Now()) && !b.IsAdmin(data.Event.SenderID()) {
+	if b.lastGameChange.Add(time.Hour).After(time.Now()) && !b.isAdmin(data.Event.SenderID()) {
 		return respond("The game can only be changed once an hour")
 	}
 
@@ -94,7 +94,7 @@ func (b *Bot) cmdGame(ctx context.Context, data cmdroute.CommandData) *api.Inter
 }
 
 func (b *Bot) cmdPanic(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
-	if !b.IsAdmin(data.Event.SenderID()) {
+	if !b.isAdmin(data.Event.SenderID()) {
 		return respondError("I don't think so, weather man")
 	}
 
