@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"regexp"
 	"time"
 
@@ -89,6 +90,27 @@ func (b *Bot) cmdProfileDelete(ctx context.Context, data cmdroute.CommandData) *
 	}
 
 	return respond("Your profile has been deleted")
+}
+
+func (b *Bot) cmdProfileGet(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	id := data.Event.SenderID()
+	if id == 0 {
+		ctxlog.Error(ctx, "sender id is 0")
+		return respondError("Unexpected error has occurred, oops!")
+	}
+
+	exists, err := modelsx.UserProfileExists(ctx, b.db, id.String())
+	if err != nil {
+		ctxlog.Error(ctx, "error checking if profile exists", zap.Error(err))
+		return dbError
+	}
+
+	if !exists {
+		return noProfileError
+	}
+
+	addr := fmt.Sprintf("%s/profile", b.siteAddress)
+	return respondf("You can find your profile at <%s>", addr)
 }
 
 func (b *Bot) cmdProfileSetTimezone(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {

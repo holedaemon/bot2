@@ -356,6 +356,10 @@ var commands = commandList{
 					discord.NewBooleanOption("are-you-sure", "Confirmation you want to delete your profile", true),
 				),
 				discord.NewSubcommandOption(
+					"get",
+					"Get a link to your profile on the site",
+				),
+				discord.NewSubcommandOption(
 					"set-timezone",
 					"Set your timezone",
 					discord.NewStringOption("timezone", "Your timezone", true),
