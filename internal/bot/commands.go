@@ -340,4 +340,27 @@ var commands = commandList{
 			},
 		},
 	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:        "profile",
+			Description: "Interface for user profiles",
+			Options: discord.CommandOptions{
+				discord.NewSubcommandOption(
+					"init",
+					"Create a profile for yourself",
+				),
+				discord.NewSubcommandOption(
+					"delete",
+					"Delete your profile. THIS IS IRREVERSIBLE.",
+					discord.NewBooleanOption("are-you-sure", "Confirmation you want to delete your profile", true),
+				),
+				discord.NewSubcommandOption(
+					"set-timezone",
+					"Set your timezone",
+					discord.NewStringOption("timezone", "Your timezone", true),
+				),
+			},
+		},
+	},
 }
