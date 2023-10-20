@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"regexp"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
@@ -21,7 +20,6 @@ import (
 )
 
 var (
-	tzRe           = regexp.MustCompile(`[a-zA-Z_]{1,14}\/[a-zA-Z_]{1,14}`)
 	noProfileError = &api.InteractionResponseData{
 		Content: option.NewNullableString("You need to initialize a profile with `/profile init` before running this command"),
 		Flags:   discord.EphemeralMessage,
@@ -119,7 +117,7 @@ func (b *Bot) cmdProfileSetTimezone(ctx context.Context, data cmdroute.CommandDa
 		return respondError("Timezone cannot be blank!!")
 	}
 
-	if !tzRe.MatchString(tz) {
+	if !validTimezone(tz) {
 		return respondError("Timezone must be in **Area/Location** format e.g. **America/Phoenix**")
 	}
 

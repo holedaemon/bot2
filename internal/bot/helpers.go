@@ -3,6 +3,7 @@ package bot
 import (
 	"fmt"
 	"io"
+	"regexp"
 	"strings"
 	"time"
 
@@ -17,7 +18,12 @@ var (
 		Content: option.NewNullableString("A database error has occurred, try again later or something"),
 		Flags:   discord.EphemeralMessage,
 	}
+	tzRe = regexp.MustCompile(`[a-zA-Z_]{1,14}\/[a-zA-Z_]{1,14}`)
 )
+
+func validTimezone(tz string) bool {
+	return tzRe.MatchString(tz)
+}
 
 func respondError(msg string) *api.InteractionResponseData {
 	if msg == "" {

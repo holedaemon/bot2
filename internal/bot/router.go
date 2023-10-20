@@ -79,6 +79,11 @@ func (b *Bot) router() *cmdroute.Router {
 		r.AddFunc("set-timezone", b.cmdProfileSetTimezone)
 	})
 
+	r.Sub("time", func(r *cmdroute.Router) {
+		r.AddFunc("in", b.cmdTimeIn)
+		r.AddFunc("stamp", b.cmdTimeStamp)
+	})
+
 	r.AddFunc("q", b.cmdQ)
 	r.Sub("quote", func(r *cmdroute.Router) {
 		r.AddFunc("delete", b.cmdQuoteDelete)
