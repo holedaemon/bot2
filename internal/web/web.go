@@ -100,6 +100,7 @@ func (s *Server) Run(ctx context.Context) error {
 	r.Get("/auth/discord/callback", s.authDiscordCallback)
 	r.Get("/guilds", s.guilds)
 	r.Get("/docs", s.docs)
+	r.Get("/profile", s.profile)
 
 	r.Route("/admin", s.routeAdmin)
 
@@ -175,6 +176,28 @@ func (s *Server) docs(w http.ResponseWriter, r *http.Request) {
 	templates.WritePageTemplate(w, &templates.DocsPage{
 		BasePage: s.basePage(r),
 		Commands: commands,
+	})
+}
+
+func (s *Server) profile(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	id := s.sessionManager.GetString(ctx, sessionDiscordID)
+	if id == "" {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	p, err := models.UserProfiles(qm.Where("user_id = ?", id)).One(ctx, s.db)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			s.errorPage(w, r, http.StatusNotFound, "You haven't created a profile yet!! See /profile init on the bot")
+			return
+		}
+	}
+
+	templates.WritePageTemplate(w, &templates.ProfilePage{
+		BasePage: s.basePage(r),
+		Profile:  p,
 	})
 }
 

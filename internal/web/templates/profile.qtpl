@@ -1,0 +1,36 @@
+{% import (
+    "strings"
+    "github.com/holedaemon/bot2/internal/db/models"
+) %}
+
+{% code type ProfilePage struct {
+    BasePage
+    Profile *models.UserProfile
+} %}
+
+{% func possess(s string) %}
+    {% if strings.HasSuffix(s, "s") %}
+        {%s s %}'
+    {% else %}
+        {%s s %}'s
+    {% endif %}
+{% endfunc %}
+
+{% func (p *ProfilePage) Title() %}{%= possess(p.Username) %} Profile{% endfunc %}
+
+{% func (p *ProfilePage) Body() %}
+    <section class="section">
+        <div class="container">
+            <h1 class="title">{%= possess(p.Username) %} profile</h1>
+            <hr>
+            <ul>
+                <li><p class="is-size-4">User ID: {%s p.Profile.UserID %}</p></li>
+                {% if p.Profile.Timezone.Valid %}
+                    <li><p class="is-size-4">Timezone: <code>{%s p.Profile.Timezone.String %}</code></p></li>
+                {% else %}
+                    <li>Timezone: not set</li>
+                {% endif %}
+            </ul>
+        </div>
+    </section>
+{% endfunc %}
