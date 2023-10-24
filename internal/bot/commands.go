@@ -381,7 +381,7 @@ var commands = commandList{
 				discord.NewSubcommandOption(
 					"stamp",
 					"Get a Discord timestamp for a given date and time",
-					discord.NewStringOption("time", "A time or date. Natural language accepted", true),
+					discord.NewStringOption("time", "A time in natural language", true),
 					discord.NewStringOption("timezone", "A valid timezone", false),
 					discord.NewStringOption("format", "The format of the Discord timestamp", false),
 				),
