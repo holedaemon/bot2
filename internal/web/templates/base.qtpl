@@ -100,6 +100,9 @@ Page {
                 <a href="/guilds" class="navbar-item">
                   Guilds
                 </a>
+                <a href="/profile" class="navbar-item">
+                  Profile
+                </a>
                 <a href="/logout" class="navbar-item">
                   Log out
                 </a>

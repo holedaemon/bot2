@@ -221,6 +221,9 @@ func (p *BasePage) StreamNavbar(qw422016 *qt422016.Writer) {
                 <a href="/guilds" class="navbar-item">
                   Guilds
                 </a>
+                <a href="/profile" class="navbar-item">
+                  Profile
+                </a>
                 <a href="/logout" class="navbar-item">
                   Log out
                 </a>

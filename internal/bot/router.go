@@ -72,6 +72,18 @@ func (b *Bot) router() *cmdroute.Router {
 		})
 	})
 
+	r.Sub("profile", func(r *cmdroute.Router) {
+		r.AddFunc("init", b.cmdProfileInit)
+		r.AddFunc("delete", b.cmdProfileDelete)
+		r.AddFunc("get", b.cmdProfileGet)
+		r.AddFunc("set-timezone", b.cmdProfileSetTimezone)
+	})
+
+	r.Sub("time", func(r *cmdroute.Router) {
+		r.AddFunc("in", b.cmdTimeIn)
+		r.AddFunc("stamp", b.cmdTimeStamp)
+	})
+
 	r.AddFunc("q", b.cmdQ)
 	r.Sub("quote", func(r *cmdroute.Router) {
 		r.AddFunc("delete", b.cmdQuoteDelete)

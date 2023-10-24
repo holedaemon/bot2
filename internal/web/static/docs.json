@@ -48,6 +48,28 @@
         ]
     },
     {
+        "title": "PROFILE",
+        "description": "User command pertaining to user profiles",
+        "commands": [
+            {
+                "name": "profile init",
+                "description": "Create your profile"
+            },
+            {
+                "name": "profile delete <are-you-sure>",
+                "description": "Delete your profile"
+            },
+            {
+                "name": "profile get",
+                "description": "Get a link to your profile on the site"
+            },
+            {
+                "name": "profile set-timezone <timezone>",
+                "description": "Set your timezone"
+            }
+        ]
+    },
+    {
         "title": "TAG",
         "description": "User command for querying tags",
         "commands": [
@@ -67,15 +89,15 @@
             },
             {
                 "name": "tags update <name> <content>",
-                "description": "Update a tag"
+                "description": "Update a tag. Limited to the user that created the tag or users with the MANAGE_MESSAGES permission"
             },
             {
                 "name": "tags rename <name> <new-name>",
-                "description": "Rename a tag"
+                "description": "Rename a tag. Limited to the user that created the tag or users with the MANAGE_MESSAGES permission"
             },
             {
                 "name": "tags delete <name>",
-                "description": "Delete a tag"
+                "description": "Delete a tag. Limited to the user that created the tag or users with the MANAGE_MESSAGES permission"
             },
             {
                 "name": "tags list",
@@ -146,6 +168,20 @@
             {
                 "name": "settings quotes toggle <toggled>",
                 "description": "Toggle use of quote functionality"
+            }
+        ]
+    },
+    {
+        "title": "TIME",
+        "description": "User commands for time convenience functionality",
+        "commands": [
+            {
+                "name": "time in [timezone]",
+                "description": "Displays the time in the given timezone. Optionally uses the timezone on your configured profile"
+            },
+            {
+                "name": "time stamp <time> [timezone] [format]",
+                "description": "Get a Discord timestamp for the given time. Accepts natural language. Uses your profile timezone, or whatever's given. Accepted formats are t, T, d, D, f, F, R"
             }
         ]
     },

@@ -340,4 +340,52 @@ var commands = commandList{
 			},
 		},
 	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:        "profile",
+			Description: "Interface for user profiles",
+			Options: discord.CommandOptions{
+				discord.NewSubcommandOption(
+					"init",
+					"Create a profile for yourself",
+				),
+				discord.NewSubcommandOption(
+					"delete",
+					"Delete your profile. THIS IS IRREVERSIBLE.",
+					discord.NewBooleanOption("are-you-sure", "Confirmation you want to delete your profile", true),
+				),
+				discord.NewSubcommandOption(
+					"get",
+					"Get a link to your profile on the site",
+				),
+				discord.NewSubcommandOption(
+					"set-timezone",
+					"Set your timezone",
+					discord.NewStringOption("timezone", "Your timezone", true),
+				),
+			},
+		},
+	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:        "time",
+			Description: "Interface for time-related commands",
+			Options: discord.CommandOptions{
+				discord.NewSubcommandOption(
+					"in",
+					"Get the time in a specific timezone or your profile's timezone",
+					discord.NewStringOption("timezone", "A valid timezone", false),
+				),
+				discord.NewSubcommandOption(
+					"stamp",
+					"Get a Discord timestamp for a given date and time",
+					discord.NewStringOption("time", "A time in natural language", true),
+					discord.NewStringOption("timezone", "A valid timezone", false),
+					discord.NewStringOption("format", "The format of the Discord timestamp", false),
+				),
+			},
+		},
+	},
 }

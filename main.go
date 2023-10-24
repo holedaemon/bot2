@@ -8,6 +8,10 @@ import (
 	"strings"
 	"time"
 
+	// Per the docs, this should be imported in the main package rather than a library.
+	// We use this for the profile timezone function
+	_ "time/tzdata"
+
 	"github.com/caarlos0/env/v7"
 	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/discord"
