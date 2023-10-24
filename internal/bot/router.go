@@ -82,6 +82,7 @@ func (b *Bot) router() *cmdroute.Router {
 	r.Sub("time", func(r *cmdroute.Router) {
 		r.AddFunc("in", b.cmdTimeIn)
 		r.AddFunc("stamp", b.cmdTimeStamp)
+		r.AddFunc("today", b.cmdTimeToday)
 	})
 
 	r.AddFunc("q", b.cmdQ)

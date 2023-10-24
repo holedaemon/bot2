@@ -385,6 +385,12 @@ var commands = commandList{
 					discord.NewStringOption("timezone", "A valid timezone", false),
 					discord.NewStringOption("format", "The format of the Discord timestamp", false),
 				),
+				discord.NewSubcommandOption(
+					"today",
+					"Get a Discord timestamp for today at a given time",
+					discord.NewStringOption("time", "A time in HH:MM format", true),
+					discord.NewStringOption("timezone", "A valid timezone", false),
+				),
 			},
 		},
 	},
