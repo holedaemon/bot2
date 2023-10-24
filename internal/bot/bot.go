@@ -15,6 +15,9 @@ import (
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
 	"github.com/holedaemon/bot2/internal/api/topster"
 	"github.com/holedaemon/bot2/internal/pkg/imagecache"
+	"github.com/olebedev/when"
+	"github.com/olebedev/when/rules/common"
+	"github.com/olebedev/when/rules/en"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -39,6 +42,7 @@ type Bot struct {
 
 	imageCache     *imagecache.Cache
 	lastGameChange time.Time
+	when           *when.Parser
 }
 
 // New creates a new Bot.
@@ -108,7 +112,10 @@ func New(token string, opts ...Option) (*Bot, error) {
 		b.topster = tp
 	}
 
-	b.state = state.New("Bot " + token)
+	b.when = when.New(nil)
+	b.when.Add(en.All...)
+	b.when.Add(common.All...)
+
 	b.state.AddHandler(b.onReady)
 	b.state.AddHandler(b.onGuildCreate)
 	b.state.AddHandler(b.onGuildUpdate)

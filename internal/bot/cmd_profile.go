@@ -117,10 +117,6 @@ func (b *Bot) cmdProfileSetTimezone(ctx context.Context, data cmdroute.CommandDa
 		return respondError("Timezone cannot be blank!!")
 	}
 
-	if !validTimezone(tz) {
-		return respondError("Timezone must be in **Area/Location** format e.g. **America/Phoenix**")
-	}
-
 	_, err := time.LoadLocation(tz)
 	if err != nil {
 		return respondError("Unable to parse given timezone. Are you sure it's real?")
