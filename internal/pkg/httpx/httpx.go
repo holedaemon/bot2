@@ -18,5 +18,5 @@ var DefaultClient = &http.Client{
 
 // IsOK tests if a status code is within the 2xx range.
 func IsOK(code int) bool {
-	return code >= http.StatusOK || code < http.StatusMultipleChoices
+	return code >= http.StatusOK && code < http.StatusMultipleChoices
 }
