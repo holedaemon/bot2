@@ -23,72 +23,86 @@ import (
 
 // RoleUpdateSetting is an object representing the database table.
 type RoleUpdateSetting struct {
-	ID          int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	GuildID     string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
-	DoUpdates   bool      `boil:"do_updates" json:"do_updates" toml:"do_updates" yaml:"do_updates"`
-	SteamUserID string    `boil:"steam_user_id" json:"steam_user_id" toml:"steam_user_id" yaml:"steam_user_id"`
-	SteamAppID  int       `boil:"steam_app_id" json:"steam_app_id" toml:"steam_app_id" yaml:"steam_app_id"`
-	CreatedAt   time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt   time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	ID            int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	GuildID       string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
+	RoleID        string    `boil:"role_id" json:"role_id" toml:"role_id" yaml:"role_id"`
+	DoUpdates     bool      `boil:"do_updates" json:"do_updates" toml:"do_updates" yaml:"do_updates"`
+	LastTimestamp time.Time `boil:"last_timestamp" json:"last_timestamp" toml:"last_timestamp" yaml:"last_timestamp"`
+	SteamUserID   string    `boil:"steam_user_id" json:"steam_user_id" toml:"steam_user_id" yaml:"steam_user_id"`
+	SteamAppID    int       `boil:"steam_app_id" json:"steam_app_id" toml:"steam_app_id" yaml:"steam_app_id"`
+	CreatedAt     time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt     time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *roleUpdateSettingR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L roleUpdateSettingL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var RoleUpdateSettingColumns = struct {
-	ID          string
-	GuildID     string
-	DoUpdates   string
-	SteamUserID string
-	SteamAppID  string
-	CreatedAt   string
-	UpdatedAt   string
+	ID            string
+	GuildID       string
+	RoleID        string
+	DoUpdates     string
+	LastTimestamp string
+	SteamUserID   string
+	SteamAppID    string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	ID:          "id",
-	GuildID:     "guild_id",
-	DoUpdates:   "do_updates",
-	SteamUserID: "steam_user_id",
-	SteamAppID:  "steam_app_id",
-	CreatedAt:   "created_at",
-	UpdatedAt:   "updated_at",
+	ID:            "id",
+	GuildID:       "guild_id",
+	RoleID:        "role_id",
+	DoUpdates:     "do_updates",
+	LastTimestamp: "last_timestamp",
+	SteamUserID:   "steam_user_id",
+	SteamAppID:    "steam_app_id",
+	CreatedAt:     "created_at",
+	UpdatedAt:     "updated_at",
 }
 
 var RoleUpdateSettingTableColumns = struct {
-	ID          string
-	GuildID     string
-	DoUpdates   string
-	SteamUserID string
-	SteamAppID  string
-	CreatedAt   string
-	UpdatedAt   string
+	ID            string
+	GuildID       string
+	RoleID        string
+	DoUpdates     string
+	LastTimestamp string
+	SteamUserID   string
+	SteamAppID    string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	ID:          "role_update_settings.id",
-	GuildID:     "role_update_settings.guild_id",
-	DoUpdates:   "role_update_settings.do_updates",
-	SteamUserID: "role_update_settings.steam_user_id",
-	SteamAppID:  "role_update_settings.steam_app_id",
-	CreatedAt:   "role_update_settings.created_at",
-	UpdatedAt:   "role_update_settings.updated_at",
+	ID:            "role_update_settings.id",
+	GuildID:       "role_update_settings.guild_id",
+	RoleID:        "role_update_settings.role_id",
+	DoUpdates:     "role_update_settings.do_updates",
+	LastTimestamp: "role_update_settings.last_timestamp",
+	SteamUserID:   "role_update_settings.steam_user_id",
+	SteamAppID:    "role_update_settings.steam_app_id",
+	CreatedAt:     "role_update_settings.created_at",
+	UpdatedAt:     "role_update_settings.updated_at",
 }
 
 // Generated where
 
 var RoleUpdateSettingWhere = struct {
-	ID          whereHelperint64
-	GuildID     whereHelperstring
-	DoUpdates   whereHelperbool
-	SteamUserID whereHelperstring
-	SteamAppID  whereHelperint
-	CreatedAt   whereHelpertime_Time
-	UpdatedAt   whereHelpertime_Time
+	ID            whereHelperint64
+	GuildID       whereHelperstring
+	RoleID        whereHelperstring
+	DoUpdates     whereHelperbool
+	LastTimestamp whereHelpertime_Time
+	SteamUserID   whereHelperstring
+	SteamAppID    whereHelperint
+	CreatedAt     whereHelpertime_Time
+	UpdatedAt     whereHelpertime_Time
 }{
-	ID:          whereHelperint64{field: "\"role_update_settings\".\"id\""},
-	GuildID:     whereHelperstring{field: "\"role_update_settings\".\"guild_id\""},
-	DoUpdates:   whereHelperbool{field: "\"role_update_settings\".\"do_updates\""},
-	SteamUserID: whereHelperstring{field: "\"role_update_settings\".\"steam_user_id\""},
-	SteamAppID:  whereHelperint{field: "\"role_update_settings\".\"steam_app_id\""},
-	CreatedAt:   whereHelpertime_Time{field: "\"role_update_settings\".\"created_at\""},
-	UpdatedAt:   whereHelpertime_Time{field: "\"role_update_settings\".\"updated_at\""},
+	ID:            whereHelperint64{field: "\"role_update_settings\".\"id\""},
+	GuildID:       whereHelperstring{field: "\"role_update_settings\".\"guild_id\""},
+	RoleID:        whereHelperstring{field: "\"role_update_settings\".\"role_id\""},
+	DoUpdates:     whereHelperbool{field: "\"role_update_settings\".\"do_updates\""},
+	LastTimestamp: whereHelpertime_Time{field: "\"role_update_settings\".\"last_timestamp\""},
+	SteamUserID:   whereHelperstring{field: "\"role_update_settings\".\"steam_user_id\""},
+	SteamAppID:    whereHelperint{field: "\"role_update_settings\".\"steam_app_id\""},
+	CreatedAt:     whereHelpertime_Time{field: "\"role_update_settings\".\"created_at\""},
+	UpdatedAt:     whereHelpertime_Time{field: "\"role_update_settings\".\"updated_at\""},
 }
 
 // RoleUpdateSettingRels is where relationship names are stored.
@@ -108,9 +122,9 @@ func (*roleUpdateSettingR) NewStruct() *roleUpdateSettingR {
 type roleUpdateSettingL struct{}
 
 var (
-	roleUpdateSettingAllColumns            = []string{"id", "guild_id", "do_updates", "steam_user_id", "steam_app_id", "created_at", "updated_at"}
-	roleUpdateSettingColumnsWithoutDefault = []string{"guild_id", "steam_user_id", "steam_app_id"}
-	roleUpdateSettingColumnsWithDefault    = []string{"id", "do_updates", "created_at", "updated_at"}
+	roleUpdateSettingAllColumns            = []string{"id", "guild_id", "role_id", "do_updates", "last_timestamp", "steam_user_id", "steam_app_id", "created_at", "updated_at"}
+	roleUpdateSettingColumnsWithoutDefault = []string{"guild_id", "role_id", "steam_user_id", "steam_app_id"}
+	roleUpdateSettingColumnsWithDefault    = []string{"id", "do_updates", "last_timestamp", "created_at", "updated_at"}
 	roleUpdateSettingPrimaryKeyColumns     = []string{"id"}
 	roleUpdateSettingGeneratedColumns      = []string{}
 )

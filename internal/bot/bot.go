@@ -13,6 +13,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
+	"github.com/holedaemon/bot2/internal/api/steam"
 	"github.com/holedaemon/bot2/internal/api/topster"
 	"github.com/holedaemon/bot2/internal/pkg/imagecache"
 	"github.com/olebedev/when"
@@ -29,6 +30,7 @@ type Bot struct {
 
 	topsterAddr string
 	siteAddress string
+	steamAPIKey string
 
 	state   *state.State
 	webhook *webhook.Client
@@ -36,6 +38,7 @@ type Bot struct {
 
 	jerkcity *jerkcity.Client
 	topster  *topster.Client
+	steam    *steam.Client
 	db       *sql.DB
 
 	admins map[discord.UserID]struct{}
@@ -112,6 +115,17 @@ func New(token string, opts ...Option) (*Bot, error) {
 		b.topster = tp
 	}
 
+	if b.steamAPIKey == "" {
+		b.logger.Warn("steam API key not set; role updater disabled")
+	} else {
+		stm, err := steam.New(b.steamAPIKey)
+		if err != nil {
+			return nil, fmt.Errorf("%w: creating steam client", err)
+		}
+
+		b.steam = stm
+	}
+
 	b.when = when.New(nil)
 	b.when.Add(en.All...)
 	b.when.Add(common.All...)
@@ -175,6 +189,9 @@ func New(token string, opts ...Option) (*Bot, error) {
 func (b *Bot) Start(ctx context.Context) error {
 	go b.imageCache.Start()
 	defer b.imageCache.Stop()
+
+	go b.roleUpdater(ctx)
+
 	return b.state.Connect(ctx)
 }
 
