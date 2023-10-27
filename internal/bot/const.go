@@ -17,6 +17,9 @@ const (
 
 	// SCROTEGANG
 	scroteGuildID = discord.GuildID(151516182439133184)
+	metticRoleID  = discord.RoleID(852707337554362369)
+	metticSteamID = "76561197999433062"
+	xivAppID      = 39210
 
 	// Test
 	// holeGuildID        = discord.GuildID(779875531712757800)

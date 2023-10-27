@@ -4,23 +4,23 @@
 package models
 
 var TableNames = struct {
-	DiscordTokens      string
-	EgoraptorMentions  string
-	Guilds             string
-	Quotes             string
-	RoleUpdateSettings string
-	Roles              string
-	Sessions           string
-	Tags               string
-	UserProfiles       string
+	DiscordTokens     string
+	EgoraptorMentions string
+	Guilds            string
+	Quotes            string
+	RoleUpdater       string
+	Roles             string
+	Sessions          string
+	Tags              string
+	UserProfiles      string
 }{
-	DiscordTokens:      "discord_tokens",
-	EgoraptorMentions:  "egoraptor_mentions",
-	Guilds:             "guilds",
-	Quotes:             "quotes",
-	RoleUpdateSettings: "role_update_settings",
-	Roles:              "roles",
-	Sessions:           "sessions",
-	Tags:               "tags",
-	UserProfiles:       "user_profiles",
+	DiscordTokens:     "discord_tokens",
+	EgoraptorMentions: "egoraptor_mentions",
+	Guilds:            "guilds",
+	Quotes:            "quotes",
+	RoleUpdater:       "role_updater",
+	Roles:             "roles",
+	Sessions:          "sessions",
+	Tags:              "tags",
+	UserProfiles:      "user_profiles",
 }
