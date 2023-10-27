@@ -198,5 +198,15 @@
                 "description": "Sets the length of an egoraptor-related timeout. Requires manage guild permissions"
             }
         ]
+    },
+    {
+        "title": "METTIC",
+        "description": "Moderator commands for configuring Mettic's role updater. **SCROTEGANG only**",
+        "commands": [
+            {
+                "name": "mettic toggle <toggled>",
+                "description": "Toggle Mettic's role updater. Requires manage guild permissions"
+            }
+        ]
     }
 ]
