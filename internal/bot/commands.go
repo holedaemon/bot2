@@ -213,6 +213,22 @@ var commands = commandList{
 		},
 	},
 	{
+		Scoped: scroteGuildID,
+		Data: api.CreateCommandData{
+			Name:                     "mettic",
+			Description:              "Moderator commands for updating Mettic's role on an interval",
+			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageGuild),
+			NoDMPermission:           true,
+			Options: discord.CommandOptions{
+				discord.NewSubcommandOption(
+					"toggle",
+					"Toggle updating Mettic's role",
+					discord.NewBooleanOption("toggled", "Whether to update or not", true),
+				),
+			},
+		},
+	},
+	{
 		Scoped: 0,
 		Data: api.CreateCommandData{
 			Name:           "q",

@@ -16,7 +16,8 @@ import (
 
 const (
 	updateInterval = (time.Hour * 24) * 7
-	roleFmt        = "%d HOURS IN XIV"
+	// updateInterval = time.Minute * 2
+	roleFmt = "%d HOURS IN XIV"
 )
 
 func (b *Bot) roleUpdater(ctx context.Context) {
@@ -39,10 +40,7 @@ func (b *Bot) roleUpdater(ctx context.Context) {
 			}
 
 			if !updater.DoUpdates {
-				continue
-			}
-
-			if updater.LastTimestamp.Add(updateInterval).After(time.Now()) {
+				ctxlog.Debug(ctx, "role updates are disabled, skipping...")
 				continue
 			}
 
@@ -65,10 +63,7 @@ func (b *Bot) roleUpdater(ctx context.Context) {
 				}
 			}
 
-			updater.LastTimestamp = time.Now()
-			if err := modelsx.UpsertRoleUpdater(ctx, b.db, updater); err != nil {
-				ctxlog.Error(ctx, "error updating role updater settings in database", zap.Error(err))
-			}
+			ctxlog.Debug(ctx, "updated mettic's role")
 		}
 	}
 }

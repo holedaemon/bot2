@@ -2,9 +2,12 @@ package bot
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
+	"github.com/holedaemon/bot2/internal/db/models"
 	"github.com/holedaemon/bot2/internal/db/modelsx"
 	"github.com/zikaeroh/ctxlog"
 	"go.uber.org/zap"
@@ -72,4 +75,36 @@ func (b *Bot) cmdEgoraptorSetTimeout(ctx context.Context, data cmdroute.CommandD
 	}
 
 	return respondf("Timeout length has been set to %d seconds", seconds)
+}
+
+func (b *Bot) cmdMetticToggle(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	toggled, err := data.Options.Find("toggled").BoolValue()
+	if err != nil {
+		ctxlog.Error(ctx, "error parsing value as bool", zap.Error(err))
+		return respondError("Unable to parse value as a boolean!!")
+	}
+
+	updater, err := modelsx.FetchRoleUpdater(ctx, b.db, scroteGuildID.String())
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			ctxlog.Error(ctx, "error fetching rolre updater", zap.Error(err))
+			return dbError
+		}
+
+		updater = &models.RoleUpdater{
+			GuildID: scroteGuildID.String(),
+		}
+	}
+
+	updater.DoUpdates = toggled
+	if err := modelsx.UpsertRoleUpdater(ctx, b.db, updater); err != nil {
+		ctxlog.Error(ctx, "error upserting role updater", zap.Error(err))
+		return dbError
+	}
+
+	if toggled {
+		return respond("I will now occasionally update Mettic's role")
+	}
+
+	return respond("I will no longer update Mettic's role")
 }

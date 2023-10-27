@@ -25,4 +25,5 @@ const (
 	// holeGuildID        = discord.GuildID(779875531712757800)
 	// holeFortniteRoleID = discord.RoleID(1080472817398710272)
 	// scroteGuildID = discord.GuildID(779875531712757800)
+	// metticRoleID  = discord.RoleID(1167522586868060231)
 )

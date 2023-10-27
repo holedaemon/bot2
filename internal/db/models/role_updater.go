@@ -23,65 +23,58 @@ import (
 
 // RoleUpdater is an object representing the database table.
 type RoleUpdater struct {
-	ID            int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	GuildID       string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
-	DoUpdates     bool      `boil:"do_updates" json:"do_updates" toml:"do_updates" yaml:"do_updates"`
-	LastTimestamp time.Time `boil:"last_timestamp" json:"last_timestamp" toml:"last_timestamp" yaml:"last_timestamp"`
-	CreatedAt     time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt     time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	GuildID   string    `boil:"guild_id" json:"guild_id" toml:"guild_id" yaml:"guild_id"`
+	DoUpdates bool      `boil:"do_updates" json:"do_updates" toml:"do_updates" yaml:"do_updates"`
+	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *roleUpdaterR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L roleUpdaterL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var RoleUpdaterColumns = struct {
-	ID            string
-	GuildID       string
-	DoUpdates     string
-	LastTimestamp string
-	CreatedAt     string
-	UpdatedAt     string
+	ID        string
+	GuildID   string
+	DoUpdates string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:            "id",
-	GuildID:       "guild_id",
-	DoUpdates:     "do_updates",
-	LastTimestamp: "last_timestamp",
-	CreatedAt:     "created_at",
-	UpdatedAt:     "updated_at",
+	ID:        "id",
+	GuildID:   "guild_id",
+	DoUpdates: "do_updates",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 var RoleUpdaterTableColumns = struct {
-	ID            string
-	GuildID       string
-	DoUpdates     string
-	LastTimestamp string
-	CreatedAt     string
-	UpdatedAt     string
+	ID        string
+	GuildID   string
+	DoUpdates string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:            "role_updater.id",
-	GuildID:       "role_updater.guild_id",
-	DoUpdates:     "role_updater.do_updates",
-	LastTimestamp: "role_updater.last_timestamp",
-	CreatedAt:     "role_updater.created_at",
-	UpdatedAt:     "role_updater.updated_at",
+	ID:        "role_updater.id",
+	GuildID:   "role_updater.guild_id",
+	DoUpdates: "role_updater.do_updates",
+	CreatedAt: "role_updater.created_at",
+	UpdatedAt: "role_updater.updated_at",
 }
 
 // Generated where
 
 var RoleUpdaterWhere = struct {
-	ID            whereHelperint64
-	GuildID       whereHelperstring
-	DoUpdates     whereHelperbool
-	LastTimestamp whereHelpertime_Time
-	CreatedAt     whereHelpertime_Time
-	UpdatedAt     whereHelpertime_Time
+	ID        whereHelperint64
+	GuildID   whereHelperstring
+	DoUpdates whereHelperbool
+	CreatedAt whereHelpertime_Time
+	UpdatedAt whereHelpertime_Time
 }{
-	ID:            whereHelperint64{field: "\"role_updater\".\"id\""},
-	GuildID:       whereHelperstring{field: "\"role_updater\".\"guild_id\""},
-	DoUpdates:     whereHelperbool{field: "\"role_updater\".\"do_updates\""},
-	LastTimestamp: whereHelpertime_Time{field: "\"role_updater\".\"last_timestamp\""},
-	CreatedAt:     whereHelpertime_Time{field: "\"role_updater\".\"created_at\""},
-	UpdatedAt:     whereHelpertime_Time{field: "\"role_updater\".\"updated_at\""},
+	ID:        whereHelperint64{field: "\"role_updater\".\"id\""},
+	GuildID:   whereHelperstring{field: "\"role_updater\".\"guild_id\""},
+	DoUpdates: whereHelperbool{field: "\"role_updater\".\"do_updates\""},
+	CreatedAt: whereHelpertime_Time{field: "\"role_updater\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"role_updater\".\"updated_at\""},
 }
 
 // RoleUpdaterRels is where relationship names are stored.
@@ -101,9 +94,9 @@ func (*roleUpdaterR) NewStruct() *roleUpdaterR {
 type roleUpdaterL struct{}
 
 var (
-	roleUpdaterAllColumns            = []string{"id", "guild_id", "do_updates", "last_timestamp", "created_at", "updated_at"}
+	roleUpdaterAllColumns            = []string{"id", "guild_id", "do_updates", "created_at", "updated_at"}
 	roleUpdaterColumnsWithoutDefault = []string{"guild_id"}
-	roleUpdaterColumnsWithDefault    = []string{"id", "do_updates", "last_timestamp", "created_at", "updated_at"}
+	roleUpdaterColumnsWithDefault    = []string{"id", "do_updates", "created_at", "updated_at"}
 	roleUpdaterPrimaryKeyColumns     = []string{"id"}
 	roleUpdaterGeneratedColumns      = []string{}
 )

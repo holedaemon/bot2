@@ -10,7 +10,6 @@ import (
 
 var updaterUpdate = boil.Whitelist(
 	models.RoleUpdaterColumns.DoUpdates,
-	models.RoleUpdaterColumns.LastTimestamp,
 	models.RoleUpdaterColumns.UpdatedAt,
 )
 
