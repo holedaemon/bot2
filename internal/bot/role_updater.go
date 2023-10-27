@@ -15,9 +15,10 @@ import (
 )
 
 const (
-	updateInterval = (time.Hour * 24) * 7
+	updateInterval = time.Hour * 24
 	// updateInterval = time.Minute * 2
-	roleFmt = "%d HOURS IN XIV"
+	updateOncePer = (time.Hour * 24) * 7
+	roleFmt       = "%d HOURS IN XIV"
 )
 
 func (b *Bot) roleUpdater(ctx context.Context) {
@@ -44,6 +45,11 @@ func (b *Bot) roleUpdater(ctx context.Context) {
 				continue
 			}
 
+			if updater.LastTimestamp.Add(updateOncePer).After(time.Now()) {
+				ctxlog.Debug(ctx, "too early to update mettic's role, skipping...")
+				continue
+			}
+
 			games, err := b.steam.GetOwnedGames(ctx, metticSteamID)
 			if err != nil {
 				ctxlog.Error(ctx, "error fetching mettic's games")
@@ -61,6 +67,11 @@ func (b *Bot) roleUpdater(ctx context.Context) {
 						continue
 					}
 				}
+			}
+
+			if err := modelsx.UpsertRoleUpdater(ctx, b.db, updater); err != nil {
+				ctxlog.Error(ctx, "error upsert role updater", zap.Error(err))
+				continue
 			}
 
 			ctxlog.Debug(ctx, "updated mettic's role")

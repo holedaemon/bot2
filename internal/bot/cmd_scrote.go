@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
@@ -92,7 +93,8 @@ func (b *Bot) cmdMetticToggle(ctx context.Context, data cmdroute.CommandData) *a
 		}
 
 		updater = &models.RoleUpdater{
-			GuildID: scroteGuildID.String(),
+			GuildID:       scroteGuildID.String(),
+			LastTimestamp: time.Now(),
 		}
 	}
 

@@ -6,6 +6,7 @@ CREATE TABLE role_updater (
     guild_id text NOT NULL,
 
     do_updates boolean NOT NULL DEFAULT 'false',
+    last_timestamp timestamp NOT NULL DEFAULT NOW(),
 
     created_at timestamp NOT NULL DEFAULT NOW(),
     updated_at timestamp NOT NULL DEFAULT NOW(),
