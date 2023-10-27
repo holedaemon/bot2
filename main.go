@@ -32,6 +32,7 @@ type BotOptions struct {
 	DSN               string        `env:"BOT2_DSN"`
 	TopsterAddr       string        `env:"BOT2_TOPSTER_ADDR"`
 	SiteAddr          string        `env:"BOT2_SITE_ADDR"`
+	SteamAPIKey       string        `env:"BOT2_STEAM_API_KEY"`
 	DBMaxAttempts     int           `env:"BOT2_DB_MAX_ATTEMPTS" envDefault:"10"`
 	DBTimeoutDuration time.Duration `env:"BOT2_DB_TIMEOUT_DURATION" envDefault:"20s"`
 }
@@ -131,6 +132,7 @@ func runBot() {
 		bot.WithDebug(opts.Debug),
 		bot.WithTopsterAddr(opts.TopsterAddr),
 		bot.WithSiteAddr(opts.SiteAddr),
+		bot.WithSteamAPIKey(opts.SteamAPIKey),
 		bot.WithAdmins(admins...),
 	)
 	if err != nil {

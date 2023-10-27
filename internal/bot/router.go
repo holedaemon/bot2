@@ -94,5 +94,9 @@ func (b *Bot) router() *cmdroute.Router {
 		r.AddFunc("settimeout", b.cmdEgoraptorSetTimeout)
 	})
 
+	r.Sub("mettic", func(r *cmdroute.Router) {
+		r.AddFunc("toggle", b.cmdMetticToggle)
+	})
+
 	return r
 }

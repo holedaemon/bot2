@@ -8,6 +8,7 @@ var TableNames = struct {
 	EgoraptorMentions string
 	Guilds            string
 	Quotes            string
+	RoleUpdater       string
 	Roles             string
 	Sessions          string
 	Tags              string
@@ -17,6 +18,7 @@ var TableNames = struct {
 	EgoraptorMentions: "egoraptor_mentions",
 	Guilds:            "guilds",
 	Quotes:            "quotes",
+	RoleUpdater:       "role_updater",
 	Roles:             "roles",
 	Sessions:          "sessions",
 	Tags:              "tags",

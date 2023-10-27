@@ -65,3 +65,10 @@ func WithSiteAddr(site string) Option {
 		b.siteAddress = site
 	}
 }
+
+// WithSteamAPIKey sets a Bot's Steam API key.
+func WithSteamAPIKey(key string) Option {
+	return func(b *Bot) {
+		b.steamAPIKey = key
+	}
+}
