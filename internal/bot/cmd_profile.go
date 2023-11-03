@@ -52,7 +52,7 @@ func (b *Bot) cmdProfileInit(ctx context.Context, data cmdroute.CommandData) *ap
 		return dbError
 	}
 
-	return respond("Your profile has been created")
+	return respondSilent("Your profile has been created")
 }
 
 func (b *Bot) cmdProfileDelete(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
@@ -63,7 +63,7 @@ func (b *Bot) cmdProfileDelete(ctx context.Context, data cmdroute.CommandData) *
 	}
 
 	if !confirmation {
-		return respond("Stop wasting my time...")
+		return respondSilent("Stop wasting my time...")
 	}
 
 	id := data.Event.SenderID()
@@ -75,7 +75,7 @@ func (b *Bot) cmdProfileDelete(ctx context.Context, data cmdroute.CommandData) *
 	p, err := modelsx.FetchUserProfile(ctx, b.db, id.String())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return respond("Can't delete a profile if you don't have one...")
+			return respondSilent("Can't delete a profile if you don't have one...")
 		}
 
 		ctxlog.Error(ctx, "error fetching profile", zap.Error(err))
@@ -87,7 +87,7 @@ func (b *Bot) cmdProfileDelete(ctx context.Context, data cmdroute.CommandData) *
 		return dbError
 	}
 
-	return respond("Your profile has been deleted")
+	return respondSilent("Your profile has been deleted")
 }
 
 func (b *Bot) cmdProfileGet(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
@@ -108,7 +108,7 @@ func (b *Bot) cmdProfileGet(ctx context.Context, data cmdroute.CommandData) *api
 	}
 
 	addr := fmt.Sprintf("%s/profile", b.siteAddress)
-	return respondf("You can find your profile at <%s>", addr)
+	return respondSilentf("You can find your profile at <%s>", addr)
 }
 
 func (b *Bot) cmdProfileSetTimezone(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
@@ -143,5 +143,5 @@ func (b *Bot) cmdProfileSetTimezone(ctx context.Context, data cmdroute.CommandDa
 		return dbError
 	}
 
-	return respondf("Your timezone has been set to `%s`", tz)
+	return respondSilentf("Your timezone has been set to `%s`", tz)
 }

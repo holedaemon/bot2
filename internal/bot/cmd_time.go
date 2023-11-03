@@ -119,5 +119,5 @@ func (b *Bot) cmdTimeStamp(ctx context.Context, data cmdroute.CommandData) *api.
 
 	formatStr := formatMap[format]
 	formatStr = fmt.Sprintf(formatStr, res.Time.Unix())
-	return respondf("`%s`", formatStr)
+	return respondSilentf("`%s`", formatStr)
 }

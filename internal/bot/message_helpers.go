@@ -71,6 +71,22 @@ func respondErrorf(msg string, args ...interface{}) *api.InteractionResponseData
 	return respondError(msg)
 }
 
+func respondSilent(msg string) *api.InteractionResponseData {
+	if msg == "" {
+		panic("bot: blank string given to respondSilent")
+	}
+
+	return &api.InteractionResponseData{
+		Content: option.NewNullableString(msg),
+		Flags:   discord.EphemeralMessage,
+	}
+}
+
+func respondSilentf(msg string, args ...any) *api.InteractionResponseData {
+	msg = fmt.Sprintf(msg, args...)
+	return respondSilent(msg)
+}
+
 func respond(msg string) *api.InteractionResponseData {
 	if msg == "" {
 		panic("bot: blank string given to respond")
