@@ -24,20 +24,20 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type BotOptions struct {
-	Debug             bool          `env:"BOT2_DEBUG" envDefault:"false"`
-	Admins            []string      `env:"BOT2_ADMINS"`
-	Token             string        `env:"BOT2_TOKEN"`
-	WebhookURL        string        `env:"BOT2_WEBHOOK_URL"`
-	DSN               string        `env:"BOT2_DSN"`
-	TopsterAddr       string        `env:"BOT2_TOPSTER_ADDR"`
-	SiteAddr          string        `env:"BOT2_SITE_ADDR"`
-	SteamAPIKey       string        `env:"BOT2_STEAM_API_KEY"`
-	DBMaxAttempts     int           `env:"BOT2_DB_MAX_ATTEMPTS" envDefault:"10"`
-	DBTimeoutDuration time.Duration `env:"BOT2_DB_TIMEOUT_DURATION" envDefault:"20s"`
+type botOptions struct {
+	Debug             bool          `env:"BOT2_BOT_DEBUG" envDefault:"false"`
+	Admins            []string      `env:"BOT2_BOT_ADMINS"`
+	Token             string        `env:"BOT2_BOT_TOKEN"`
+	WebhookURL        string        `env:"BOT2_BOT_WEBHOOK_URL"`
+	DSN               string        `env:"BOT2_BOT_DSN"`
+	TopsterAddr       string        `env:"BOT2_BOT_TOPSTER_ADDR"`
+	SiteAddr          string        `env:"BOT2_BOT_SITE_ADDR"`
+	SteamAPIKey       string        `env:"BOT2_BOT_STEAM_API_KEY"`
+	DBMaxAttempts     int           `env:"BOT2_BOT_DB_MAX_ATTEMPTS" envDefault:"10"`
+	DBTimeoutDuration time.Duration `env:"BOT2_BOT_DB_TIMEOUT_DURATION" envDefault:"20s"`
 }
 
-type WebOptions struct {
+type webOptions struct {
 	Debug  bool              `env:"BOT2_WEB_DEBUG" envDefault:"false"`
 	Addr   string            `env:"BOT2_WEB_ADDR" envDefault:":8080"`
 	Admins map[string]string `env:"BOT2_WEB_ADMINS"`
@@ -70,7 +70,7 @@ func main() {
 }
 
 func runBot() {
-	opts := &BotOptions{}
+	opts := &botOptions{}
 	eo := env.Options{
 		RequiredIfNoDef: true,
 	}
@@ -145,7 +145,7 @@ func runBot() {
 }
 
 func runWeb() {
-	opts := &WebOptions{}
+	opts := &webOptions{}
 	eo := env.Options{
 		RequiredIfNoDef: true,
 	}
