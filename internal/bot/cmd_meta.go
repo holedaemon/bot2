@@ -3,6 +3,7 @@ package bot
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
@@ -100,4 +101,30 @@ func (b *Bot) cmdPanic(ctx context.Context, data cmdroute.CommandData) *api.Inte
 
 	ctxlog.Error(ctx, "why should we panic when we can just log?")
 	return respond("Nothing to see here!!")
+}
+
+func (b *Bot) cmdChangelog(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	release, _, err := b.github.Repositories.GetLatestRelease(ctx, repoOwner, repoName)
+	if err != nil {
+		ctxlog.Error(ctx, "error fetching github release", zap.Error(err))
+		return respondError("Unable to fetch GitHub release...")
+	}
+
+	var sb strings.Builder
+
+	if release.Name != nil {
+		sb.WriteString("# " + release.GetName() + "\n")
+	}
+
+	if release.Body != nil {
+		sb.WriteString(release.GetBody())
+	} else {
+		sb.WriteString("Release doesn't have a body...")
+	}
+
+	if release.URL != nil {
+		sb.WriteString("\n" + release.GetURL())
+	}
+
+	return respond(sb.String())
 }
