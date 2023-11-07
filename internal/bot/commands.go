@@ -243,9 +243,10 @@ var commands = commandList{
 	{
 		Scoped: 0,
 		Data: api.CreateCommandData{
-			Name:           "quote",
-			Description:    "Interact with guild quotes",
-			NoDMPermission: true,
+			Name:                     "quote",
+			Description:              "Interact with guild quotes",
+			NoDMPermission:           true,
+			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageMessages),
 			Options: discord.CommandOptions{
 				discord.NewSubcommandOption(
 					"delete",
