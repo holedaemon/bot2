@@ -48,6 +48,30 @@
         ]
     },
     {
+        "title": "Q",
+        "description": "Query guild quotes",
+        "commands": [
+            {
+                "name": "q [user] [index]",
+                "description": "Query a guild quote. Quotes are added by reacting to messages with 💬"
+            }
+        ]
+    },
+    {
+        "title": "QUOTE",
+        "description": "Interact with guild quotes",
+        "commands": [
+            {
+                "name": "quote delete <index>",
+                "description": "Delete a quote. Must have manage server permission, be the author of the message, or the user that added the quote"
+            },
+            {
+                "name": "quote list",
+                "description": "Get the guild's list of quotes"
+            }
+        ]
+    },
+    {
         "title": "PROFILE",
         "description": "User command pertaining to user profiles",
         "commands": [
