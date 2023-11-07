@@ -6,6 +6,9 @@ const (
 	// Generalized
 	fakeCDN = "https://holedaemon.net/images"
 
+	repoOwner = "holedaemon"
+	repoName  = "bot2"
+
 	// Testing specific
 	testGuildID        = discord.GuildID(779875531712757800)
 	testFortniteRoleID = discord.RoleID(1080472817398710272)

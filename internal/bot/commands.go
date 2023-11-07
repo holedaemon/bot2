@@ -70,6 +70,13 @@ var commands = commandList{
 		},
 	},
 	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:        "changelog",
+			Description: "Get the bot's changelog from GitHub",
+		},
+	},
+	{
 		Scoped: testGuildID,
 		Data: api.CreateCommandData{
 			Name:                     "panic",

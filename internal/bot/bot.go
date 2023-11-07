@@ -12,6 +12,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/state"
+	"github.com/google/go-github/v56/github"
 	"github.com/holedaemon/bot2/internal/api/jerkcity"
 	"github.com/holedaemon/bot2/internal/api/steam"
 	"github.com/holedaemon/bot2/internal/api/topster"
@@ -39,6 +40,7 @@ type Bot struct {
 	jerkcity *jerkcity.Client
 	topster  *topster.Client
 	steam    *steam.Client
+	github   *github.Client
 	db       *sql.DB
 
 	admins map[discord.UserID]struct{}
@@ -57,6 +59,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 	b := &Bot{
 		jerkcity:   jerkcity.New(),
 		imageCache: imagecache.New(),
+		github:     github.NewClient(nil),
 		admins:     make(map[discord.UserID]struct{}),
 		state:      state.New("Bot " + token),
 	}
