@@ -122,9 +122,5 @@ func (b *Bot) cmdChangelog(ctx context.Context, data cmdroute.CommandData) *api.
 		sb.WriteString("Release doesn't have a body...")
 	}
 
-	if release.URL != nil {
-		sb.WriteString("\n" + release.GetURL())
-	}
-
 	return respond(sb.String())
 }
