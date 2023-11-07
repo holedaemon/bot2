@@ -257,6 +257,10 @@ var commands = commandList{
 						true,
 					),
 				),
+				discord.NewSubcommandOption(
+					"list",
+					"Get a list of guild quotes",
+				),
 			},
 		},
 	},

@@ -296,3 +296,15 @@ func (b *Bot) cmdQuoteDelete(ctx context.Context, data cmdroute.CommandData) *ap
 
 	return respondf("Quote #%d has been deleted", index)
 }
+
+func (b *Bot) cmdQuoteList(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	addr := fmt.Sprintf("%s/guild/%s/quotes", b.siteAddress, data.Event.GuildID.String())
+
+	guild, err := b.state.Guild(data.Event.GuildID)
+	if err != nil {
+		ctxlog.Error(ctx, "error fetching guild", zap.Error(err), zap.String("guild_id", data.Event.GuildID.String()))
+		return respondError("There was an error fetching the guild :(")
+	}
+
+	return respondf("Quotes for %s can be found at <%s>", guild.Name, addr)
+}

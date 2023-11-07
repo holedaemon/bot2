@@ -87,6 +87,7 @@ func (b *Bot) router() *cmdroute.Router {
 	r.AddFunc("q", b.cmdQ)
 	r.Sub("quote", func(r *cmdroute.Router) {
 		r.AddFunc("delete", b.cmdQuoteDelete)
+		r.AddFunc("list", b.cmdQuoteList)
 	})
 
 	r.Sub("egoraptor", func(r *cmdroute.Router) {
