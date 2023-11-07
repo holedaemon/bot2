@@ -42,7 +42,7 @@ func (b *Bot) cmdInfo(ctx context.Context, data cmdroute.CommandData) *api.Inter
 			},
 			{
 				Name:   "Wow",
-				Value:  "[Website](https://dilf.holedaemon.net)",
+				Value:  "[Website](https://bot.holedaemon.net)",
 				Inline: true,
 			},
 		},
