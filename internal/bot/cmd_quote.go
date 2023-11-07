@@ -279,6 +279,16 @@ func (b *Bot) cmdQuoteDelete(ctx context.Context, data cmdroute.CommandData) *ap
 		return dbError
 	}
 
+	perms, err := b.state.Permissions(data.Event.ChannelID, data.Event.Member.User.ID)
+	if err != nil {
+		ctxlog.Error(ctx, "error checking permissions for user", zap.String("user_id", data.Event.Member.User.ID.String()))
+		return respondError("Error reading your permissions...!")
+	}
+
+	if !perms.Has(discord.PermissionManageMessages) && data.Event.Member.User.ID.String() != quote.QuotedID && data.Event.Member.User.ID.String() != quote.QuoterID.String {
+		return respondError("You lack permission to delete this quote!!")
+	}
+
 	if err := quote.Delete(ctx, b.db); err != nil {
 		ctxlog.Error(ctx, "error deleting quote", zap.Error(err))
 		return dbError
