@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"net/http"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
@@ -62,12 +63,15 @@ func (b *Bot) cmdTopster(ctx context.Context, data cmdroute.CommandData) *api.In
 			return respondErrorf("Your chart options are wrong: %s", err.Error())
 		}
 
-		ctxlog.Error(ctx, "error creating topster chart", zap.Error(err))
-
-		switch err.(type) {
+		switch te := err.(type) {
 		case *topster.Error:
+			if te.HTTPStatus == http.StatusInternalServerError {
+				ctxlog.Error(ctx, "error generating topster chart", zap.Error(err))
+			}
+
 			return respondErrorf("Rut roh, something went wrong. Topster says: %s", err.Error())
 		default:
+			ctxlog.Error(ctx, "error creating topster chart", zap.Error(err))
 			return respondError("Oops, an unknown error has occurred. Try again later.")
 		}
 	}
