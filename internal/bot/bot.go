@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -110,7 +111,11 @@ func New(token string, opts ...Option) (*Bot, error) {
 			b.topsterAddr = "https://" + b.topsterAddr
 		}
 
-		tp, err := topster.New(b.topsterAddr)
+		topsterClient := &http.Client{
+			Timeout: time.Second * 20,
+		}
+
+		tp, err := topster.New(b.topsterAddr, topster.WithHTTPClient(topsterClient))
 		if err != nil {
 			return nil, fmt.Errorf("%w: creating topster client", err)
 		}
