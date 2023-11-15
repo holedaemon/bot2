@@ -8,6 +8,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
+	"github.com/diamondburned/arikawa/v3/api/webhook"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/holedaemon/bot2/internal/version"
@@ -123,4 +124,59 @@ func (b *Bot) cmdChangelog(ctx context.Context, data cmdroute.CommandData) *api.
 	}
 
 	return respond(sb.String())
+}
+
+var feedbackEmbedColor = discord.Color(1815851)
+
+func makeFeedbackEmbed(data cmdroute.CommandData) discord.Embed {
+	sender := data.Event.Sender()
+
+	embed := discord.Embed{
+		Title:     "Feedback Submitted",
+		Color:     feedbackEmbedColor,
+		Timestamp: discord.NewTimestamp(time.Now()),
+	}
+
+	if sender != nil {
+		embed.Author = &discord.EmbedAuthor{
+			Name: sender.Username,
+			Icon: sender.AvatarURL(),
+		}
+	}
+
+	embed.Fields = append(embed.Fields,
+		discord.EmbedField{
+			Name:  "Feedback",
+			Value: data.Options.Find("feedback").String(),
+		},
+		discord.EmbedField{
+			Name:  "Channel ID",
+			Value: data.Event.ChannelID.String(),
+		},
+	)
+
+	return embed
+}
+
+func (b *Bot) cmdFeedback(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	if b.feedbackWebhook == nil {
+		return respondSilent("Submitting feedback has been disabled...!")
+	}
+
+	if data.Options.Find("feedback").String() == "" {
+		return respondError("You gotta provide some feedback to use this command...")
+	}
+
+	hookData := webhook.ExecuteData{
+		Embeds: []discord.Embed{
+			makeFeedbackEmbed(data),
+		},
+	}
+
+	if err := b.feedbackWebhook.Execute(hookData); err != nil {
+		ctxlog.Error(ctx, "error firing feedback hook", zap.Error(err))
+		return respondError("There was an error submitting your feedback. Try again later!")
+	}
+
+	return respondSilent("Your feedback has been recorded")
 }

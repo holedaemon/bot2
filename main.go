@@ -25,16 +25,17 @@ import (
 )
 
 type botOptions struct {
-	Debug             bool          `env:"BOT2_BOT_DEBUG" envDefault:"false"`
-	Admins            []string      `env:"BOT2_BOT_ADMINS"`
-	Token             string        `env:"BOT2_BOT_TOKEN"`
-	WebhookURL        string        `env:"BOT2_BOT_WEBHOOK_URL"`
-	DSN               string        `env:"BOT2_BOT_DSN"`
-	TopsterAddr       string        `env:"BOT2_BOT_TOPSTER_ADDR"`
-	SiteAddr          string        `env:"BOT2_BOT_SITE_ADDR"`
-	SteamAPIKey       string        `env:"BOT2_BOT_STEAM_API_KEY"`
-	DBMaxAttempts     int           `env:"BOT2_BOT_DB_MAX_ATTEMPTS" envDefault:"10"`
-	DBTimeoutDuration time.Duration `env:"BOT2_BOT_DB_TIMEOUT_DURATION" envDefault:"20s"`
+	Debug              bool          `env:"BOT2_BOT_DEBUG" envDefault:"false"`
+	Admins             []string      `env:"BOT2_BOT_ADMINS"`
+	Token              string        `env:"BOT2_BOT_TOKEN"`
+	LoggingWebhookURL  string        `env:"BOT2_BOT_LOGGING_WEBHOOK_URL"`
+	FeedbackWebhookURL string        `env:"BOT2_BOT_FEEDBACK_WEBHOOK_URL"`
+	DSN                string        `env:"BOT2_BOT_DSN"`
+	TopsterAddr        string        `env:"BOT2_BOT_TOPSTER_ADDR"`
+	SiteAddr           string        `env:"BOT2_BOT_SITE_ADDR"`
+	SteamAPIKey        string        `env:"BOT2_BOT_STEAM_API_KEY"`
+	DBMaxAttempts      int           `env:"BOT2_BOT_DB_MAX_ATTEMPTS" envDefault:"10"`
+	DBTimeoutDuration  time.Duration `env:"BOT2_BOT_DB_TIMEOUT_DURATION" envDefault:"20s"`
 }
 
 type webOptions struct {
@@ -120,15 +121,21 @@ func runBot() {
 		logger.Fatal("max database attempts reached", zap.Int("attempts", opts.DBMaxAttempts))
 	}
 
-	hook, err := webhook.NewFromURL(opts.WebhookURL)
+	logHook, err := webhook.NewFromURL(opts.LoggingWebhookURL)
 	if err != nil {
-		logger.Fatal("error creating webhook", zap.Error(err))
+		logger.Fatal("error creating logging webhook", zap.Error(err))
+	}
+
+	feedHook, err := webhook.NewFromURL(opts.FeedbackWebhookURL)
+	if err != nil {
+		logger.Fatal("error creating feedback webhook", zap.Error(err))
 	}
 
 	b, err := bot.New(
 		opts.Token,
 		bot.WithDB(db),
-		bot.WithWebhook(hook),
+		bot.WithLoggingWebhook(logHook),
+		bot.WithFeedbackWebhook(feedHook),
 		bot.WithDebug(opts.Debug),
 		bot.WithTopsterAddr(opts.TopsterAddr),
 		bot.WithSiteAddr(opts.SiteAddr),

@@ -415,4 +415,14 @@ var commands = commandList{
 			},
 		},
 	},
+	{
+		Scoped: 0,
+		Data: api.CreateCommandData{
+			Name:        "feedback",
+			Description: "Submit bot feedback, ideas, or tell the owner they suck",
+			Options: discord.CommandOptions{
+				discord.NewStringOption("feedback", "Your feedback", true),
+			},
+		},
+	},
 }

@@ -52,10 +52,17 @@ func WithTopsterAddr(t string) Option {
 	}
 }
 
-// WithWebhook sets the Bot's error log webhook.
-func WithWebhook(hook *webhook.Client) Option {
+// WithLoggingWebhook sets the Bot's error log webhook.
+func WithLoggingWebhook(hook *webhook.Client) Option {
 	return func(b *Bot) {
-		b.webhook = hook
+		b.loggingWebhook = hook
+	}
+}
+
+// WithFeedbackWebhook sets the Bot's feedback webhook.
+func WithFeedbackWebhook(hook *webhook.Client) Option {
+	return func(b *Bot) {
+		b.feedbackWebhook = hook
 	}
 }
 

@@ -34,6 +34,7 @@ func (b *Bot) router() *cmdroute.Router {
 	r.AddFunc("topster", b.cmdTopster)
 	r.AddFunc("tag", b.cmdTag)
 	r.AddFunc("changelog", b.cmdChangelog)
+	r.AddFunc("feedback", b.cmdFeedback)
 
 	r.Sub("jerkcity", func(r *cmdroute.Router) {
 		r.AddFunc("latest", b.cmdJerkcityLatest)

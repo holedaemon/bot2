@@ -34,9 +34,10 @@ type Bot struct {
 	siteAddress string
 	steamAPIKey string
 
-	state   *state.State
-	webhook *webhook.Client
-	logger  *zap.Logger
+	state           *state.State
+	loggingWebhook  *webhook.Client
+	feedbackWebhook *webhook.Client
+	logger          *zap.Logger
 
 	jerkcity *jerkcity.Client
 	topster  *topster.Client
@@ -92,12 +93,16 @@ func New(token string, opts ...Option) (*Bot, error) {
 	}
 
 	// optional options
-	if b.webhook == nil {
+	if b.loggingWebhook == nil {
 		b.logger.Warn("webhook logs have been disabled")
 	} else {
 		b.logger = b.logger.WithOptions(
 			zap.Hooks(b.webhookHook),
 		)
+	}
+
+	if b.feedbackWebhook == nil {
+		b.logger.Warn("feedback webhook has been disabled")
 	}
 
 	if len(b.admins) == 0 {
@@ -212,7 +217,7 @@ func (b *Bot) isAdmin(sf discord.UserID) bool {
 }
 
 func (b *Bot) webhookHook(entry zapcore.Entry) error {
-	if b.webhook == nil {
+	if b.loggingWebhook == nil {
 		return nil
 	}
 
@@ -226,5 +231,5 @@ func (b *Bot) webhookHook(entry zapcore.Entry) error {
 		Content:   entry.Message,
 	}
 
-	return b.webhook.Execute(data)
+	return b.loggingWebhook.Execute(data)
 }
