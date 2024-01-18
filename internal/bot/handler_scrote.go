@@ -80,3 +80,27 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 		}
 	}
 }
+
+func (b *Bot) onScroteDeparture(ctx context.Context, e *gateway.GuildMemberRemoveEvent) {
+	guildName := "SCROTEGANG"
+
+	guild, err := b.state.Guild(e.GuildID)
+	if err != nil {
+		ctxlog.Error(ctx, "error retrieving guild from cache", zap.Error(err))
+	} else {
+		guildName = guild.Name
+	}
+
+	msg := fmt.Sprintf("%s (%s) has left %s please advise", e.User.Username, e.User.ID.String(), guildName)
+
+	ch, err := b.state.CreatePrivateChannel(dylanDMID)
+	if err != nil {
+		ctxlog.Error(ctx, "error creating private channel", zap.Error(err))
+		return
+	}
+
+	_, err = b.state.SendMessage(ch.ID, msg)
+	if err != nil {
+		ctxlog.Error(ctx, "error sending message leave notification", zap.Error(err))
+	}
+}

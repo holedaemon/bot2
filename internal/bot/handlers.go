@@ -122,3 +122,16 @@ func (b *Bot) onMessage(m *gateway.MessageCreateEvent) {
 		return
 	}
 }
+
+func (b *Bot) onGuildMemberRemove(e *gateway.GuildMemberRemoveEvent) {
+	ctx := context.Background()
+	ctx = ctxlog.WithLogger(ctx, b.logger)
+	ctx = ctxlog.With(ctx, zap.String("guild_Id", e.GuildID.String()))
+
+	ctxlog.Info(ctx, "a user has left a server", zap.String("username", e.User.Username), zap.String("user_id", e.User.ID.String()))
+
+	if e.GuildID == scroteGuildID {
+		b.onScroteDeparture(ctx, e)
+		return
+	}
+}

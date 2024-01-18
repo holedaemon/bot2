@@ -147,6 +147,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 	b.state.AddHandler(b.onGuildCreate)
 	b.state.AddHandler(b.onGuildUpdate)
 	b.state.AddHandler(b.onGuildRoleDelete)
+	b.state.AddHandler(b.onGuildMemberRemove)
 	b.state.AddHandler(b.onMessage)
 	b.state.AddHandler(b.onReconnect)
 	b.state.AddHandler(b.onMessageReactionAdd)
@@ -154,7 +155,7 @@ func New(token string, opts ...Option) (*Bot, error) {
 
 	r := b.router()
 	b.state.AddInteractionHandler(r)
-	b.state.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages | gateway.IntentGuildMessageReactions)
+	b.state.AddIntents(gateway.IntentGuilds | gateway.IntentGuildMessages | gateway.IntentGuildMessageReactions | gateway.IntentDirectMessages | gateway.IntentGuildMembers)
 
 	if b.debug {
 		commands = commands.Scoped(testGuildID)
