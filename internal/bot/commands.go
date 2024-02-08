@@ -425,4 +425,13 @@ var commands = commandList{
 			},
 		},
 	},
+	{
+		Scoped: jennaGuildID,
+		Data: api.CreateCommandData{
+			Name:                     "stfu",
+			Description:              "Tell everyone to use a thread for their argument.",
+			NoDMPermission:           true,
+			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionAdministrator),
+		},
+	},
 }
