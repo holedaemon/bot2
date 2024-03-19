@@ -56,6 +56,15 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 			return
 		}
 
+		data.Count++
+		data.LastTimestamp = time.Now().In(azLoc)
+		data.LastUser = m.Author.ID.String()
+
+		err = modelsx.UpsertSetting(ctx, b.db, data)
+		if err != nil {
+			ctxlog.Error(ctx, "error upserting egoraptor mention", zap.Error(err))
+		}
+
 		if data.TimeoutOnMention {
 			time.Sleep(time.Second * 10)
 			duration := time.Duration(data.TimeoutLength) * time.Second
@@ -68,15 +77,6 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 			if err != nil {
 				ctxlog.Error(ctx, "error timing user out", zap.Error(err))
 			}
-		}
-
-		data.Count++
-		data.LastTimestamp = time.Now().In(azLoc)
-		data.LastUser = m.Author.ID.String()
-
-		err = modelsx.UpsertSetting(ctx, b.db, data)
-		if err != nil {
-			ctxlog.Error(ctx, "error upserting egoraptor mention", zap.Error(err))
 		}
 	}
 }
