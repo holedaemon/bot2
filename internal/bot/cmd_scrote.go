@@ -4,10 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/api/cmdroute"
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/holedaemon/bot2/internal/db/models"
 	"github.com/holedaemon/bot2/internal/db/modelsx"
 	"github.com/zikaeroh/ctxlog"
@@ -109,4 +111,50 @@ func (b *Bot) cmdMetticToggle(ctx context.Context, data cmdroute.CommandData) *a
 	}
 
 	return respond("I will no longer update Mettic's role")
+}
+
+var leaderboardMap = map[int]string{
+	0: "🥇",
+	1: "🥈",
+	2: "🥉",
+}
+
+func (b *Bot) cmdLeaderboard(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
+	mentions, err := modelsx.FetchTopThreeMentions(ctx, b.db, data.Event.GuildID)
+	if err != nil {
+		ctxlog.Error(ctx, "error fetching mentions from database", zap.Error(err))
+		return dbError
+	}
+
+	if len(mentions) == 0 {
+		return respond("There aren't any users to shame...")
+	}
+
+	e := discord.Embed{
+		Title: "Egoraptor Leaderboard",
+	}
+
+	fields := make([]discord.EmbedField, 0, 3)
+
+	for i, m := range mentions {
+		sf, err := discord.ParseSnowflake(m.UserID)
+		if err != nil {
+			ctxlog.Error(ctx, "error parsing snowflake", zap.Error(err))
+			return respondError("Error building leaderboard...")
+		}
+
+		user, err := b.state.User(discord.UserID(sf))
+		if err != nil {
+			ctxlog.Error(ctx, "error fetching user", zap.Error(err))
+			return respondError("Error fetching user for leaderboard...")
+		}
+
+		fields = append(fields, discord.EmbedField{
+			Name:  fmt.Sprintf("%s **%s**", leaderboardMap[i], user.DisplayOrUsername()),
+			Value: fmt.Sprintf("with **%d** mentions", m.Count),
+		})
+	}
+
+	e.Fields = fields
+	return respondEmbeds(e)
 }

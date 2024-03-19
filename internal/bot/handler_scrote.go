@@ -62,7 +62,14 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 
 		err = modelsx.UpsertSetting(ctx, b.db, data)
 		if err != nil {
-			ctxlog.Error(ctx, "error upserting egoraptor mention", zap.Error(err))
+			ctxlog.Error(ctx, "error upserting egoraptor settings", zap.Error(err))
+			return
+		}
+
+		err = modelsx.BumpMention(ctx, b.db, m.GuildID, m.Author.ID)
+		if err != nil {
+			ctxlog.Error(ctx, "error bumping egoraptor mention", zap.Error(err))
+			return
 		}
 
 		if data.TimeoutOnMention {

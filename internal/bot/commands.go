@@ -222,6 +222,14 @@ var commands = commandList{
 	{
 		Scoped: scroteGuildID,
 		Data: api.CreateCommandData{
+			Name:           "leaderboard",
+			Description:    "Leaderboard for Egoraptor mentions",
+			NoDMPermission: true,
+		},
+	},
+	{
+		Scoped: scroteGuildID,
+		Data: api.CreateCommandData{
 			Name:                     "mettic",
 			Description:              "Moderator commands for updating Mettic's role on an interval",
 			DefaultMemberPermissions: discord.NewPermissions(discord.PermissionManageGuild),
