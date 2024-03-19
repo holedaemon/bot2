@@ -32,7 +32,7 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 	thingsCheck := wordInContent(m.Content, egoraptorThings)
 
 	if namesCheck && thingsCheck {
-		data, err := modelsx.FetchMention(ctx, b.db, m.GuildID)
+		data, err := modelsx.FetchSetting(ctx, b.db, m.GuildID)
 		if err != nil {
 			ctxlog.Error(ctx, "error querying egoraptor mention", zap.Error(err))
 			return
@@ -74,7 +74,7 @@ func (b *Bot) onScroteMessage(ctx context.Context, m *gateway.MessageCreateEvent
 		data.LastTimestamp = time.Now().In(azLoc)
 		data.LastUser = m.Author.ID.String()
 
-		err = modelsx.UpsertMention(ctx, b.db, data)
+		err = modelsx.UpsertSetting(ctx, b.db, data)
 		if err != nil {
 			ctxlog.Error(ctx, "error upserting egoraptor mention", zap.Error(err))
 		}
