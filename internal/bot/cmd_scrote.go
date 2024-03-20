@@ -119,6 +119,8 @@ var leaderboardMap = map[int]string{
 	2: "🥉",
 }
 
+var leaderboardEmbedColor = discord.Color(14360865)
+
 func (b *Bot) cmdLeaderboard(ctx context.Context, data cmdroute.CommandData) *api.InteractionResponseData {
 	mentions, err := modelsx.FetchTopThreeMentions(ctx, b.db, data.Event.GuildID)
 	if err != nil {
@@ -132,6 +134,7 @@ func (b *Bot) cmdLeaderboard(ctx context.Context, data cmdroute.CommandData) *ap
 
 	e := discord.Embed{
 		Title: "Egoraptor Leaderboard",
+		Color: leaderboardEmbedColor,
 	}
 
 	fields := make([]discord.EmbedField, 0, 3)
@@ -143,15 +146,23 @@ func (b *Bot) cmdLeaderboard(ctx context.Context, data cmdroute.CommandData) *ap
 			return respondError("Error building leaderboard...")
 		}
 
-		user, err := b.state.User(discord.UserID(sf))
+		nick, err := b.state.MemberDisplayName(data.Event.GuildID, discord.UserID(sf))
 		if err != nil {
-			ctxlog.Error(ctx, "error fetching user", zap.Error(err))
-			return respondError("Error fetching user for leaderboard...")
+			ctxlog.Error(ctx, "error fetching user nickname", zap.Error(err))
+			return respondError("Error fetching user nickname...")
+		}
+
+		name := fmt.Sprintf("%s **%s**", leaderboardMap[i], nick)
+		var value string
+		if m.Count == 1 {
+			value = "**1** mention"
+		} else {
+			value = fmt.Sprintf("**%d** mentions", m.Count)
 		}
 
 		fields = append(fields, discord.EmbedField{
-			Name:  fmt.Sprintf("%s **%s**", leaderboardMap[i], user.DisplayOrUsername()),
-			Value: fmt.Sprintf("with **%d** mentions", m.Count),
+			Name:  name,
+			Value: value,
 		})
 	}
 
